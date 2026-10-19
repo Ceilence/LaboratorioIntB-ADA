@@ -1,4 +1,4 @@
-package org.example;
+package TheKnife;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -45,7 +45,7 @@ public class ImportatoreCSV {
 
             int contatore = 0;
 
-            System.out.println("Inizio importazione nel database. Attendi...");
+            System.out.println("Importazione nel database...");
 
             for (CSVRecord record : records) {
 
