@@ -14,9 +14,9 @@ public class DatabaseManager {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Connessione al database the_knife stabilita con successo!");
+            System.out.println("Connessione al database stabilita con successo");
         } catch (SQLException e) {
-            System.out.println("Errore durante la connessione al database.");
+            System.out.println("Errore durante la connessione al database");
             e.printStackTrace();
         }
         return conn;
