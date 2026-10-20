@@ -1,7 +1,7 @@
-package TheKnife.DAO;
+package theknife.dao;
 
-import TheKnife.DB.DatabaseManager;
-import TheKnife.Essenziali.Ristorante;
+import theknife.db.DatabaseManager;
+import theknife.essenziali.Ristorante;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Classe Data Access Object (DAO) per la gestione della persistenza dell'entit&agrave; <code>Ristorante</code>.
+ * Classe Data Access Object (DAO) per la gestione della persistenza dell'entitá <code>Ristorante</code>.
  * <p>
  * Fornisce i metodi per eseguire le operazioni CRUD e le ricerche filtrate sulla tabella
  * <code>RistorantiTheKnife</code> del database PostgreSQL tramite JDBC.
- * @author Alessandro Frigerio
+ * @author Alessandro Frigerio, Antonio Pardo, Davide Moretti
  */
 public class RistoranteDAO {
 
@@ -83,19 +83,19 @@ public class RistoranteDAO {
     }
 
     /**
-     * Ricerca i ristoranti nel database combinando dinamicamente la barra di ricerca e i filtri selezionati.
+     * Ricerca i ristoranti nel database combinando la barra di ricerca e i filtri selezionati.
      * <p>
-     * Utilizza la clausola base <code>WHERE 1=1</code> per permettere la concatenazione libera di qualsiasi
-     * combinazione di criteri (inclusa la ricerca per solo nome e prezzo) ed esegue un <code>LEFT JOIN</code>
-     * con la tabella <code>Recensioni</code> per il filtro sulla media delle stelle.
-     * @param nomeRistorante parola chiave o nome del ristorante inserito nella barra di ricerca (pu&ograve; essere <code>null</code>)
-     * @param locazione citt&agrave; o nazione del ristorante (pu&ograve; essere <code>null</code>)
-     * @param tipoCucina tipologia di cucina desiderata (pu&ograve; essere <code>null</code>)
-     * @param prezzoMin prezzo minimo in euro, es. maggiore di 30 euro (pu&ograve; essere <code>null</code>)
-     * @param prezzoMax prezzo massimo in euro, es. minore di 50 euro (pu&ograve; essere <code>null</code>)
-     * @param delivery se <code>true</code> filtra i ristoranti con consegna a domicilio (pu&ograve; essere <code>null</code>)
-     * @param prenotazioneOnline se <code>true</code> filtra i ristoranti con prenotazione online (pu&ograve; essere <code>null</code>)
-     * @param mediaStelleMin valutazione media minima di stelle da 1 a 5 (pu&ograve; essere <code>null</code>)
+     * Utilizza la clausola base <code>WHERE 1=1</code> per permettere la concatenazione di qualsiasi
+     * combinazione di criteri ed esegue un <code>LEFT JOIN</code> con la tabella <code>Recensioni</code>
+     * per il filtro sulla media delle stelle.
+     * @param nomeRistorante parola chiave o nome del ristorante inserito nella barra di ricerca
+     * @param locazione cittá o nazione del ristorante
+     * @param tipoCucina tipologia di cucina desiderata
+     * @param prezzoMin prezzo minimo in euro
+     * @param prezzoMax prezzo massimo in euro
+     * @param delivery se <code>true</code> filtra i ristoranti con consegna a domicilio
+     * @param prenotazioneOnline se <code>true</code> filtra i ristoranti con prenotazione online
+     * @param mediaStelleMin valutazione media minima di stelle da 1 a 5
      * @return una lista di oggetti <code>Ristorante</code> che soddisfano tutti i filtri specificati
      */
     public List<Ristorante> cercaRistorante(String nomeRistorante, String locazione, String tipoCucina,
@@ -103,7 +103,6 @@ public class RistoranteDAO {
                                             Boolean prenotazioneOnline, Double mediaStelleMin) {
         List<Ristorante> risultati = new ArrayList<>();
 
-        // WHERE 1=1 permette di attaccare qualsiasi filtro con "AND" in totale libertà
         StringBuilder query = new StringBuilder(
                 "SELECT r.* FROM RistorantiTheKnife r " +
                         "LEFT JOIN Recensioni rec ON r.id_ristorante = rec.id_ristorante " +
@@ -112,13 +111,13 @@ public class RistoranteDAO {
 
         List<Object> parametri = new ArrayList<>();
 
-        // 1. Barra di ricerca (cerca nel nome del ristorante)
+        // Barra di ricerca
         if (nomeRistorante != null && !nomeRistorante.trim().isEmpty()) {
             query.append(" AND LOWER(r.nome) LIKE LOWER(?)");
             parametri.add("%" + nomeRistorante.trim() + "%");
         }
 
-        // 2. Filtro locazione geografica (cerca sia in città che in nazione)
+        // Filtro locazione geografica
         if (locazione != null && !locazione.trim().isEmpty()) {
             query.append(" AND (LOWER(r.citta) LIKE LOWER(?) OR LOWER(r.nazione) LIKE LOWER(?))");
             String locPattern = "%" + locazione.trim() + "%";
@@ -126,16 +125,13 @@ public class RistoranteDAO {
             parametri.add(locPattern);
         }
 
-        // 3. Filtro tipologia di cucina
+        // Filtro tipologia di cucina
         if (tipoCucina != null && !tipoCucina.trim().isEmpty()) {
             query.append(" AND LOWER(r.tipo_cucina) LIKE LOWER(?)");
             parametri.add("%" + tipoCucina.trim() + "%");
         }
 
-        // 4. Filtro fascia di prezzo:
-        // - Solo prezzoMin valorizzato (es. 31 o 50): tutti quelli che costano più di 30€ (da €€ in su)
-        // - Solo prezzoMax valorizzato (es. 30): tutti quelli che costano meno di 30€ (solo € = 25€)
-        // - Entrambi valorizzati: fascia compresa tra prezzoMin e prezzoMax
+        // Filtro fascia di prezzo:
         if (prezzoMin != null) {
             query.append(" AND r.fascia_prezzo >= ?");
             parametri.add(prezzoMin);
@@ -145,20 +141,19 @@ public class RistoranteDAO {
             parametri.add(prezzoMax);
         }
 
-        // 5. Filtro servizio delivery
+        // Filtro servizio delivery
         if (delivery != null && delivery) {
             query.append(" AND r.delivery = true");
         }
 
-        // 6. Filtro prenotazione online
+        // Filtro prenotazione online
         if (prenotazioneOnline != null && prenotazioneOnline) {
             query.append(" AND r.prenotazione_online = true");
         }
 
-        // Raggruppamento per calcolare la media delle recensioni di ogni ristorante
         query.append(" GROUP BY r.id_ristorante");
 
-        // 7. Filtro media stelle
+        // Filtro media stelle
         if (mediaStelleMin != null) {
             query.append(" HAVING COALESCE(AVG(rec.stelle), 0) >= ?");
             parametri.add(mediaStelleMin);
@@ -186,7 +181,7 @@ public class RistoranteDAO {
     }
 
     /**
-     * Metodo di utilit&agrave; privato che converte una riga del <code>ResultSet</code> in un oggetto <code>Ristorante</code>.
+     * Metodo che converte una riga del <code>ResultSet</code> in un oggetto <code>Ristorante</code>.
      * @param rs il <code>ResultSet</code> posizionato sulla riga corrente da convertire
      * @return l'oggetto <code>Ristorante</code> popolato con i dati della riga
      * @throws SQLException se si verifica un errore nell'accesso alle colonne del <code>ResultSet</code>
@@ -203,7 +198,8 @@ public class RistoranteDAO {
                 rs.getInt("fascia_prezzo"),
                 rs.getBoolean("delivery"),
                 rs.getBoolean("prenotazione_online"),
-                rs.getString("tipo_cucina")
+                rs.getString("tipo_cucina"),
+                rs.getInt("id_ristoratore")
         );
     }
 }

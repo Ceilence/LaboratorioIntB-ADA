@@ -1,4 +1,4 @@
-package TheKnife.DB;
+package theknife.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

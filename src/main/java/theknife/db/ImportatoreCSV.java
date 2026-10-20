@@ -1,4 +1,4 @@
-package TheKnife.DB;
+package theknife.db;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -36,6 +36,13 @@ public class ImportatoreCSV {
              Reader in = new FileReader(percorsoFile);
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
+            try (PreparedStatement checkStmt = conn.prepareStatement("SELECT COUNT(*) FROM RistorantiTheKnife");
+                 java.sql.ResultSet rs = checkStmt.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    System.out.println("Database già popolato (" + rs.getInt(1) + " ristoranti presenti).");
+                    return;
+                }
+            }
 
             Iterable<CSVRecord> records = CSVFormat.DEFAULT.builder()
                     .setHeader()

@@ -1,11 +1,11 @@
-package TheKnife.Essenziali;
+package theknife.essenziali;
 
 
 
 import java.io.Serializable;
 
 /**
- * Classe di dominio (Model) che rappresenta l'entit&agrave; Ristorante all'interno del sistema.
+ * Classe di dominio (Model) che rappresenta l'entitá Ristorante all'interno del sistema.
  * <p>
  * Mappa la struttura della tabella relazionale <code>RistorantiTheKnife</code> presente nel database
  * e implementa l'interfaccia <code>Serializable</code> per consentire il trasferimento degli oggetti
@@ -75,6 +75,11 @@ public class Ristorante implements Serializable {
     private String tipoCucina;
 
     /**
+     * Identificativo univoco del ristoratore <code>idRistoratore</code>.
+     */
+    private Integer idRistoratore;
+
+    /**
      * Costruttore vuoto di default per la classe <code>Ristorante</code>.
      */
     public Ristorante() {
@@ -93,10 +98,11 @@ public class Ristorante implements Serializable {
      * @param delivery true se offre servizio delivery, false altrimenti
      * @param prenotazioneOnline true se accetta prenotazioni online, false altrimenti
      * @param tipoCucina descrizione della tipologia di cucina
+     * @param idRistoratore indentificativo univoco del ristoratore
      */
     public Ristorante(int idRistorante, String nome, String nazione, String citta, String indirizzo,
                       double latitudine, double longitudine, int fasciaPrezzo,
-                      boolean delivery, boolean prenotazioneOnline, String tipoCucina) {
+                      boolean delivery, boolean prenotazioneOnline, String tipoCucina, int idRistoratore) {
         this.idRistorante = idRistorante;
         this.nome = nome;
         this.nazione = nazione;
