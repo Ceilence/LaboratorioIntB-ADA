@@ -1,3 +1,9 @@
+/*
+ * Autori del progetto:
+ * - Alessandro Frigerio, Matricola: 759926, Sede: CO
+ * - Antonio Pardo, Matricola: 760613, Sede: CO
+ * - Davide Moretti, Matricola: 762176, Sede: CO
+ */
 package theknife.dao;
 
 import theknife.db.DatabaseManager;
@@ -11,27 +17,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Classe Data Access Object (DAO) per la gestione della persistenza dell'entitá <code>Ristorante</code>.
+ * Classe DAO per gestire le query sul database relative ai ristoranti e ai preferiti.
  * <p>
- * Fornisce i metodi per eseguire le operazioni CRUD e le ricerche filtrate sulla tabella
- * <code>RistorantiTheKnife</code> del database PostgreSQL tramite JDBC.
- * @author Alessandro Frigerio, Antonio Pardo, Davide Moretti
+ * Si occupa di inserire, cercare e filtrare i ristoranti nella tabella <code>RistorantiTheKnife</code>
+ * e di gestire la tabella <code>Preferiti</code> per i clienti.
+ * @author Alessandro Frigerio
+ * @author Antonio Pardo
+ * @author Davide Moretti
  */
 public class RistoranteDAO {
 
     /**
-     * Costruttore vuoto di default per la classe <code>RistoranteDAO</code>.
+     * Costruttore vuoto della classe <code>RistoranteDAO</code>.
      */
     public RistoranteDAO() {
     }
 
     /**
-     * Inserisce un nuovo ristorante all'interno della tabella <code>RistorantiTheKnife</code>.
-     * @param r l'oggetto <code>Ristorante</code> contenente i dati da salvare
-     * @return <code>true</code> se l'inserimento va a buon fine, <code>false</code> altrimenti
+     * Aggiunge un nuovo ristorante nel database, controllando che l'utente sia un ristoratore.
+     * @param r il nuovo <code>Ristorante</code> da inserire
+     * @param idRistoratore l'ID dell'utente ristoratore che sta creando il locale
+     * @return <code>true</code> se l'inserimento riesce, <code>false</code> se l'utente non è un ristoratore o c'è un errore
      */
-    public boolean inserisciRistorante(Ristorante r) {
-        String query = "INSERT INTO RistorantiTheKnife (nome, nazione, citta, indirizzo, latitudine, longitudine, fascia_prezzo, delivery, prenotazione_online, tipo_cucina) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public boolean aggiungiRistorante(Ristorante r, int idRistoratore) {
+        String query = "INSERT INTO RistorantiTheKnife (nome, nazione, citta, indirizzo, latitudine, longitudine, fascia_prezzo, delivery, prenotazione_online, tipo_cucina, id_ristoratore) " +
+                "SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? FROM Utenti " +
+                "WHERE id_utente = ? AND LOWER(ruolo) = 'ristoratore'";
 
         try (Connection conn = DatabaseManager.connect();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -46,8 +57,13 @@ public class RistoranteDAO {
             pstmt.setBoolean(8, r.isDelivery());
             pstmt.setBoolean(9, r.isPrenotazioneOnline());
             pstmt.setString(10, r.getTipoCucina());
+            pstmt.setInt(11, idRistoratore);
+            pstmt.setInt(12, idRistoratore);
 
             int righeInserite = pstmt.executeUpdate();
+            if (righeInserite == 0) {
+                System.err.println("Operazione negata: solo un utente con ruolo 'ristoratore' può aggiungere un ristorante.");
+            }
             return righeInserite > 0;
 
         } catch (SQLException e) {
@@ -58,11 +74,11 @@ public class RistoranteDAO {
     }
 
     /**
-     * Recupera un singolo ristorante dal database a partire dal suo identificativo univoco.
-     * @param idRistorante l'identificativo univoco del ristorante da cercare
-     * @return l'oggetto <code>Ristorante</code> corrispondente, oppure <code>null</code> se non trovato
+     * Cerca un ristorante nel database tramite il suo ID.
+     * @param idRistorante l'ID del ristorante da cercare
+     * @return l'oggetto <code>Ristorante</code> trovato, oppure <code>null</code> se non esiste
      */
-    public Ristorante getRistorantePerId(int idRistorante) {
+    public Ristorante visualizzaRistorante(int idRistorante) {
         String query = "SELECT * FROM RistorantiTheKnife WHERE id_ristorante = ?";
 
         try (Connection conn = DatabaseManager.connect();
@@ -83,20 +99,18 @@ public class RistoranteDAO {
     }
 
     /**
-     * Ricerca i ristoranti nel database combinando la barra di ricerca e i filtri selezionati.
+     * Cerca i ristoranti combinando il testo della barra di ricerca e i vari filtri.
      * <p>
-     * Utilizza la clausola base <code>WHERE 1=1</code> per permettere la concatenazione di qualsiasi
-     * combinazione di criteri ed esegue un <code>LEFT JOIN</code> con la tabella <code>Recensioni</code>
-     * per il filtro sulla media delle stelle.
-     * @param nomeRistorante parola chiave o nome del ristorante inserito nella barra di ricerca
-     * @param locazione cittá o nazione del ristorante
-     * @param tipoCucina tipologia di cucina desiderata
-     * @param prezzoMin prezzo minimo in euro
-     * @param prezzoMax prezzo massimo in euro
-     * @param delivery se <code>true</code> filtra i ristoranti con consegna a domicilio
-     * @param prenotazioneOnline se <code>true</code> filtra i ristoranti con prenotazione online
-     * @param mediaStelleMin valutazione media minima di stelle da 1 a 5
-     * @return una lista di oggetti <code>Ristorante</code> che soddisfano tutti i filtri specificati
+     * Se un filtro viene passato come <code>null</code>, viene semplicemente ignorato nella query.
+     * @param nomeRistorante nome o parola chiave cercata nella barra di ricerca (può essere <code>null</code>)
+     * @param locazione città o nazione del ristorante (può essere <code>null</code>)
+     * @param tipoCucina tipo di cucina cercata (può essere <code>null</code>)
+     * @param prezzoMin prezzo minimo in euro (può essere <code>null</code>)
+     * @param prezzoMax prezzo massimo in euro (può essere <code>null</code>)
+     * @param delivery true per cercare solo ristoranti con delivery (può essere <code>null</code>)
+     * @param prenotazioneOnline true per cercare solo ristoranti con prenotazione online (può essere <code>null</code>)
+     * @param mediaStelleMin media minima delle stelle da 1 a 5 (può essere <code>null</code>)
+     * @return lista di oggetti <code>Ristorante</code> che rispettano i filtri inseriti
      */
     public List<Ristorante> cercaRistorante(String nomeRistorante, String locazione, String tipoCucina,
                                             Integer prezzoMin, Integer prezzoMax, Boolean delivery,
@@ -111,13 +125,11 @@ public class RistoranteDAO {
 
         List<Object> parametri = new ArrayList<>();
 
-        // Barra di ricerca
         if (nomeRistorante != null && !nomeRistorante.trim().isEmpty()) {
             query.append(" AND LOWER(r.nome) LIKE LOWER(?)");
             parametri.add("%" + nomeRistorante.trim() + "%");
         }
 
-        // Filtro locazione geografica
         if (locazione != null && !locazione.trim().isEmpty()) {
             query.append(" AND (LOWER(r.citta) LIKE LOWER(?) OR LOWER(r.nazione) LIKE LOWER(?))");
             String locPattern = "%" + locazione.trim() + "%";
@@ -125,13 +137,11 @@ public class RistoranteDAO {
             parametri.add(locPattern);
         }
 
-        // Filtro tipologia di cucina
         if (tipoCucina != null && !tipoCucina.trim().isEmpty()) {
             query.append(" AND LOWER(r.tipo_cucina) LIKE LOWER(?)");
             parametri.add("%" + tipoCucina.trim() + "%");
         }
 
-        // Filtro fascia di prezzo:
         if (prezzoMin != null) {
             query.append(" AND r.fascia_prezzo >= ?");
             parametri.add(prezzoMin);
@@ -141,19 +151,16 @@ public class RistoranteDAO {
             parametri.add(prezzoMax);
         }
 
-        // Filtro servizio delivery
         if (delivery != null && delivery) {
             query.append(" AND r.delivery = true");
         }
 
-        // Filtro prenotazione online
         if (prenotazioneOnline != null && prenotazioneOnline) {
             query.append(" AND r.prenotazione_online = true");
         }
 
         query.append(" GROUP BY r.id_ristorante");
 
-        // Filtro media stelle
         if (mediaStelleMin != null) {
             query.append(" HAVING COALESCE(AVG(rec.stelle), 0) >= ?");
             parametri.add(mediaStelleMin);
@@ -181,12 +188,117 @@ public class RistoranteDAO {
     }
 
     /**
-     * Metodo che converte una riga del <code>ResultSet</code> in un oggetto <code>Ristorante</code>.
-     * @param rs il <code>ResultSet</code> posizionato sulla riga corrente da convertire
-     * @return l'oggetto <code>Ristorante</code> popolato con i dati della riga
-     * @throws SQLException se si verifica un errore nell'accesso alle colonne del <code>ResultSet</code>
+     * Restituisce la lista dei ristoranti che appartengono a uno specifico ristoratore.
+     * @param idRistoratore l'ID dell'utente ristoratore
+     * @return lista dei ristoranti gestiti da quell'utente
+     */
+    public List<Ristorante> getRistorantiPerRistoratore(int idRistoratore) {
+        List<Ristorante> mieiRistoranti = new ArrayList<>();
+        String query = "SELECT * FROM RistorantiTheKnife WHERE id_ristoratore = ? ORDER BY nome ASC";
+
+        try (Connection conn = DatabaseManager.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, idRistoratore);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    mieiRistoranti.add(estraiRistorante(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore nel recupero dei ristoranti del ristoratore:");
+            e.printStackTrace();
+        }
+        return mieiRistoranti;
+    }
+
+    /**
+     * Aggiunge un ristorante alla lista dei preferiti di un cliente.
+     * @param idCliente l'ID dell'utente cliente
+     * @param idRistorante l'ID del ristorante da aggiungere ai preferiti
+     * @return <code>true</code> se viene aggiunto, <code>false</code> se l'utente non è un cliente o c'è un errore
+     */
+    public boolean aggiungiPreferito(int idCliente, int idRistorante) {
+        String query = "INSERT INTO Preferiti (id_utente, id_ristorante) " +
+                "SELECT ?, ? FROM Utenti WHERE id_utente = ? AND LOWER(ruolo) = 'cliente'";
+
+        try (Connection conn = DatabaseManager.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, idCliente);
+            pstmt.setInt(2, idRistorante);
+            pstmt.setInt(3, idCliente);
+
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Errore durante l'aggiunta ai preferiti:");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Rimuove un ristorante dalla lista dei preferiti di un cliente.
+     * @param idCliente l'ID dell'utente cliente
+     * @param idRistorante l'ID del ristorante da rimuovere
+     * @return <code>true</code> se viene rimosso con successo, <code>false</code> altrimenti
+     */
+    public boolean rimuoviPreferito(int idCliente, int idRistorante) {
+        String query = "DELETE FROM Preferiti WHERE id_utente = ? AND id_ristorante = ?";
+
+        try (Connection conn = DatabaseManager.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, idCliente);
+            pstmt.setInt(2, idRistorante);
+
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Errore durante la rimozione dai preferiti:");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Restituisce tutti i ristoranti preferiti salvati da un cliente.
+     * @param idCliente l'ID dell'utente cliente
+     * @return lista di oggetti <code>Ristorante</code> preferiti dal cliente
+     */
+    public List<Ristorante> visualizzaPreferiti(int idCliente) {
+        List<Ristorante> preferiti = new ArrayList<>();
+        String query = "SELECT r.* FROM RistorantiTheKnife r " +
+                "JOIN Preferiti p ON r.id_ristorante = p.id_ristorante " +
+                "WHERE p.id_utente = ? ORDER BY r.nome ASC";
+
+        try (Connection conn = DatabaseManager.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, idCliente);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    preferiti.add(estraiRistorante(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore nel recupero dei ristoranti preferiti:");
+            e.printStackTrace();
+        }
+        return preferiti;
+    }
+
+    /**
+     * Legge la riga corrente del <code>ResultSet</code> e crea un oggetto <code>Ristorante</code>.
+     * @param rs il <code>ResultSet</code> della query
+     * @return l'oggetto <code>Ristorante</code> creato con i dati letti
+     * @throws SQLException se c'è un errore nella lettura delle colonne
      */
     private Ristorante estraiRistorante(ResultSet rs) throws SQLException {
+        int idRist = rs.getInt("id_ristoratore");
+        Integer idRistoratoreObj = rs.wasNull() ? null : idRist;
+
         return new Ristorante(
                 rs.getInt("id_ristorante"),
                 rs.getString("nome"),
@@ -199,7 +311,7 @@ public class RistoranteDAO {
                 rs.getBoolean("delivery"),
                 rs.getBoolean("prenotazione_online"),
                 rs.getString("tipo_cucina"),
-                rs.getInt("id_ristoratore")
+                idRistoratoreObj
         );
     }
 }

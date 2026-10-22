@@ -1,0 +1,35 @@
+-- 1. Tabella per Clienti e Ristoratori
+CREATE TABLE Utenti (
+    id_utente SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cognome VARCHAR(100) NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    data_nascita DATE,
+    luogo_domicilio VARCHAR(150) NOT NULL,
+    ruolo VARCHAR(50) NOT NULL CHECK (ruolo IN ('cliente', 'ristoratore'))
+);
+
+-- 2. Tabella per le Recensioni
+CREATE TABLE Recensioni (
+    id_recensione SERIAL PRIMARY KEY,
+    id_utente INTEGER NOT NULL REFERENCES Utenti(id_utente) ON DELETE CASCADE,
+    id_ristorante INTEGER NOT NULL REFERENCES RistorantiTheKnife(id_ristorante) ON DELETE CASCADE,
+    stelle INTEGER NOT NULL CHECK (stelle >= 1 AND stelle <= 5),
+    testo TEXT NOT NULL,
+    data_recensione DATE NOT NULL DEFAULT CURRENT_DATE,
+    risposta_ristoratore TEXT,
+    -- Opzionale: impedisce allo stesso utente di recensire più volte lo stesso ristorante
+    UNIQUE (id_utente, id_ristorante)
+);
+TRUNCATE TABLE RistorantiTheKnife RESTART IDENTITY CASCADE;
+-- 1. Aggiunge il riferimento al ristoratore nella tabella RistorantiTheKnife
+ALTER TABLE RistorantiTheKnife
+ADD COLUMN id_ristoratore INTEGER REFERENCES Utenti(id_utente) ON DELETE SET NULL;
+
+-- 3. Crea la tabella ponte per i Ristoranti Preferiti dei clienti
+CREATE TABLE Preferiti (
+    id_utente INTEGER NOT NULL REFERENCES Utenti(id_utente) ON DELETE CASCADE,
+    id_ristorante INTEGER NOT NULL REFERENCES RistorantiTheKnife(id_ristorante) ON DELETE CASCADE,
+    PRIMARY KEY (id_utente, id_ristorante)
+);

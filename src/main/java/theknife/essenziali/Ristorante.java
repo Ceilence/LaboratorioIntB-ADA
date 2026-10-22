@@ -1,26 +1,31 @@
+/*
+ * Autori del progetto:
+ * - Alessandro Frigerio, Matricola: 759926, Sede: CO
+ * - Antonio Pardo, Matricola: 760613, Sede: CO
+ * - Davide Moretti, Matricola: 762176, Sede: CO
+ */
 package theknife.essenziali;
-
-
 
 import java.io.Serializable;
 
 /**
- * Classe di dominio (Model) che rappresenta l'entitá Ristorante all'interno del sistema.
+ * Classe che rappresenta un ristorante all'interno dell'applicazione.
  * <p>
- * Mappa la struttura della tabella relazionale <code>RistorantiTheKnife</code> presente nel database
- * e implementa l'interfaccia <code>Serializable</code> per consentire il trasferimento degli oggetti
- * tra server e client.
+ * Contiene i dati della tabella <code>RistorantiTheKnife</code> e implementa
+ * <code>Serializable</code> per passare gli oggetti tra client e server.
  * @author Alessandro Frigerio
+ * @author Antonio Pardo
+ * @author Davide Moretti
  */
 public class Ristorante implements Serializable {
 
     /**
-     * Identificativo univoco per la serializzazione della classe <code>serialVersionUID</code>.
+     * ID per la serializzazione <code>serialVersionUID</code>.
      */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Identificativo numerico univoco del ristorante <code>idRistorante</code> (chiave primaria).
+     * ID univoco del ristorante <code>idRistorante</code>.
      */
     private int idRistorante;
 
@@ -30,12 +35,12 @@ public class Ristorante implements Serializable {
     private String nome;
 
     /**
-     * Stato o nazione <code>nazione</code>.
+     * Nazione in cui si trova il ristorante <code>nazione</code>.
      */
     private String nazione;
 
     /**
-     * Citta in cui é ubicato il ristorante <code>citta</code>.
+     * Città in cui si trova il ristorante <code>citta</code>.
      */
     private String citta;
 
@@ -45,12 +50,12 @@ public class Ristorante implements Serializable {
     private String indirizzo;
 
     /**
-     * Latitudine <code>latitudine</code>.
+     * Coordinata di latitudine <code>latitudine</code>.
      */
     private double latitudine;
 
     /**
-     * Longitudine <code>longitudine</code>.
+     * Coordinata di longitudine <code>longitudine</code>.
      */
     private double longitudine;
 
@@ -60,49 +65,49 @@ public class Ristorante implements Serializable {
     private int fasciaPrezzo;
 
     /**
-     * Disponibilita del servizio di consegna a domicilio <code>delivery</code>.
+     * Indica se il ristorante fa consegne a domicilio <code>delivery</code>.
      */
     private boolean delivery;
 
     /**
-     * Disponibilita del servizio di prenotazione online <code>prenotazioneOnline</code>.
+     * Indica se il ristorante accetta prenotazioni online <code>prenotazioneOnline</code>.
      */
     private boolean prenotazioneOnline;
 
     /**
-     * Tipologia di cucina offerta dal ristorante <code>tipoCucina</code>.
+     * Tipo di cucina del ristorante <code>tipoCucina</code>.
      */
     private String tipoCucina;
 
     /**
-     * Identificativo univoco del ristoratore <code>idRistoratore</code>.
+     * ID dell'utente ristoratore proprietario del locale <code>idRistoratore</code> (può essere null).
      */
     private Integer idRistoratore;
 
     /**
-     * Costruttore vuoto di default per la classe <code>Ristorante</code>.
+     * Costruttore vuoto della classe <code>Ristorante</code>.
      */
     public Ristorante() {
     }
 
     /**
-     * Costruttore completo per istanziare un oggetto <code>Ristorante</code> gia presente nel database.
-     * @param idRistorante identificativo univoco del ristorante
+     * Costruttore completo per creare un oggetto <code>Ristorante</code> letto dal database.
+     * @param idRistorante ID del ristorante
      * @param nome nome del ristorante
      * @param nazione nazione del ristorante
-     * @param citta citta del ristorante
+     * @param citta città del ristorante
      * @param indirizzo indirizzo del ristorante
-     * @param latitudine latitudine
-     * @param longitudine longitudine
+     * @param latitudine latitudine geografica
+     * @param longitudine longitudine geografica
      * @param fasciaPrezzo prezzo medio in euro
-     * @param delivery true se offre servizio delivery, false altrimenti
-     * @param prenotazioneOnline true se accetta prenotazioni online, false altrimenti
-     * @param tipoCucina descrizione della tipologia di cucina
-     * @param idRistoratore indentificativo univoco del ristoratore
+     * @param delivery true se ha il delivery, false altrimenti
+     * @param prenotazioneOnline true se ha la prenotazione online, false altrimenti
+     * @param tipoCucina tipo di cucina offerta
+     * @param idRistoratore ID del ristoratore proprietario (può essere null)
      */
     public Ristorante(int idRistorante, String nome, String nazione, String citta, String indirizzo,
                       double latitudine, double longitudine, int fasciaPrezzo,
-                      boolean delivery, boolean prenotazioneOnline, String tipoCucina, int idRistoratore) {
+                      boolean delivery, boolean prenotazioneOnline, String tipoCucina, Integer idRistoratore) {
         this.idRistorante = idRistorante;
         this.nome = nome;
         this.nazione = nazione;
@@ -114,24 +119,26 @@ public class Ristorante implements Serializable {
         this.delivery = delivery;
         this.prenotazioneOnline = prenotazioneOnline;
         this.tipoCucina = tipoCucina;
+        this.idRistoratore = idRistoratore;
     }
 
     /**
-     * Costruttore senza <code>idRistorante</code> per la creazione di un nuovo ristorante prima del salvataggio sul database.
+     * Costruttore senza ID ristorante, utile quando un ristoratore crea un nuovo locale da salvare nel DB.
      * @param nome nome del ristorante
      * @param nazione nazione del ristorante
-     * @param citta citta del ristorante
-     * @param indirizzo indirizzo fisico del ristorante
-     * @param latitudine latitudine
-     * @param longitudine longitudine
+     * @param citta città del ristorante
+     * @param indirizzo indirizzo del ristorante
+     * @param latitudine latitudine geografica
+     * @param longitudine longitudine geografica
      * @param fasciaPrezzo prezzo medio in euro
-     * @param delivery true se offre servizio delivery, false altrimenti
-     * @param prenotazioneOnline true se accetta prenotazioni online, false altrimenti
-     * @param tipoCucina descrizione della tipologia di cucina
+     * @param delivery true se ha il delivery, false altrimenti
+     * @param prenotazioneOnline true se ha la prenotazione online, false altrimenti
+     * @param tipoCucina tipo di cucina offerta
+     * @param idRistoratore ID del ristoratore che sta creando il ristorante
      */
     public Ristorante(String nome, String nazione, String citta, String indirizzo,
                       double latitudine, double longitudine, int fasciaPrezzo,
-                      boolean delivery, boolean prenotazioneOnline, String tipoCucina) {
+                      boolean delivery, boolean prenotazioneOnline, String tipoCucina, Integer idRistoratore) {
         this.nome = nome;
         this.nazione = nazione;
         this.citta = citta;
@@ -142,19 +149,20 @@ public class Ristorante implements Serializable {
         this.delivery = delivery;
         this.prenotazioneOnline = prenotazioneOnline;
         this.tipoCucina = tipoCucina;
+        this.idRistoratore = idRistoratore;
     }
 
     /**
-     * Restituisce l'identificativo univoco del ristorante.
-     * @return il valore dell'attributo <code>idRistorante</code>
+     * Restituisce l'ID del ristorante.
+     * @return il valore di <code>idRistorante</code>
      */
     public int getIdRistorante() {
         return idRistorante;
     }
 
     /**
-     * Imposta l'identificativo univoco del ristorante.
-     * @param idRistorante il nuovo identificativo da assegnare a <code>idRistorante</code>
+     * Imposta l'ID del ristorante.
+     * @param idRistorante nuovo valore per <code>idRistorante</code>
      */
     public void setIdRistorante(int idRistorante) {
         this.idRistorante = idRistorante;
@@ -162,7 +170,7 @@ public class Ristorante implements Serializable {
 
     /**
      * Restituisce il nome del ristorante.
-     * @return il valore dell'attributo <code>nome</code>
+     * @return il valore di <code>nome</code>
      */
     public String getNome() {
         return nome;
@@ -170,7 +178,7 @@ public class Ristorante implements Serializable {
 
     /**
      * Imposta il nome del ristorante.
-     * @param nome il nuovo nome da assegnare a <code>nome</code>
+     * @param nome nuovo valore per <code>nome</code>
      */
     public void setNome(String nome) {
         this.nome = nome;
@@ -178,7 +186,7 @@ public class Ristorante implements Serializable {
 
     /**
      * Restituisce la nazione del ristorante.
-     * @return il valore dell'attributo <code>nazione</code>
+     * @return il valore di <code>nazione</code>
      */
     public String getNazione() {
         return nazione;
@@ -186,23 +194,23 @@ public class Ristorante implements Serializable {
 
     /**
      * Imposta la nazione del ristorante.
-     * @param nazione la nuova nazione da assegnare a <code>nazione</code>
+     * @param nazione nuovo valore per <code>nazione</code>
      */
     public void setNazione(String nazione) {
         this.nazione = nazione;
     }
 
     /**
-     * Restituisce la citta del ristorante.
-     * @return il valore dell'attributo <code>citta</code>
+     * Restituisce la città del ristorante.
+     * @return il valore di <code>citta</code>
      */
     public String getCitta() {
         return citta;
     }
 
     /**
-     * Imposta la citta del ristorante.
-     * @param citta la nuova citta da assegnare a <code>citta</code>
+     * Imposta la città del ristorante.
+     * @param citta nuovo valore per <code>citta</code>
      */
     public void setCitta(String citta) {
         this.citta = citta;
@@ -210,7 +218,7 @@ public class Ristorante implements Serializable {
 
     /**
      * Restituisce l'indirizzo del ristorante.
-     * @return il valore dell'attributo <code>indirizzo</code>
+     * @return il valore di <code>indirizzo</code>
      */
     public String getIndirizzo() {
         return indirizzo;
@@ -218,7 +226,7 @@ public class Ristorante implements Serializable {
 
     /**
      * Imposta l'indirizzo del ristorante.
-     * @param indirizzo il nuovo indirizzo da assegnare a <code>indirizzo</code>
+     * @param indirizzo nuovo valore per <code>indirizzo</code>
      */
     public void setIndirizzo(String indirizzo) {
         this.indirizzo = indirizzo;
@@ -226,7 +234,7 @@ public class Ristorante implements Serializable {
 
     /**
      * Restituisce la latitudine del ristorante.
-     * @return il valore dell'attributo <code>latitudine</code>
+     * @return il valore di <code>latitudine</code>
      */
     public double getLatitudine() {
         return latitudine;
@@ -234,7 +242,7 @@ public class Ristorante implements Serializable {
 
     /**
      * Imposta la latitudine del ristorante.
-     * @param latitudine la nuova coordinata da assegnare a <code>latitudine</code>
+     * @param latitudine nuovo valore per <code>latitudine</code>
      */
     public void setLatitudine(double latitudine) {
         this.latitudine = latitudine;
@@ -242,7 +250,7 @@ public class Ristorante implements Serializable {
 
     /**
      * Restituisce la longitudine del ristorante.
-     * @return il valore dell'attributo <code>longitudine</code>
+     * @return il valore di <code>longitudine</code>
      */
     public double getLongitudine() {
         return longitudine;
@@ -250,7 +258,7 @@ public class Ristorante implements Serializable {
 
     /**
      * Imposta la longitudine del ristorante.
-     * @param longitudine la nuova coordinata da assegnare a <code>longitudine</code>
+     * @param longitudine nuovo valore per <code>longitudine</code>
      */
     public void setLongitudine(double longitudine) {
         this.longitudine = longitudine;
@@ -258,7 +266,7 @@ public class Ristorante implements Serializable {
 
     /**
      * Restituisce la fascia di prezzo del ristorante.
-     * @return il valore dell'attributo <code>fasciaPrezzo</code>
+     * @return il valore di <code>fasciaPrezzo</code>
      */
     public int getFasciaPrezzo() {
         return fasciaPrezzo;
@@ -266,39 +274,39 @@ public class Ristorante implements Serializable {
 
     /**
      * Imposta la fascia di prezzo del ristorante.
-     * @param fasciaPrezzo il nuovo prezzo medio da assegnare a <code>fasciaPrezzo</code>
+     * @param fasciaPrezzo nuovo valore per <code>fasciaPrezzo</code>
      */
     public void setFasciaPrezzo(int fasciaPrezzo) {
         this.fasciaPrezzo = fasciaPrezzo;
     }
 
     /**
-     * Indica se il servizio di delivery é disponibile.
-     * @return <code>true</code> se il delivery é attivo, <code>false</code> altrimenti
+     * Restituisce true se il ristorante fa consegne a domicilio.
+     * @return il valore di <code>delivery</code>
      */
     public boolean isDelivery() {
         return delivery;
     }
 
     /**
-     * Imposta la disponibilita del servizio di delivery.
-     * @param delivery il nuovo stato da assegnare a <code>delivery</code>
+     * Imposta il servizio di consegna a domicilio.
+     * @param delivery nuovo valore per <code>delivery</code>
      */
     public void setDelivery(boolean delivery) {
         this.delivery = delivery;
     }
 
     /**
-     * Indica se la prenotazione online é disponibile.
-     * @return <code>true</code> se la prenotazione online é attiva, <code>false</code> altrimenti
+     * Restituisce true se il ristorante accetta prenotazioni online.
+     * @return il valore di <code>prenotazioneOnline</code>
      */
     public boolean isPrenotazioneOnline() {
         return prenotazioneOnline;
     }
 
     /**
-     * Imposta la disponibilita della prenotazione online.
-     * @param prenotazioneOnline il nuovo stato da assegnare a <code>prenotazioneOnline</code>
+     * Imposta il servizio di prenotazione online.
+     * @param prenotazioneOnline nuovo valore per <code>prenotazioneOnline</code>
      */
     public void setPrenotazioneOnline(boolean prenotazioneOnline) {
         this.prenotazioneOnline = prenotazioneOnline;
@@ -306,7 +314,7 @@ public class Ristorante implements Serializable {
 
     /**
      * Restituisce il tipo di cucina del ristorante.
-     * @return il valore dell'attributo <code>tipoCucina</code>
+     * @return il valore di <code>tipoCucina</code>
      */
     public String getTipoCucina() {
         return tipoCucina;
@@ -314,15 +322,31 @@ public class Ristorante implements Serializable {
 
     /**
      * Imposta il tipo di cucina del ristorante.
-     * @param tipoCucina la nuova tipologia da assegnare a <code>tipoCucina</code>
+     * @param tipoCucina nuovo valore per <code>tipoCucina</code>
      */
     public void setTipoCucina(String tipoCucina) {
         this.tipoCucina = tipoCucina;
     }
 
     /**
-     * Restituisce una rappresentazione testuale sintetica dell'oggetto <code>Ristorante</code>.
-     * @return stringa contenente i dati principali del ristorante
+     * Restituisce l'ID del ristoratore proprietario.
+     * @return il valore di <code>idRistoratore</code>, oppure <code>null</code> se non ha un proprietario
+     */
+    public Integer getIdRistoratore() {
+        return idRistoratore;
+    }
+
+    /**
+     * Imposta l'ID del ristoratore proprietario.
+     * @param idRistoratore nuovo valore per <code>idRistoratore</code>
+     */
+    public void setIdRistoratore(Integer idRistoratore) {
+        this.idRistoratore = idRistoratore;
+    }
+
+    /**
+     * Restituisce una stringa con le informazioni principali del ristorante.
+     * @return stringa descrittiva del ristorante
      */
     @Override
     public String toString() {

@@ -237,6 +237,42 @@ public class Utente implements Serializable {
     }
 
     /**
+     * Crea un oggetto <code>Utente</code> temporaneo per chi accede con il tasto Guest.
+     * <p>
+     * L'utente Guest non viene salvato nel database, ha ID pari a <code>-1</code>,
+     * ruolo impostato a <code>guest</code> e memorizza solo il luogo scelto all'avvio.
+     * @param luogoIndicato il nome della città o luogo inserito dall'utente Guest
+     * @return un oggetto <code>Utente</code> configurato come Guest
+     */
+    public static Utente creaGuest(String luogoIndicato) {
+        return new Utente(-1, "Ospite", "Guest", "guest", "", null, luogoIndicato, "guest");
+    }
+
+    /**
+     * Controlla se l'utente attuale sta usando l'applicazione come Guest (non registrato).
+     * @return <code>true</code> se il ruolo è <code>guest</code>, <code>false</code> altrimenti
+     */
+    public boolean isGuest() {
+        return "guest".equalsIgnoreCase(this.ruolo);
+    }
+
+    /**
+     * Controlla se l'utente attuale è un cliente registrato.
+     * @return <code>true</code> se il ruolo è <code>cliente</code>, <code>false</code> altrimenti
+     */
+    public boolean isCliente() {
+        return "cliente".equalsIgnoreCase(this.ruolo);
+    }
+
+    /**
+     * Controlla se l'utente attuale è un ristoratore/gestore registrato.
+     * @return <code>true</code> se il ruolo è <code>ristoratore</code> o <code>gestore</code>, <code>false</code> altrimenti
+     */
+    public boolean isRistoratore() {
+        return "ristoratore".equalsIgnoreCase(this.ruolo) || "gestore".equalsIgnoreCase(this.ruolo);
+    }
+
+    /**
      * Restituisce una rappresentazione testuale dell'oggetto <code>Utente</code>.
      * @return stringa contenente username, nome, cognome e ruolo dell'utente
      */
@@ -244,4 +280,5 @@ public class Utente implements Serializable {
     public String toString() {
         return username + " (" + nome + " " + cognome + " - " + ruolo + ")";
     }
+
 }
