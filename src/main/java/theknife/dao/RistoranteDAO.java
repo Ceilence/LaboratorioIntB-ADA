@@ -314,4 +314,60 @@ public class RistoranteDAO {
                 idRistoratoreObj
         );
     }
+
+    /**
+     * Modifica i dati di un ristorante esistente verificando che appartenga al ristoratore.
+     * @param r l'oggetto <code>Ristorante</code> con i dati aggiornati
+     * @param idRistoratore l'ID del ristoratore proprietario
+     * @return <code>true</code> se la modifica riesce, <code>false</code> altrimenti
+     */
+    public boolean modificaRistorante(Ristorante r, int idRistoratore) {
+        String query = "UPDATE RistorantiTheKnife SET nome = ?, nazione = ?, citta = ?, indirizzo = ?, " +
+                "latitudine = ?, longitudine = ?, fascia_prezzo = ?, delivery = ?, prenotazione_online = ?, tipo_cucina = ? " +
+                "WHERE id_ristorante = ? AND id_ristoratore = ?";
+
+        try (Connection conn = DatabaseManager.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, r.getNome());
+            pstmt.setString(2, r.getNazione());
+            pstmt.setString(3, r.getCitta());
+            pstmt.setString(4, r.getIndirizzo());
+            pstmt.setDouble(5, r.getLatitudine());
+            pstmt.setDouble(6, r.getLongitudine());
+            pstmt.setInt(7, r.getFasciaPrezzo());
+            pstmt.setBoolean(8, r.isDelivery());
+            pstmt.setBoolean(9, r.isPrenotazioneOnline());
+            pstmt.setString(10, r.getTipoCucina());
+            pstmt.setInt(11, r.getIdRistorante());
+            pstmt.setInt(12, idRistoratore);
+
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Elimina un ristorante dal database verificando che appartenga al ristoratore.
+     * @param idRistorante l'ID del ristorante da eliminare
+     * @param idRistoratore l'ID del ristoratore proprietario
+     * @return <code>true</code> se viene eliminato, <code>false</code> altrimenti
+     */
+    public boolean eliminaRistorante(int idRistorante, int idRistoratore) {
+        String query = "DELETE FROM RistorantiTheKnife WHERE id_ristorante = ? AND id_ristoratore = ?";
+
+        try (Connection conn = DatabaseManager.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, idRistorante);
+            pstmt.setInt(2, idRistoratore);
+
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

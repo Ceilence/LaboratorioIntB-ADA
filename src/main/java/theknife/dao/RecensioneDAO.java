@@ -66,37 +66,6 @@ public class RecensioneDAO {
     }
 
     /**
-     * Modifica le stelle e il testo di una recensione, verificando che l'utente sia il cliente che l'ha scritta.
-     * @param idRecensione l'ID della recensione da modificare
-     * @param idCliente l'ID del cliente autore della recensione
-     * @param nuoveStelle il nuovo voto in stelle (da 1 a 5)
-     * @param nuovoTesto il nuovo testo del commento
-     * @return <code>true</code> se la modifica riesce, <code>false</code> altrimenti
-     */
-    public boolean modificaRecensione(int idRecensione, int idCliente, int nuoveStelle, String nuovoTesto) {
-        String query = "UPDATE Recensioni rec SET stelle = ?, testo = ?, data_recensione = CURRENT_DATE " +
-                "FROM Utenti u " +
-                "WHERE rec.id_recensione = ? AND rec.id_utente = ? " +
-                "AND u.id_utente = rec.id_utente AND LOWER(u.ruolo) = 'cliente'";
-
-        try (Connection conn = DatabaseManager.connect();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-
-            pstmt.setInt(1, nuoveStelle);
-            pstmt.setString(2, nuovoTesto);
-            pstmt.setInt(3, idRecensione);
-            pstmt.setInt(4, idCliente);
-
-            return pstmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            System.err.println("Errore durante la modifica della recensione:");
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
      * Elimina una recensione dal database, verificando che l'utente sia il cliente che l'ha scritta.
      * @param idRecensione l'ID della recensione da eliminare
      * @param idCliente l'ID del cliente autore della recensione
@@ -117,51 +86,6 @@ public class RecensioneDAO {
 
         } catch (SQLException e) {
             System.err.println("Errore durante l'eliminazione della recensione:");
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * Permette al ristoratore di rispondere a una recensione di un suo ristorante (massimo una risposta).
-     * <p>
-     * Controlla che l'utente abbia il ruolo <code>ristoratore</code>, che sia il proprietario del
-     * ristorante (tramite <code>id_ristoratore</code>) e che non abbia già risposto.
-     * @param idRecensione l'ID della recensione a cui rispondere
-     * @param idRistoratore l'ID del ristoratore che sta scrivendo la risposta
-     * @param risposta il testo della risposta
-     * @return <code>true</code> se la risposta viene salvata, <code>false</code> altrimenti
-     */
-    public boolean rispostaRecensioni(int idRecensione, int idRistoratore, String risposta) {
-        if (risposta == null || risposta.trim().isEmpty()) {
-            return false;
-        }
-
-        String query = "UPDATE Recensioni rec SET risposta_ristoratore = ? " +
-                "FROM RistorantiTheKnife r, Utenti u " +
-                "WHERE rec.id_recensione = ? " +
-                "AND rec.id_ristorante = r.id_ristorante " +
-                "AND r.id_ristoratore = ? " +
-                "AND u.id_utente = ? " +
-                "AND LOWER(u.ruolo) = 'ristoratore' " +
-                "AND rec.risposta_ristoratore IS NULL";
-
-        try (Connection conn = DatabaseManager.connect();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-
-            pstmt.setString(1, risposta.trim());
-            pstmt.setInt(2, idRecensione);
-            pstmt.setInt(3, idRistoratore);
-            pstmt.setInt(4, idRistoratore);
-
-            int righeAggiornate = pstmt.executeUpdate();
-            if (righeAggiornate == 0) {
-                System.err.println("Impossibile rispondere: controlla di essere il proprietario del ristorante e di non aver già risposto.");
-            }
-            return righeAggiornate > 0;
-
-        } catch (SQLException e) {
-            System.err.println("Errore durante il salvataggio della risposta del ristoratore:");
             e.printStackTrace();
             return false;
         }
@@ -263,5 +187,77 @@ public class RecensioneDAO {
                 rs.getDate("data_recensione"),
                 rs.getString("risposta_ristoratore")
         );
+    }
+
+    /**
+     * Modifica stelle e testo di una recensione e, se il ristoratore aveva già risposto,
+     * segnala che la recensione è stata modificata dal cliente.
+     * @param idRecensione l'ID della recensione da modificare
+     * @param idCliente l'ID del cliente autore
+     * @param nuoveStelle il nuovo voto in stelle (da 1 a 5)
+     * @param nuovoTesto il nuovo testo del commento
+     * @return <code>true</code> se la modifica riesce, <code>false</code> altrimenti
+     */
+    public boolean modificaRecensione(int idRecensione, int idCliente, int nuoveStelle, String nuovoTesto) {
+        String testoPulito = nuovoTesto.replace(" [MODIFICATA DAL CLIENTE]", "").trim();
+        String query = "UPDATE Recensioni rec SET stelle = ?, " +
+                "testo = CASE WHEN rec.risposta_ristoratore IS NOT NULL THEN ? || ' [MODIFICATA DAL CLIENTE]' ELSE ? END, " +
+                "data_recensione = CURRENT_DATE " +
+                "FROM Utenti u " +
+                "WHERE rec.id_recensione = ? AND rec.id_utente = ? " +
+                "AND u.id_utente = rec.id_utente AND LOWER(u.ruolo) = 'cliente'";
+
+        try (Connection conn = DatabaseManager.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, nuoveStelle);
+            pstmt.setString(2, testoPulito);
+            pstmt.setString(3, testoPulito);
+            pstmt.setInt(4, idRecensione);
+            pstmt.setInt(5, idCliente);
+
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Permette al ristoratore di inserire o modificare la propria risposta a una recensione.
+     * <p>
+     * Quando il ristoratore aggiorna la risposta, rimuove automaticamente l'avviso di modifica dal testo.
+     * @param idRecensione l'ID della recensione a cui rispondere
+     * @param idRistoratore l'ID del ristoratore proprietario
+     * @param risposta il testo della nuova risposta
+     * @return <code>true</code> se la risposta viene salvata o aggiornata, <code>false</code> altrimenti
+     */
+    public boolean rispostaRecensioni(int idRecensione, int idRistoratore, String risposta) {
+        if (risposta == null || risposta.trim().isEmpty()) {
+            return false;
+        }
+
+        String query = "UPDATE Recensioni rec SET risposta_ristoratore = ?, " +
+                "testo = REPLACE(rec.testo, ' [MODIFICATA DAL CLIENTE]', '') " +
+                "FROM RistorantiTheKnife r, Utenti u " +
+                "WHERE rec.id_recensione = ? " +
+                "AND rec.id_ristorante = r.id_ristorante " +
+                "AND r.id_ristoratore = ? " +
+                "AND u.id_utente = ? " +
+                "AND LOWER(u.ruolo) = 'ristoratore'";
+
+        try (Connection conn = DatabaseManager.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, risposta.trim());
+            pstmt.setInt(2, idRecensione);
+            pstmt.setInt(3, idRistoratore);
+            pstmt.setInt(4, idRistoratore);
+
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

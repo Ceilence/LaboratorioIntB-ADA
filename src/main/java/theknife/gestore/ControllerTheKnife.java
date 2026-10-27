@@ -434,4 +434,72 @@ public class ControllerTheKnife {
         }
         return true;
     }
+
+    /**
+     * Aggiorna i dati e le credenziali dell'utente attualmente loggato.
+     * @param nuovoNome nuovo nome
+     * @param nuovoCognome nuovo cognome
+     * @param nuovoUsername nuovo username
+     * @param nuovoDomicilio nuovo luogo di domicilio
+     * @param nuovaPasswordInChiaro nuova password (lascia vuoto per non cambiarla)
+     * @return <code>true</code> se l'aggiornamento riesce, <code>false</code> altrimenti
+     */
+    public boolean aggiornaProfiloUtente(String nuovoNome, String nuovoCognome, String nuovoUsername,
+                                         String nuovoDomicilio, String nuovaPasswordInChiaro) {
+        Utente corrente = sessione.getUtenteCorrente();
+        if (corrente == null || corrente.isGuest()) {
+            return false;
+        }
+        try {
+            boolean cambiaPass = nuovaPasswordInChiaro != null && !nuovaPasswordInChiaro.trim().isEmpty();
+            Utente modificato = new Utente(
+                    corrente.getIdUtente(), nuovoNome, nuovoCognome, nuovoUsername,
+                    cambiaPass ? nuovaPasswordInChiaro : corrente.getPassword(),
+                    corrente.getDataNascita(), nuovoDomicilio, corrente.getRuolo()
+            );
+            if (serverRemoto.aggiornaUtente(modificato, cambiaPass)) {
+                sessione.impostaUtenteLoggato(modificato);
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Modifica un ristorante esistente del ristoratore loggato.
+     * @param ristoranteModificato l'oggetto <code>Ristorante</code> aggiornato
+     * @return <code>true</code> se la modifica riesce, <code>false</code> altrimenti
+     */
+    public boolean modificaRistorante(Ristorante ristoranteModificato) {
+        if (!verificaPermessoRistoratore("modificare un ristorante")) {
+            return false;
+        }
+        try {
+            int idRist = sessione.getUtenteCorrente().getIdUtente();
+            ristoranteModificato.setIdRistoratore(idRist);
+            return serverRemoto.modificaRistorante(ristoranteModificato, idRist);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Elimina un ristorante gestito dal ristoratore loggato.
+     * @param idRistorante l'ID del ristorante da eliminare
+     * @return <code>true</code> se viene eliminato, <code>false</code> altrimenti
+     */
+    public boolean eliminaRistorante(int idRistorante) {
+        if (!verificaPermessoRistoratore("eliminare un ristorante")) {
+            return false;
+        }
+        try {
+            return serverRemoto.eliminaRistorante(idRistorante, sessione.getUtenteCorrente().getIdUtente());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

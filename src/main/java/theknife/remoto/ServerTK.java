@@ -324,4 +324,18 @@ public class ServerTK extends UnicastRemoteObject implements ServiziTheKnife {
             e.printStackTrace();
         }
     }
+    @Override
+    public synchronized boolean modificaRistorante(Ristorante r, int idRistoratore) throws RemoteException {
+        return ristoranteDAO.modificaRistorante(r, idRistoratore);
+    }
+
+    @Override
+    public synchronized boolean eliminaRistorante(int idRistorante, int idRistoratore) throws RemoteException {
+        return ristoranteDAO.eliminaRistorante(idRistorante, idRistoratore);
+    }
+
+    @Override
+    public synchronized boolean aggiornaUtente(Utente u, boolean cambiaPassword) throws RemoteException {
+        return utenteDAO.aggiornaUtente(u, cambiaPassword);
+    }
 }

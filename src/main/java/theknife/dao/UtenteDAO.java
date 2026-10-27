@@ -188,4 +188,38 @@ public class UtenteDAO {
                 rs.getString("ruolo")
         );
     }
+
+    /**
+     * Aggiorna i dati anagrafici, lo username e (opzionalmente) la password di un utente.
+     * @param u l'oggetto <code>Utente</code> con i nuovi dati
+     * @param cambiaPassword <code>true</code> se l'utente ha inserito una nuova password da cifrare, <code>false</code> per mantenere quella attuale
+     * @return <code>true</code> se l'aggiornamento riesce, <code>false</code> altrimenti
+     */
+    public boolean aggiornaUtente(Utente u, boolean cambiaPassword) {
+        String query = cambiaPassword
+                ? "UPDATE Utenti SET nome = ?, cognome = ?, username = ?, password = ?, luogo_domicilio = ? WHERE id_utente = ?"
+                : "UPDATE Utenti SET nome = ?, cognome = ?, username = ?, luogo_domicilio = ? WHERE id_utente = ?";
+
+        try (Connection conn = DatabaseManager.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, u.getNome());
+            pstmt.setString(2, u.getCognome());
+            pstmt.setString(3, u.getUsername());
+            if (cambiaPassword) {
+                pstmt.setString(4, cifraPassword(u.getPassword()));
+                pstmt.setString(5, u.getLuogoDomicilio());
+                pstmt.setInt(6, u.getIdUtente());
+            } else {
+                pstmt.setString(4, u.getLuogoDomicilio());
+                pstmt.setInt(5, u.getIdUtente());
+            }
+
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Errore durante l'aggiornamento del profilo utente:");
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

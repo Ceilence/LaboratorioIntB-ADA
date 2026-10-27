@@ -170,4 +170,8 @@ public interface ServiziTheKnife extends Remote {
      * @throws RemoteException in caso di errore di comunicazione in rete
      */
     List<Ristorante> getRistorantiPerRistoratore(int idRistoratore) throws RemoteException;
+
+    boolean modificaRistorante(Ristorante r, int idRistoratore) throws RemoteException;
+    boolean eliminaRistorante(int idRistorante, int idRistoratore) throws RemoteException;
+    boolean aggiornaUtente(Utente u, boolean cambiaPassword) throws RemoteException;
 }
