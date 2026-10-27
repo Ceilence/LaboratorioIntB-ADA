@@ -270,8 +270,8 @@ public class ServerTK extends UnicastRemoteObject implements ServiziTheKnife {
     /**
      * Metodo principale di avvio di <code>serverTK</code>.
      * <p>
-     * Richiede all'utente l'host e le credenziali del database, verifica la connessione
-     * e pubblica il server sul registro RMI sulla porta <code>1099</code>.
+     * Richiede all'utente l'host e le credenziali del database, ripetendo la richiesta
+     * della password in caso di errore di autenticazione, e avvia il registro RMI sulla porta <code>1099</code>.
      * @param args argomenti da riga di comando
      */
     public static void main(String[] args) {
@@ -279,30 +279,35 @@ public class ServerTK extends UnicastRemoteObject implements ServiziTheKnife {
 
         System.out.println("=== AVVIO MODULO serverTK (TheKnife) ===");
         System.out.print("Inserisci l'host del DB PostgreSQL [premi Invio per 'localhost']: ");
-        String host = scanner.nextLine();
+        String host = scanner.nextLine().trim();
+        if (host.isEmpty()) {
+            host = "localhost";
+        }
 
         System.out.print("Inserisci l'username del DB [premi Invio per 'postgres']: ");
-        String dbUser = scanner.nextLine();
+        String dbUser = scanner.nextLine().trim();
+        if (dbUser.isEmpty()) {
+            dbUser = "postgres";
+        }
 
-        System.out.print("Inserisci la password del DB [premi Invio per usare quella di default]: ");
-        String dbPass = scanner.nextLine();
+        boolean connesso = false;
+        System.out.print("Inserisci la password del DB per l'utente '" + dbUser + "': ");
+        while (!connesso) {
+            String dbPass = scanner.nextLine();
 
-        DatabaseManager.configuraDatabase(
-                host.isEmpty() ? "localhost" : host,
-                dbUser.isEmpty() ? "postgres" : dbUser,
-                dbPass.isEmpty() ? null : dbPass
-        );
+            DatabaseManager.configuraDatabase(host, dbUser, dbPass);
 
-        // Verifica che le credenziali siano valide prima di avviare il server
-        try (Connection testConn = DatabaseManager.connect()) {
-            if (testConn == null) {
-                System.err.println("Impossibile avviare serverTK: credenziali o host del database non validi.");
-                return;
+            try (Connection testConn = DatabaseManager.connect()) {
+                if (testConn != null) {
+                    connesso = true;
+                    System.out.println("Connessione al database PostgreSQL stabilita con successo!");
+                } else {
+                    System.out.println("Errore: password errata o database non raggiungibile su '" + host + "'. Riprova.\n");
+                    System.out.print("Inserisci la password del DB per l'utente '" + dbUser + "': ");
+                }
+            } catch (Exception e) {
+                System.err.println("Errore imprevisto durante la verifica della connessione. Riprova.\n");
             }
-            System.out.println("Connessione al database PostgreSQL verificata con successo!");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
         }
 
         // Controlla se serve popolare il DB dal CSV

@@ -13,7 +13,8 @@ import java.sql.SQLException;
 /**
  * Classe che gestisce la connessione al database PostgreSQL tramite JDBC.
  * <p>
- * Permette di configurare dinamicamente host, username e password all'avvio di <code>serverTK</code>.
+ * Non memorizza alcuna password di default nel codice per motivi di sicurezza,
+ * richiedendo la configurazione dinamica all'avvio di <code>serverTK</code>.
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
@@ -31,9 +32,9 @@ public class DatabaseManager {
     private static String user = "postgres";
 
     /**
-     * Password per accedere a PostgreSQL <code>password</code>.
+     * Password per accedere a PostgreSQL impostata a stringa vuota di default <code>password</code>.
      */
-    private static String password;
+    private static String password = "";
 
     /**
      * Costruttore vuoto della classe <code>DatabaseManager</code>.
@@ -61,13 +62,12 @@ public class DatabaseManager {
 
     /**
      * Apre e restituisce una nuova connessione al database PostgreSQL.
-     * @return l'oggetto <code>Connection</code> attivo, oppure <code>null</code> in caso di errore
+     * @return l'oggetto <code>Connection</code> attivo, oppure <code>null</code> se le credenziali o l'host sono errati
      */
     public static Connection connect() {
         try {
             return DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
-            System.err.println("Errore di connessione al database");
             return null;
         }
     }
