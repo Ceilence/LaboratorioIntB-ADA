@@ -27,11 +27,16 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -39,8 +44,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Finestra principale per il ruolo <code>ristoratore</code> con finestre di dialogo stilizzate in verde
- * e aggiornamento automatico in tempo reale quando i clienti aggiungono o modificano recensioni.
+ * Finestra principale per il ruolo <code>ristoratore</code> con tabella recensioni divisa in 6 colonne
+ * (Stelle, Nome Utente, Commento, Data, La Tua Risposta, Modificata), pallino rosso lampeggiante
+ * per le recensioni modificate e finestra di risposta ampia e scorrevole.
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
@@ -52,7 +58,9 @@ public class FinestraRistoratore extends JFrame {
     private List<Recensione> recensioniLocaleSelezionato = new ArrayList<>();
 
     private Timer timerSyncRealTime;
-    private long ultimaVersioneNota = -1;
+    private Timer timerPallinoLampeggiante;
+    private boolean pallinoRossoVisibile = true;
+    private String ultimaImprontaRistoratore = "";
 
     private JLabel lblTitoloHeader;
     private DefaultTableModel modelloRistoranti;
@@ -61,21 +69,19 @@ public class FinestraRistoratore extends JFrame {
     private JTable tabellaRecensioni;
     private JLabel lblRiepilogoLocale;
 
-    private String ultimaImprontaRistoratore = "";
-
     public FinestraRistoratore(ControllerTheKnife controller) {
         super("TheKnife - Area Riservata Ristoratore");
         this.controller = controller;
-        this.ultimaVersioneNota = controller.getVersioneDatiServer();
         inizializzaGUI();
         caricaMieiRistoranti();
         avviaSincronizzazioneRealTime();
+        avviaAnimazionePallinoLampeggiante();
     }
 
     private void inizializzaGUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1220, 740);
-        setMinimumSize(new Dimension(820, 520));
+        setSize(1260, 740);
+        setMinimumSize(new Dimension(880, 520));
         setLocationRelativeTo(null);
         setResizable(true);
         getContentPane().setBackground(StileTheKnife.VERDE_THEKNIFE);
@@ -84,13 +90,12 @@ public class FinestraRistoratore extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (timerSyncRealTime != null) {
-                    timerSyncRealTime.stop();
-                }
+                if (timerSyncRealTime != null) timerSyncRealTime.stop();
+                if (timerPallinoLampeggiante != null) timerPallinoLampeggiante.stop();
             }
         });
 
-        // 1. BARRA SUPERIORE CON LOGO, FONT BRAND "THE KNIFE" E SPAZI PULITI
+        // 1. BARRA SUPERIORE
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(StileTheKnife.VERDE_THEKNIFE);
         topBar.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
@@ -130,6 +135,7 @@ public class FinestraRistoratore extends JFrame {
         itemLogout.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 20));
         itemLogout.addActionListener(e -> {
             if (timerSyncRealTime != null) timerSyncRealTime.stop();
+            if (timerPallinoLampeggiante != null) timerPallinoLampeggiante.stop();
             controller.logout();
             dispose();
             new FinestraIniziale(controller).setVisible(true);
@@ -148,8 +154,8 @@ public class FinestraRistoratore extends JFrame {
 
         // 2. CORPO CENTRALE CON DIVISORE VERDE CONTINUO
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, creaPannelloSinistro(), creaPannelloDestro());
-        splitPane.setResizeWeight(0.50);
-        splitPane.setDividerLocation(590);
+        splitPane.setResizeWeight(0.42);
+        splitPane.setDividerLocation(510);
         splitPane.setContinuousLayout(true);
         StileTheKnife.applicaSplitVerdeContinuo(splitPane);
 
@@ -162,9 +168,18 @@ public class FinestraRistoratore extends JFrame {
     }
 
     /**
-     * Controlla ogni 2.5 secondi direttamente dal database se un cliente ha aggiunto,
-     * modificato o eliminato una recensione, aggiornando in automatico la vista del ristoratore.
+     * Fa lampeggiare il pallino rosso nella colonna "Modificata" ogni 500 millisecondi.
      */
+    private void avviaAnimazionePallinoLampeggiante() {
+        timerPallinoLampeggiante = new Timer(500, e -> {
+            pallinoRossoVisibile = !pallinoRossoVisibile;
+            if (tabellaRecensioni != null && tabellaRecensioni.getRowCount() > 0) {
+                tabellaRecensioni.repaint();
+            }
+        });
+        timerPallinoLampeggiante.start();
+    }
+
     private void avviaSincronizzazioneRealTime() {
         timerSyncRealTime = new Timer(2500, e -> {
             int rigaRist = tabellaRistoranti.getSelectedRow();
@@ -194,42 +209,9 @@ public class FinestraRistoratore extends JFrame {
         timerSyncRealTime.start();
     }
 
-    private void caricaRecensioniRistoranteSelezionato() {
-        int riga = tabellaRistoranti.getSelectedRow();
-        modelloRecensioni.setRowCount(0);
-        if (riga < 0 || riga >= mieiRistoranti.size()) {
-            lblRiepilogoLocale.setText("Seleziona un ristorante a sinistra per vedere le recensioni");
-            return;
-        }
-
-        Ristorante r = mieiRistoranti.get(riga);
-        double[] riepilogo = controller.visualizzaRiepilogo(r.getIdRistorante());
-        lblRiepilogoLocale.setText("<html>" + r.getNome() + "   |   Media: " + riepilogo[1]
-                + " <span style='color:#F5B000;'>★</span>  (" + (int) riepilogo[0] + " recensioni)</html>");
-
-        recensioniLocaleSelezionato = controller.visualizzaRecensioni(r.getIdRistorante());
-        StringBuilder sb = new StringBuilder();
-        for (Recensione rec : recensioniLocaleSelezionato) {
-            sb.append(rec.getIdRecensione()).append(":").append(rec.getStelle()).append(":")
-                    .append(rec.getTesto()).append(":").append(rec.getRispostaRistoratore()).append("|");
-
-            String risp = (rec.getRispostaRistoratore() != null && !rec.getRispostaRistoratore().isEmpty())
-                    ? rec.getRispostaRistoratore()
-                    : "[Ancora nessuna risposta]";
-            String autore = (rec.getUsernameAutore() != null) ? "@" + rec.getUsernameAutore() + ": " : "";
-            modelloRecensioni.addRow(new Object[]{
-                    "<html>" + StileTheKnife.stelleGialleHtml(rec.getStelle()) + "</html>",
-                    autore + rec.getTesto(),
-                    rec.getDataRecensione(),
-                    risp
-            });
-        }
-        ultimaImprontaRistoratore = sb.toString();
-    }
-
     private JPanel creaPannelloSinistro() {
         JPanel panel = StileTheKnife.creaCardBianca();
-        panel.setMinimumSize(new Dimension(340, 250));
+        panel.setMinimumSize(new Dimension(320, 250));
         panel.setLayout(new BorderLayout(10, 12));
 
         JLabel lblIntestazione = new JLabel("I Miei Ristoranti Gestiti");
@@ -244,8 +226,6 @@ public class FinestraRistoratore extends JFrame {
                 return false;
             }
         };
-
-
 
         tabellaRistoranti = new JTable(modelloRistoranti);
         tabellaRistoranti.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -285,9 +265,13 @@ public class FinestraRistoratore extends JFrame {
         return panel;
     }
 
+    /**
+     * Costruisce il pannello di destra con le 6 colonne richieste:
+     * Stelle, Nome Utente, Commento, Data, La Tua Risposta e Modificata (con pallino rosso lampeggiante).
+     */
     private JPanel creaPannelloDestro() {
         JPanel panel = StileTheKnife.creaCardBianca();
-        panel.setMinimumSize(new Dimension(340, 250));
+        panel.setMinimumSize(new Dimension(420, 250));
         panel.setLayout(new BorderLayout(10, 12));
 
         lblRiepilogoLocale = new JLabel("Seleziona un ristorante a sinistra per vedere le recensioni");
@@ -295,7 +279,7 @@ public class FinestraRistoratore extends JFrame {
         lblRiepilogoLocale.setForeground(StileTheKnife.VERDE_THEKNIFE);
         panel.add(lblRiepilogoLocale, BorderLayout.NORTH);
 
-        String[] col = {"Stelle", "Commento del Cliente (e avvisi di modifica)", "Data", "La tua Risposta"};
+        String[] col = {"Stelle", "Nome Utente", "Commento", "Data", "La Tua Risposta", "Modificata"};
         modelloRecensioni = new DefaultTableModel(col, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -306,6 +290,33 @@ public class FinestraRistoratore extends JFrame {
         tabellaRecensioni = new JTable(modelloRecensioni);
         tabellaRecensioni.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         StileTheKnife.applicaStileTabella(tabellaRecensioni);
+
+        // Larghezza ottimizzata per le 6 colonne
+        tabellaRecensioni.getColumnModel().getColumn(0).setPreferredWidth(95);  // Stelle
+        tabellaRecensioni.getColumnModel().getColumn(1).setPreferredWidth(100); // Nome Utente
+        tabellaRecensioni.getColumnModel().getColumn(2).setPreferredWidth(190); // Commento
+        tabellaRecensioni.getColumnModel().getColumn(3).setPreferredWidth(85);  // Data
+        tabellaRecensioni.getColumnModel().getColumn(4).setPreferredWidth(170); // La Tua Risposta
+        tabellaRecensioni.getColumnModel().getColumn(5).setPreferredWidth(80);  // Modificata
+
+        // Renderer personalizzato per il pallino rosso lampeggiante nella colonna 5 ("Modificata")
+        tabellaRecensioni.getColumnModel().getColumn(5).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, "", isSelected, hasFocus, row, column);
+                lbl.setHorizontalAlignment(SwingConstants.CENTER);
+                boolean isModificata = Boolean.TRUE.equals(value);
+                if (isModificata && pallinoRossoVisibile) {
+                    lbl.setText("●");
+                    lbl.setFont(new Font("SansSerif", Font.BOLD, 20));
+                    lbl.setForeground(StileTheKnife.ROSSO_NOTIFICA);
+                } else {
+                    lbl.setText("");
+                }
+                return lbl;
+            }
+        });
 
         panel.add(new JScrollPane(tabellaRecensioni), BorderLayout.CENTER);
 
@@ -337,8 +348,50 @@ public class FinestraRistoratore extends JFrame {
         }
     }
 
+    private void caricaRecensioniRistoranteSelezionato() {
+        int riga = tabellaRistoranti.getSelectedRow();
+        modelloRecensioni.setRowCount(0);
+        if (riga < 0 || riga >= mieiRistoranti.size()) {
+            lblRiepilogoLocale.setText("Seleziona un ristorante a sinistra per vedere le recensioni");
+            return;
+        }
+
+        Ristorante r = mieiRistoranti.get(riga);
+        double[] riepilogo = controller.visualizzaRiepilogo(r.getIdRistorante());
+        lblRiepilogoLocale.setText("<html>" + r.getNome() + "   |   Media: " + riepilogo[1]
+                + " <span style='color:#F5B000;'>★</span>  (" + (int) riepilogo[0] + " recensioni)</html>");
+
+        recensioniLocaleSelezionato = controller.visualizzaRecensioni(r.getIdRistorante());
+        StringBuilder sb = new StringBuilder();
+        for (Recensione rec : recensioniLocaleSelezionato) {
+            sb.append(rec.getIdRecensione()).append(":").append(rec.getStelle()).append(":")
+                    .append(rec.getTesto()).append(":").append(rec.getRispostaRistoratore()).append("|");
+
+            boolean modificataDalCliente = rec.getTesto() != null && rec.getTesto().contains("[MODIFICATA DAL CLIENTE]");
+            String testoPulito = rec.getTesto() != null ? rec.getTesto().replace(" [MODIFICATA DAL CLIENTE]", "") : "";
+            String username = (rec.getUsernameAutore() != null && !rec.getUsernameAutore().isEmpty())
+                    ? rec.getUsernameAutore()
+                    : "Cliente";
+            String risp = (rec.getRispostaRistoratore() != null && !rec.getRispostaRistoratore().isEmpty())
+                    ? rec.getRispostaRistoratore()
+                    : "[Ancora nessuna risposta]";
+
+            modelloRecensioni.addRow(new Object[]{
+                    "<html>" + StileTheKnife.stelleGialleHtml(rec.getStelle()) + "</html>",
+                    username,
+                    testoPulito,
+                    rec.getDataRecensione(),
+                    risp,
+                    modificataDalCliente
+            });
+        }
+        ultimaImprontaRistoratore = sb.toString();
+    }
+
     /**
-     * Apre la finestra di dialogo stilizzata con dettagli in verde per rispondere o modificare la risposta.
+     * Apre una finestra di dialogo ben proporzionata (560x480) divisa in due parti uguali:
+     * sopra il commento completo del cliente (scorrevole e mai tagliato) e sotto un ampio box
+     * con contatore 0/400 per scrivere o modificare la risposta del ristoratore.
      */
     private void rispondiOModificaRisposta() {
         int riga = tabellaRecensioni.getSelectedRow();
@@ -348,54 +401,77 @@ public class FinestraRistoratore extends JFrame {
         }
 
         Recensione rec = recensioniLocaleSelezionato.get(riga);
+        String testoClientePulito = rec.getTesto() != null ? rec.getTesto().replace(" [MODIFICATA DAL CLIENTE]", "") : "";
         String rispostaAttuale = rec.getRispostaRistoratore() != null ? rec.getRispostaRistoratore() : "";
+        String autore = (rec.getUsernameAutore() != null) ? rec.getUsernameAutore() : "Cliente";
 
-        JPanel panel = new JPanel(new BorderLayout(10, 12));
+        // Usiamo GridLayout(2, 1) così il commento sopra non schiaccia mai la casella di risposta sotto!
+        JPanel panel = new JPanel(new GridLayout(2, 1, 0, 14));
 
-        JPanel boxRecCliente = new JPanel(new BorderLayout(6, 4));
+        // 1. Meta superiore: Commento completo del cliente in JTextArea scorrevole
+        JPanel boxRecCliente = new JPanel(new BorderLayout(6, 6));
         boxRecCliente.setBackground(StileTheKnife.VERDE_CHIARO_SFONDO);
         boxRecCliente.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 4, 0, 0, StileTheKnife.VERDE_THEKNIFE),
                 BorderFactory.createEmptyBorder(10, 12, 10, 12)
         ));
-        JLabel lblStelle = new JLabel("Recensione del Cliente (" + rec.getStelle() + "/5 ★):");
-        lblStelle.setFont(StileTheKnife.FONT_BOTTONE);
-        lblStelle.setForeground(StileTheKnife.VERDE_THEKNIFE);
-        JLabel lblCommento = StileTheKnife.creaEtichetta("<html><div style='width:380px;'>\"" + rec.getTesto() + "\"</div></html>");
-        boxRecCliente.add(lblStelle, BorderLayout.NORTH);
-        boxRecCliente.add(lblCommento, BorderLayout.CENTER);
 
+        JLabel lblStelle = new JLabel("<html>Recensione di <b>" + autore + "</b>  (" + rec.getStelle() + "/5)  "
+                + StileTheKnife.stelleGialleHtml(rec.getStelle()) + "</html>");
+        lblStelle.setFont(StileTheKnife.FONT_BOTTONE);
+        lblStelle.setForeground(StileTheKnife.TESTO_SCURO);
+
+        JTextArea txtCommentoCliente = new JTextArea(testoClientePulito);
+        txtCommentoCliente.setFont(StileTheKnife.FONT_NORMALE);
+        txtCommentoCliente.setForeground(StileTheKnife.TESTO_SCURO);
+        txtCommentoCliente.setBackground(StileTheKnife.VERDE_CHIARO_SFONDO);
+        txtCommentoCliente.setLineWrap(true);
+        txtCommentoCliente.setWrapStyleWord(true);
+        txtCommentoCliente.setEditable(false);
+        txtCommentoCliente.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+
+        JScrollPane scrollCommento = new JScrollPane(txtCommentoCliente);
+        scrollCommento.setBorder(null);
+
+        boxRecCliente.add(lblStelle, BorderLayout.NORTH);
+        boxRecCliente.add(scrollCommento, BorderLayout.CENTER);
+
+        // 2. Metà inferiore: Casella ampia per la risposta del ristoratore + contatore 0/400
         JPanel boxInputRisposta = new JPanel(new BorderLayout(6, 6));
         boxInputRisposta.setOpaque(false);
+
         JLabel lblPrompt = new JLabel("Scrivi o modifica la tua risposta ufficiale:");
         lblPrompt.setFont(StileTheKnife.FONT_BOTTONE);
         lblPrompt.setForeground(StileTheKnife.VERDE_THEKNIFE);
 
-        JTextArea txtRisposta = new JTextArea(rispostaAttuale, 4, 30);
+        JTextArea txtRisposta = new JTextArea(rispostaAttuale, 5, 30);
         txtRisposta.setFont(StileTheKnife.FONT_NORMALE);
         txtRisposta.setLineWrap(true);
         txtRisposta.setWrapStyleWord(true);
-        txtRisposta.setBorder(StileTheKnife.creaBordoInput());
+        txtRisposta.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+
+        JLabel lblContatoreRisp = new JLabel("0/400", SwingConstants.RIGHT);
+        lblContatoreRisp.setFont(new Font("SansSerif", Font.BOLD, 12));
+        StileTheKnife.applicaLimiteCaratteri(txtRisposta, lblContatoreRisp, 400);
+
+        JScrollPane scrollRisposta = new JScrollPane(txtRisposta);
+        scrollRisposta.setBorder(BorderFactory.createLineBorder(StileTheKnife.GRIGIO_BORDO, 1));
 
         boxInputRisposta.add(lblPrompt, BorderLayout.NORTH);
-        boxInputRisposta.add(new JScrollPane(txtRisposta), BorderLayout.CENTER);
+        boxInputRisposta.add(scrollRisposta, BorderLayout.CENTER);
+        boxInputRisposta.add(lblContatoreRisp, BorderLayout.SOUTH);
 
-        panel.add(boxRecCliente, BorderLayout.NORTH);
-        panel.add(boxInputRisposta, BorderLayout.CENTER);
+        panel.add(boxRecCliente);
+        panel.add(boxInputRisposta);
 
-        if (StileTheKnife.mostraDialogoStilizzato(this, "Risposta del Ristoratore", panel, "Pubblica Risposta", 520, 380)) {
+        if (StileTheKnife.mostraDialogoStilizzato(this, "Risposta del Ristoratore", panel, "Pubblica Risposta", 560, 480)) {
             String nuovaRisposta = txtRisposta.getText().trim();
             if (!nuovaRisposta.isEmpty() && controller.rispostaRecensioni(rec.getIdRecensione(), nuovaRisposta)) {
-                ultimaVersioneNota = controller.getVersioneDatiServer();
                 caricaRecensioniRistoranteSelezionato();
             }
         }
     }
 
-    /**
-     * Apre la finestra di dialogo stilizzata con barra verde per aggiungere o modificare un ristorante.
-     * @param esistente il ristorante da modificare, oppure <code>null</code> per crearne uno nuovo
-     */
     private void apriDialogRistorante(Ristorante esistente) {
         boolean modalitaModifica = (esistente != null);
 
@@ -472,7 +548,6 @@ public class FinestraRistoratore extends JFrame {
                             lat, lon, prezzo, chkDel.isSelected(), chkPren.isSelected(), cucina, esistente.getIdRistoratore()
                     );
                     if (controller.modificaRistorante(aggiornato)) {
-                        ultimaVersioneNota = controller.getVersioneDatiServer();
                         caricaMieiRistoranti();
                     }
                 } else {
@@ -481,7 +556,6 @@ public class FinestraRistoratore extends JFrame {
                             chkDel.isSelected(), chkPren.isSelected(), cucina, null
                     );
                     if (controller.aggiungiRistorante(nuovo)) {
-                        ultimaVersioneNota = controller.getVersioneDatiServer();
                         caricaMieiRistoranti();
                     }
                 }
@@ -505,7 +579,6 @@ public class FinestraRistoratore extends JFrame {
                 JOptionPane.YES_NO_OPTION
         );
         if (conferma == JOptionPane.YES_OPTION && controller.eliminaRistorante(r.getIdRistorante())) {
-            ultimaVersioneNota = controller.getVersioneDatiServer();
             caricaMieiRistoranti();
             modelloRecensioni.setRowCount(0);
         }

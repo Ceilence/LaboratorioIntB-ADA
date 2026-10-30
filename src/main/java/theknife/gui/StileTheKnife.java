@@ -19,12 +19,19 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -34,6 +41,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -42,7 +50,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Classe di utilità grafica con cache in memoria per le bandiere, validazione password e stile moderno.
+ * Classe di utilità grafica con palette <code>VERDE_THEKNIFE</code>, cache immagini,
+ * pulsanti con ripristino automatico del colore e filtro per il limite di 400 caratteri.
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
@@ -54,12 +63,8 @@ public class StileTheKnife {
     public static final Color VERDE_BOTTONE = VERDE_THEKNIFE;
     public static final Color VERDE_HOVER = new Color(10, 160, 140);
     public static final Color VERDE_CHIARO_SFONDO = new Color(224, 242, 241);
-
-    /**
-     * Giallo dorato per tutte le stelle (sia in anteprima hover sia confermate/pubblicate) <code>GIALLO_STELLA</code>.
-     */
     public static final Color GIALLO_STELLA = new Color(245, 176, 0);
-
+    public static final Color ROSSO_NOTIFICA = new Color(220, 38, 38);
     public static final Color BIANCO = Color.WHITE;
     public static final Color GRIGIO_SFONDO = new Color(244, 247, 246);
     public static final Color TESTO_SCURO = new Color(30, 40, 45);
@@ -73,20 +78,81 @@ public class StileTheKnife {
     public static final Font FONT_NORMALE = new Font("SansSerif", Font.PLAIN, 14);
     public static final Font FONT_BOTTONE = new Font("SansSerif", Font.BOLD, 14);
 
-    /**
-     * Cache in memoria per non ricaricare da disco le immagini delle bandiere durante lo scroll.
-     */
     private static final Map<String, ImageIcon> CACHE_IMMAGINI = new HashMap<>();
 
     public StileTheKnife() {
     }
 
     /**
-     * Controlla che la password rispetti i criteri di sicurezza:
-     * almeno 8 caratteri, almeno una maiuscola, almeno una minuscola e almeno un numero.
-     * @param password la password da controllare
-     * @return <code>null</code> se la password è valida, oppure il messaggio di errore da mostrare
+     * Applica a una <code>JTextArea</code> un limite massimo di caratteri (es. 400) e aggiorna
+     * in tempo reale l'etichetta contatore (es. <code>0/400</code>).
+     * @param textArea la casella di testo da limitare
+     * @param lblContatore l'etichetta che mostra il conteggio in tempo reale
+     * @param maxCaratteri il numero massimo di caratteri consentiti (es. 400)
      */
+    public static void applicaLimiteCaratteri(JTextArea textArea, JLabel lblContatore, int maxCaratteri) {
+        if (textArea.getDocument() instanceof AbstractDocument doc) {
+            doc.setDocumentFilter(new DocumentFilter() {
+                @Override
+                public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                    if (string == null) return;
+                    if ((fb.getDocument().getLength() + string.length()) <= maxCaratteri) {
+                        super.insertString(fb, offset, string, attr);
+                    } else {
+                        int spazioRimasto = maxCaratteri - fb.getDocument().getLength();
+                        if (spazioRimasto > 0) {
+                            super.insertString(fb, offset, string.substring(0, spazioRimasto), attr);
+                        } else {
+                            Toolkit.getDefaultToolkit().beep();
+                        }
+                    }
+                }
+
+                @Override
+                public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                    if (text == null) return;
+                    int lunghezzaAttuale = fb.getDocument().getLength();
+                    int nuovaLunghezza = lunghezzaAttuale - length + text.length();
+                    if (nuovaLunghezza <= maxCaratteri) {
+                        super.replace(fb, offset, length, text, attrs);
+                    } else {
+                        int spazioDisponibile = maxCaratteri - (lunghezzaAttuale - length);
+                        if (spazioDisponibile > 0) {
+                            super.replace(fb, offset, length, text.substring(0, spazioDisponibile), attrs);
+                        } else {
+                            Toolkit.getDefaultToolkit().beep();
+                        }
+                    }
+                }
+            });
+
+            Runnable aggiornaTestoContatore = () -> {
+                int len = textArea.getText().length();
+                lblContatore.setText(len + "/" + maxCaratteri);
+                lblContatore.setForeground(len >= maxCaratteri ? ROSSO_NOTIFICA : TESTO_GRIGIO);
+            };
+
+            doc.addDocumentListener(new DocumentListener() {
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    aggiornaTestoContatore.run();
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    aggiornaTestoContatore.run();
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    aggiornaTestoContatore.run();
+                }
+            });
+
+            aggiornaTestoContatore.run();
+        }
+    }
+
     public static String validaPassword(String password) {
         if (password == null || password.length() < 8) {
             return "La password deve contenere almeno 8 caratteri.";
@@ -105,13 +171,6 @@ public class StileTheKnife {
         return null;
     }
 
-    /**
-     * Carica un'immagine usando la cache in RAM per evitare rallentamenti o crash con molti ristoranti.
-     * @param nomeFile nome del file PNG
-     * @param larghezza larghezza in pixel
-     * @param altezza altezza in pixel
-     * @return <code>ImageIcon</code> ridimensionata
-     */
     public static ImageIcon caricaImmagine(String nomeFile, int larghezza, int altezza) {
         String chiaveCache = nomeFile + "_" + larghezza + "x" + altezza;
         if (CACHE_IMMAGINI.containsKey(chiaveCache)) {
@@ -222,11 +281,6 @@ public class StileTheKnife {
                 + "con particolare attenzione alla qualità delle materie prime e all'accoglienza. " + servizi;
     }
 
-    /**
-     * Restituisce una stringa HTML con le stelle piene gialle e quelle vuote grigie.
-     * @param stelle numero di stelle da 1 a 5
-     * @return stringa HTML con stelle gialle
-     */
     public static String stelleGialleHtml(int stelle) {
         int piene = Math.max(0, Math.min(5, stelle));
         String sPiene = "★".repeat(piene);
@@ -235,6 +289,12 @@ public class StileTheKnife {
                 + "<span style='color:#B0BEC5; font-size:14pt;'>" + sVuote + "</span>";
     }
 
+    /**
+     * Crea un pulsante primario che ripristina sempre il colore originale quando il mouse esce
+     * o quando il pulsante viene disabilitato.
+     * @param testo il testo del pulsante
+     * @return il componente <code>JButton</code>
+     */
     public static JButton creaBottonePrimario(String testo) {
         JButton btn = new JButton(testo);
         btn.setFont(FONT_BOTTONE);
@@ -257,14 +317,31 @@ public class StileTheKnife {
 
             @Override
             public void mouseExited(MouseEvent e) {
-                if (btn.isEnabled()) {
+                btn.setBackground(VERDE_THEKNIFE);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (!btn.isEnabled()) {
                     btn.setBackground(VERDE_THEKNIFE);
                 }
             }
         });
+
+        btn.addPropertyChangeListener("enabled", evt -> {
+            btn.setBackground(VERDE_THEKNIFE);
+            btn.setForeground(BIANCO);
+        });
+
         return btn;
     }
 
+    /**
+     * Crea un pulsante secondario che torna sempre del suo colore originale anche se
+     * viene cliccato o disabilitato mentre il cursore è sopra (es. bottoni paginazione).
+     * @param testo il testo del pulsante
+     * @return il componente <code>JButton</code>
+     */
     public static JButton creaBottoneSecondario(String testo) {
         JButton btn = new JButton(testo);
         btn.setFont(FONT_BOTTONE);
@@ -288,12 +365,24 @@ public class StileTheKnife {
 
             @Override
             public void mouseExited(MouseEvent e) {
-                if (btn.isEnabled()) {
+                btn.setBackground(VERDE_CHIARO_SFONDO);
+                btn.setForeground(VERDE_THEKNIFE);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (!btn.isEnabled()) {
                     btn.setBackground(VERDE_CHIARO_SFONDO);
                     btn.setForeground(VERDE_THEKNIFE);
                 }
             }
         });
+
+        btn.addPropertyChangeListener("enabled", evt -> {
+            btn.setBackground(VERDE_CHIARO_SFONDO);
+            btn.setForeground(VERDE_THEKNIFE);
+        });
+
         return btn;
     }
 

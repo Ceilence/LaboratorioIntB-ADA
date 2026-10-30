@@ -52,11 +52,14 @@ public class FinestraIniziale extends JFrame {
         getContentPane().setBackground(StileTheKnife.VERDE_THEKNIFE);
         setLayout(new BorderLayout());
 
-        // 1. BANNER SUPERIORE CON LOGO E FONT DISTINTIVO PER "THE KNIFE"
-        JPanel panelBanner = new JPanel(new FlowLayout(FlowLayout.CENTER, 18, 18));
+        // 1. BANNER SUPERIORE ALLINEATO A SINISTRA AL BORDO DEL RIQUADRO BIANCO (16px di margine)
+        JPanel panelBanner = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         panelBanner.setBackground(StileTheKnife.VERDE_THEKNIFE);
+        panelBanner.setBorder(BorderFactory.createEmptyBorder(18, 16, 18, 16));
 
-        panelBanner.add(StileTheKnife.creaLabelLogo(64));
+        JLabel lblLogo = StileTheKnife.creaLabelLogo(64);
+        panelBanner.add(lblLogo);
+        panelBanner.add(Box.createHorizontalStrut(16));
 
         JPanel testiBanner = new JPanel();
         testiBanner.setOpaque(false);
@@ -65,10 +68,12 @@ public class FinestraIniziale extends JFrame {
         JLabel lblTitolo = new JLabel("THE KNIFE");
         lblTitolo.setFont(StileTheKnife.FONT_BRAND_GRANDE);
         lblTitolo.setForeground(StileTheKnife.BIANCO);
+        lblTitolo.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel lblSottotitolo = new JLabel("Trova i migliori ristoranti, consulta le recensioni e condividi la tua esperienza");
         lblSottotitolo.setFont(StileTheKnife.FONT_NORMALE);
         lblSottotitolo.setForeground(StileTheKnife.VERDE_CHIARO_SFONDO);
+        lblSottotitolo.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         testiBanner.add(lblTitolo);
         testiBanner.add(Box.createVerticalStrut(4));
@@ -77,7 +82,7 @@ public class FinestraIniziale extends JFrame {
 
         add(panelBanner, BorderLayout.NORTH);
 
-        // 2. CORPO CENTRALE CON VERDE CHE CONTINUA FINO IN FONDO
+        // 2. CORPO CENTRALE CON VERDE CHE CONTINUA FINO IN FONDO (margine sinistro identico: 16px)
         JPanel panelCentrale = new JPanel(new GridLayout(1, 2, 16, 0));
         panelCentrale.setBackground(StileTheKnife.VERDE_THEKNIFE);
         panelCentrale.setBorder(BorderFactory.createEmptyBorder(0, 16, 16, 16));

@@ -129,6 +129,9 @@ public class FinestraClienteGuest extends JFrame {
     private DefaultTableModel modelloMieRecensioni;
     private JTable tabellaMieRecensioni;
 
+    private boolean inModificaInline = false;
+
+
     public FinestraClienteGuest(ControllerTheKnife controller) {
         super("TheKnife - Scopri i Ristoranti");
         this.controller = controller;
@@ -226,12 +229,12 @@ public class FinestraClienteGuest extends JFrame {
     }
 
     /**
-     * Controlla direttamente dal database (ogni 2.5 secondi) se sono cambiate le recensioni
-     * o le risposte del ristorante aperto, aggiornando la schermata da solo senza dover cliccare nulla!
+     * Controlla ogni 2.5 secondi se ci sono novità sul database (sospendendo l'aggiornamento
+     * grafico solo mentre l'utente ha il box di modifica in-place aperto).
      */
     private void avviaSincronizzazioneRealTime() {
         timerSyncRealTime = new Timer(2500, e -> {
-            if (ristoranteSelezionato != null) {
+            if (ristoranteSelezionato != null && !inModificaInline) {
                 List<Recensione> recAttuali = controller.visualizzaRecensioni(ristoranteSelezionato.getIdRistorante());
                 String nuovaImpronta = calcolaImprontaRecensioni(recAttuali);
                 if (!nuovaImpronta.equals(ultimaImprontaRecensioni)) {
@@ -630,18 +633,22 @@ public class FinestraClienteGuest extends JFrame {
     }
 
     /**
-     * Crea il riquadro di scrittura recensione: le stelle partono bianche/vuote (0/5) e si colorano
-     * di GIALLO sia quando ci passi sopra col mouse sia quando clicchi per confermare.
+     * Crea il riquadro di scrittura recensione con dimensioni fisse, compatte ed eleganti
+     * (evitando che il bottone o la casella di testo si ingrandiscano a schermo intero).
      */
     private JPanel creaBoxScritturaRecensioneInline() {
-        JPanel box = new JPanel(new BorderLayout(10, 8));
+        JPanel box = new JPanel(new BorderLayout(10, 4));
         box.setBackground(StileTheKnife.GRIGIO_SFONDO);
         box.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(StileTheKnife.GRIGIO_BORDO, 1),
-                BorderFactory.createEmptyBorder(10, 14, 10, 14)
+                BorderFactory.createEmptyBorder(8, 12, 8, 12)
         ));
         box.setAlignmentX(Component.LEFT_ALIGNMENT);
+        box.setPreferredSize(new Dimension(650, 125));
+        box.setMaximumSize(new Dimension(Integer.MAX_VALUE, 125));
+        box.setMinimumSize(new Dimension(400, 125));
 
+        // 1. Riga superiore: Titolo e 5 stelle interattive
         JPanel rigaStelle = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         rigaStelle.setOpaque(false);
 
@@ -653,7 +660,7 @@ public class FinestraClienteGuest extends JFrame {
         for (int i = 0; i < 5; i++) {
             final int valoreStella = i + 1;
             JLabel stella = new JLabel("☆");
-            stella.setFont(new Font("SansSerif", Font.BOLD, 24));
+            stella.setFont(new Font("SansSerif", Font.BOLD, 22));
             stella.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
             stella.addMouseListener(new MouseAdapter() {
@@ -685,24 +692,42 @@ public class FinestraClienteGuest extends JFrame {
 
         aggiornaColoriStelle(0, false);
 
+        // 2. Riga inferiore: Casella di testo compatta + Contatore + Bottone di dimensione fissa
         JPanel rigaInputCommento = new JPanel(new BorderLayout(10, 0));
         rigaInputCommento.setOpaque(false);
 
-        txtNuovaRecensioneInline = new JTextArea(2, 30);
+        txtNuovaRecensioneInline = new JTextArea();
         txtNuovaRecensioneInline.setFont(StileTheKnife.FONT_NORMALE);
         txtNuovaRecensioneInline.setLineWrap(true);
         txtNuovaRecensioneInline.setWrapStyleWord(true);
-        txtNuovaRecensioneInline.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
+        txtNuovaRecensioneInline.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
 
+        JLabel lblContatoreInline = new JLabel("0/400", SwingConstants.RIGHT);
+        lblContatoreInline.setFont(new Font("SansSerif", Font.BOLD, 11));
+        lblContatoreInline.setForeground(StileTheKnife.TESTO_GRIGIO);
+        StileTheKnife.applicaLimiteCaratteri(txtNuovaRecensioneInline, lblContatoreInline, 400);
+
+        JPanel centroConContatore = new JPanel(new BorderLayout(0, 2));
+        centroConContatore.setOpaque(false);
         JScrollPane scrollTxt = new JScrollPane(txtNuovaRecensioneInline);
         scrollTxt.setBorder(BorderFactory.createLineBorder(StileTheKnife.GRIGIO_BORDO));
+        centroConContatore.add(scrollTxt, BorderLayout.CENTER);
+        centroConContatore.add(lblContatoreInline, BorderLayout.SOUTH);
 
-        btnPubblicaRecensioneInline = StileTheKnife.creaBottonePrimario("Pubblica Recensione");
+        btnPubblicaRecensioneInline = StileTheKnife.creaBottonePrimario("Pubblica");
         btnPubblicaRecensioneInline.setEnabled(false);
+        btnPubblicaRecensioneInline.setPreferredSize(new Dimension(170, 38));
+        btnPubblicaRecensioneInline.setMinimumSize(new Dimension(170, 38));
+        btnPubblicaRecensioneInline.setMaximumSize(new Dimension(170, 38));
         btnPubblicaRecensioneInline.addActionListener(e -> pubblicaRecensioneInline());
 
-        rigaInputCommento.add(scrollTxt, BorderLayout.CENTER);
-        rigaInputCommento.add(btnPubblicaRecensioneInline, BorderLayout.EAST);
+        // Pannello a destra per mantenere il bottone compatto e allineato in alto
+        JPanel boxBottoneDestra = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        boxBottoneDestra.setOpaque(false);
+        boxBottoneDestra.add(btnPubblicaRecensioneInline);
+
+        rigaInputCommento.add(centroConContatore, BorderLayout.CENTER);
+        rigaInputCommento.add(boxBottoneDestra, BorderLayout.EAST);
 
         box.add(rigaStelle, BorderLayout.NORTH);
         box.add(rigaInputCommento, BorderLayout.CENTER);
@@ -780,11 +805,13 @@ public class FinestraClienteGuest extends JFrame {
     }
 
     /**
-     * Aggiorna le informazioni del ristorante e renderizza le recensioni con stelle GIALLE,
-     * username visibile per gli utenti loggati e scritte in NERO GRASSETTO.
+     * Aggiorna i dettagli del ristorante, posiziona per prima la recensione dell'utente loggato
+     * evidenziandola in grigio con modifica al volo, e formatta la risposta del ristoratore
+     * con la stessa evidenziatura della descrizione del ristorante.
      */
     private void aggiornaDatiRistoranteSenzaResetInput(Ristorante r, List<Recensione> recensioni) {
         this.ristoranteSelezionato = r;
+        this.inModificaInline = false;
         this.ultimaImprontaRecensioni = calcolaImprontaRecensioni(recensioni);
 
         panelBandieraDettaglio.removeAll();
@@ -814,7 +841,9 @@ public class FinestraClienteGuest extends JFrame {
         lblValutazioneMedia.setText(String.format("★ Media: %.1f / 5.0 (%d recensioni)", riepilogo[1], (int) riepilogo[0]));
 
         panelContenitoreRecensioni.removeAll();
-        boolean isUtenteGuest = controller.getSessione().getUtenteCorrente().isGuest();
+        Utente utenteCorrente = controller.getSessione().getUtenteCorrente();
+        boolean isUtenteGuest = utenteCorrente.isGuest();
+        int idUtenteLoggato = isUtenteGuest ? -1 : utenteCorrente.getIdUtente();
 
         if (recensioni.isEmpty()) {
             JLabel lblVuota = StileTheKnife.creaEtichetta("Ancora nessuna recensione presente per questo ristorante.");
@@ -822,44 +851,266 @@ public class FinestraClienteGuest extends JFrame {
             lblVuota.setBorder(BorderFactory.createEmptyBorder(15, 5, 15, 5));
             panelContenitoreRecensioni.add(lblVuota);
         } else {
-            for (Recensione rec : recensioni) {
-                JPanel rigaRec = new JPanel(new BorderLayout(6, 4));
-                rigaRec.setBackground(StileTheKnife.BIANCO);
-                rigaRec.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createMatteBorder(0, 0, 1, 0, StileTheKnife.GRIGIO_BORDO),
-                        BorderFactory.createEmptyBorder(10, 4, 10, 4)
-                ));
-                rigaRec.setMaximumSize(new Dimension(Integer.MAX_VALUE, 130));
+            // Ordina la lista mettendo la recensione dell'utente loggato SEMPRE AL PRIMO POSTO
+            List<Recensione> recensioniOrdinate = new ArrayList<>(recensioni);
+            recensioniOrdinate.sort((r1, r2) -> {
+                boolean r1Mia = (!isUtenteGuest && r1.getIdUtente() == idUtenteLoggato);
+                boolean r2Mia = (!isUtenteGuest && r2.getIdUtente() == idUtenteLoggato);
+                if (r1Mia && !r2Mia) return -1;
+                if (!r1Mia && r2Mia) return 1;
+                return 0;
+            });
 
-                // Se sei loggato mostra l'username reale (es. Alefrigio02), se sei Guest mostra 'Cliente Anonimo'
-                String nomeAutore = (!isUtenteGuest && rec.getUsernameAutore() != null && !rec.getUsernameAutore().isEmpty())
-                        ? rec.getUsernameAutore()
-                        : "Cliente Anonimo";
-
-                // Stelle gialle + Nome autore e data in NERO GRASSETTO
-                JLabel lblTopRec = new JLabel("<html>" + StileTheKnife.stelleGialleHtml(rec.getStelle())
-                        + "  <b style='color:#1E282D; font-size:11pt;'>(" + rec.getStelle() + "/5)   —   "
-                        + nomeAutore + "   [" + rec.getDataRecensione() + "]</b></html>");
-
-                JLabel lblTestoRec = new JLabel("<html><div style='width:460px; color:#1E282D;'><b>" + rec.getTesto() + "</b></div></html>");
-                lblTestoRec.setFont(StileTheKnife.FONT_NORMALE);
-
-                rigaRec.add(lblTopRec, BorderLayout.NORTH);
-                rigaRec.add(lblTestoRec, BorderLayout.CENTER);
-
-                if (rec.getRispostaRistoratore() != null && !rec.getRispostaRistoratore().isEmpty()) {
-                    JLabel lblRisp = new JLabel("<html><div style='color:#1E282D;'><b>Risposta del Ristoratore: " + rec.getRispostaRistoratore() + "</b></div></html>");
-                    lblRisp.setFont(StileTheKnife.FONT_NORMALE);
-                    lblRisp.setBorder(BorderFactory.createEmptyBorder(6, 14, 0, 0));
-                    rigaRec.add(lblRisp, BorderLayout.SOUTH);
-                }
-
-                panelContenitoreRecensioni.add(rigaRec);
+            for (Recensione rec : recensioniOrdinate) {
+                boolean isMiaRecensione = (!isUtenteGuest && rec.getIdUtente() == idUtenteLoggato);
+                panelContenitoreRecensioni.add(creaCardSingolaRecensione(rec, isMiaRecensione, isUtenteGuest));
+                panelContenitoreRecensioni.add(Box.createVerticalStrut(8));
             }
+            // Spinge tutte le recensioni in alto evitando che si stiracchino a schermo intero
+            panelContenitoreRecensioni.add(Box.createVerticalGlue());
         }
 
         panelContenitoreRecensioni.revalidate();
         panelContenitoreRecensioni.repaint();
+    }
+
+    /**
+     * Crea il pannello grafico di una recensione.
+     * Se appartiene all'utente loggato, la evidenzia in grigio e permette di modificarla al volo (in-place).
+     * Inoltre formatta la risposta del ristoratore con la stessa evidenziatura della descrizione del ristorante.
+     */
+    private JPanel creaCardSingolaRecensione(Recensione rec, boolean isMiaRecensione, boolean isUtenteGuest) {
+        Color coloreSfondoCard = isMiaRecensione ? StileTheKnife.GRIGIO_SFONDO : StileTheKnife.BIANCO;
+
+        JPanel rigaRec = new JPanel(new BorderLayout(8, 6)) {
+            @Override
+            public Dimension getMaximumSize() {
+                Dimension pref = getPreferredSize();
+                return new Dimension(Integer.MAX_VALUE, pref.height);
+            }
+        };
+        rigaRec.setBackground(coloreSfondoCard);
+
+        if (isMiaRecensione) {
+            rigaRec.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(StileTheKnife.GRIGIO_BORDO, 1),
+                    BorderFactory.createEmptyBorder(12, 14, 12, 14)
+            ));
+        } else {
+            rigaRec.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, StileTheKnife.GRIGIO_BORDO),
+                    BorderFactory.createEmptyBorder(12, 6, 12, 8)
+            ));
+        }
+
+        String nomeAutore = (!isUtenteGuest && rec.getUsernameAutore() != null && !rec.getUsernameAutore().isEmpty())
+                ? rec.getUsernameAutore()
+                : "Cliente Anonimo";
+
+        String tagTuaRecensione = isMiaRecensione
+                ? "  <span style='color:#006666;'>(La tua recensione)</span>"
+                : "";
+
+        // 1. BARRA SUPERIORE DELLA RECENSIONE (Stelle + Autore + eventuale bottone Modifica al volo)
+        JPanel headerRec = new JPanel(new BorderLayout());
+        headerRec.setOpaque(false);
+
+        JLabel lblTopRec = new JLabel("<html>" + StileTheKnife.stelleGialleHtml(rec.getStelle())
+                + "  <b style='color:#1E282D; font-size:11pt;'>(" + rec.getStelle() + "/5)   —   "
+                + nomeAutore + "   [" + rec.getDataRecensione() + "]" + tagTuaRecensione + "</b></html>");
+        headerRec.add(lblTopRec, BorderLayout.WEST);
+
+        // 2. CORPO CENTRALE (Testo normale in lettura, oppure Editor In-Place quando si clicca Modifica)
+        JPanel panelCorpoDinamico = new JPanel(new BorderLayout());
+        panelCorpoDinamico.setOpaque(false);
+
+        String testoPulito = rec.getTesto().replace(" [MODIFICATA DAL CLIENTE]", "");
+        JTextArea txtTestoRec = new JTextArea(testoPulito);
+        txtTestoRec.setFont(StileTheKnife.FONT_NORMALE);
+        txtTestoRec.setForeground(StileTheKnife.TESTO_SCURO);
+        txtTestoRec.setBackground(coloreSfondoCard);
+        txtTestoRec.setLineWrap(true);
+        txtTestoRec.setWrapStyleWord(true);
+        txtTestoRec.setEditable(false);
+        txtTestoRec.setFocusable(false);
+        txtTestoRec.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2));
+
+        panelCorpoDinamico.add(txtTestoRec, BorderLayout.CENTER);
+
+        // Se è la recensione dell'utente loggato, aggiungiamo il tasto "Modifica" per modificarla direttamente lì
+        if (isMiaRecensione) {
+            JPanel boxBottoniAzioneMia = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+            boxBottoniAzioneMia.setOpaque(false);
+
+            JButton btnModificaAlVolo = StileTheKnife.creaBottoneSecondario("✎ Modifica");
+            btnModificaAlVolo.setBorder(BorderFactory.createEmptyBorder(5, 12, 5, 12));
+
+            btnModificaAlVolo.addActionListener(e -> {
+                inModificaInline = true;
+                btnModificaAlVolo.setVisible(false);
+                panelCorpoDinamico.removeAll();
+
+                // Costruiamo l'editor al volo direttamente dentro la card grigia della recensione
+                JPanel editorInPlace = new JPanel(new BorderLayout(6, 6));
+                editorInPlace.setOpaque(false);
+                editorInPlace.setBorder(BorderFactory.createEmptyBorder(6, 0, 4, 0));
+
+                // Selettore 5 stelle gialle interattive per la modifica al volo
+                final int[] nuoveStelleScelte = {rec.getStelle()};
+                final JLabel[] stelleEdit = new JLabel[5];
+                JPanel rigaStelleEdit = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+                rigaStelleEdit.setOpaque(false);
+
+                JLabel lblModVoto = new JLabel("Modifica valutazione: ");
+                lblModVoto.setFont(StileTheKnife.FONT_BOTTONE);
+                lblModVoto.setForeground(StileTheKnife.TESTO_SCURO);
+                rigaStelleEdit.add(lblModVoto);
+
+                Runnable aggiornaStelleEdit = () -> {
+                    for (int k = 0; k < 5; k++) {
+                        if (k < nuoveStelleScelte[0]) {
+                            stelleEdit[k].setText("★");
+                            stelleEdit[k].setForeground(StileTheKnife.GIALLO_STELLA);
+                        } else {
+                            stelleEdit[k].setText("☆");
+                            stelleEdit[k].setForeground(new Color(180, 190, 195));
+                        }
+                    }
+                };
+
+                for (int i = 0; i < 5; i++) {
+                    final int val = i + 1;
+                    JLabel st = new JLabel("★");
+                    st.setFont(new Font("SansSerif", Font.BOLD, 22));
+                    st.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    st.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseEntered(MouseEvent ev) {
+                            for (int k = 0; k < 5; k++) {
+                                stelleEdit[k].setText(k < val ? "★" : "☆");
+                                stelleEdit[k].setForeground(k < val ? StileTheKnife.GIALLO_STELLA : new Color(180, 190, 195));
+                            }
+                        }
+
+                        @Override
+                        public void mouseExited(MouseEvent ev) {
+                            aggiornaStelleEdit.run();
+                        }
+
+                        @Override
+                        public void mouseClicked(MouseEvent ev) {
+                            nuoveStelleScelte[0] = val;
+                            aggiornaStelleEdit.run();
+                        }
+                    });
+                    stelleEdit[i] = st;
+                    rigaStelleEdit.add(st);
+                }
+                aggiornaStelleEdit.run();
+
+                // Casella di testo editabile sul posto + contatore 0/400
+                JTextArea txtEditInPlace = new JTextArea(testoPulito, 3, 25);
+                txtEditInPlace.setFont(StileTheKnife.FONT_NORMALE);
+                txtEditInPlace.setLineWrap(true);
+                txtEditInPlace.setWrapStyleWord(true);
+                txtEditInPlace.setBackground(StileTheKnife.BIANCO);
+                txtEditInPlace.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
+
+                JLabel lblContatoreEdit = new JLabel("0/400", SwingConstants.LEFT);
+                lblContatoreEdit.setFont(new Font("SansSerif", Font.BOLD, 12));
+                StileTheKnife.applicaLimiteCaratteri(txtEditInPlace, lblContatoreEdit, 400);
+
+                JScrollPane scrollEdit = new JScrollPane(txtEditInPlace);
+                scrollEdit.setBorder(BorderFactory.createLineBorder(StileTheKnife.VERDE_THEKNIFE, 1));
+
+                // Barra inferiore dell'editor in-place: Contatore a sinistra, Annulla e Salva a destra
+                JPanel barraSottoEdit = new JPanel(new BorderLayout());
+                barraSottoEdit.setOpaque(false);
+                barraSottoEdit.add(lblContatoreEdit, BorderLayout.WEST);
+
+                JPanel bottoniConferma = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+                bottoniConferma.setOpaque(false);
+
+                JButton btnAnnullaMod = StileTheKnife.creaBottoneSecondario("Annulla");
+                btnAnnullaMod.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
+
+                JButton btnSalvaMod = StileTheKnife.creaBottonePrimario("Salva Modifiche");
+                btnSalvaMod.setBorder(BorderFactory.createEmptyBorder(6, 16, 6, 16));
+
+                btnAnnullaMod.addActionListener(ev -> {
+                    inModificaInline = false;
+                    mostraDettagliRistoranteADestra(ristoranteSelezionato);
+                });
+
+                btnSalvaMod.addActionListener(ev -> {
+                    String nuovoTesto = txtEditInPlace.getText().trim();
+                    if (nuovoTesto.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Il commento della recensione non può essere vuoto.", "Attenzione", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    if (controller.modificaRecensione(rec.getIdRecensione(), nuoveStelleScelte[0], nuovoTesto)) {
+                        inModificaInline = false;
+                        mostraDettagliRistoranteADestra(ristoranteSelezionato);
+                        if (modelloMieRecensioni != null) {
+                            aggiornaTabellaMieRecensioni();
+                        }
+                    }
+                });
+
+                bottoniConferma.add(btnAnnullaMod);
+                bottoniConferma.add(btnSalvaMod);
+                barraSottoEdit.add(bottoniConferma, BorderLayout.EAST);
+
+                editorInPlace.add(rigaStelleEdit, BorderLayout.NORTH);
+                editorInPlace.add(scrollEdit, BorderLayout.CENTER);
+                editorInPlace.add(barraSottoEdit, BorderLayout.SOUTH);
+
+                panelCorpoDinamico.add(editorInPlace, BorderLayout.CENTER);
+                panelCorpoDinamico.revalidate();
+                panelCorpoDinamico.repaint();
+                txtEditInPlace.requestFocusInWindow();
+            });
+
+            boxBottoniAzioneMia.add(btnModificaAlVolo);
+            headerRec.add(boxBottoniAzioneMia, BorderLayout.EAST);
+        }
+
+        rigaRec.add(headerRec, BorderLayout.NORTH);
+        rigaRec.add(panelCorpoDinamico, BorderLayout.CENTER);
+
+        // 3. RISPOSTA DEL RISTORATORE CON EVIDENZIATURA IDENTICA ALLA DESCRIZIONE DEL RISTORANTE
+        if (rec.getRispostaRistoratore() != null && !rec.getRispostaRistoratore().isEmpty()) {
+            JPanel boxRispostaEvidenziata = new JPanel(new BorderLayout(0, 3));
+            boxRispostaEvidenziata.setBackground( isMiaRecensione ? StileTheKnife.BIANCO : StileTheKnife.GRIGIO_SFONDO );
+            boxRispostaEvidenziata.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createEmptyBorder(6, 12, 2, 0),
+                    BorderFactory.createCompoundBorder(
+                            BorderFactory.createMatteBorder(0, 3, 0, 0, StileTheKnife.VERDE_THEKNIFE),
+                            BorderFactory.createEmptyBorder(8, 12, 8, 12)
+                    )
+            ));
+
+            JLabel lblIntestazioneRisp = new JLabel("Risposta del Ristoratore:");
+            lblIntestazioneRisp.setFont(StileTheKnife.FONT_BOTTONE);
+            lblIntestazioneRisp.setForeground(StileTheKnife.TESTO_SCURO);
+
+            JTextArea txtTestoRisp = new JTextArea(rec.getRispostaRistoratore());
+            txtTestoRisp.setFont(StileTheKnife.FONT_NORMALE);
+            txtTestoRisp.setForeground(StileTheKnife.TESTO_SCURO);
+            txtTestoRisp.setBackground( isMiaRecensione ? StileTheKnife.BIANCO : StileTheKnife.GRIGIO_SFONDO );
+            txtTestoRisp.setLineWrap(true);
+            txtTestoRisp.setWrapStyleWord(true);
+            txtTestoRisp.setEditable(false);
+            txtTestoRisp.setFocusable(false);
+            txtTestoRisp.setBorder(null);
+
+            boxRispostaEvidenziata.add(lblIntestazioneRisp, BorderLayout.NORTH);
+            boxRispostaEvidenziata.add(txtTestoRisp, BorderLayout.CENTER);
+
+            rigaRec.add(boxRispostaEvidenziata, BorderLayout.SOUTH);
+        }
+
+        return rigaRec;
     }
 
     private static class RistoranteCardRenderer extends JPanel implements ListCellRenderer<Ristorante> {
@@ -1157,11 +1408,14 @@ public class FinestraClienteGuest extends JFrame {
             String risp = (rec.getRispostaRistoratore() != null) ? rec.getRispostaRistoratore() : "In attesa di risposta";
 
             modelloMieRecensioni.addRow(new Object[]{
-                    nomeRist, cittaRist, "<html>" + StileTheKnife.stelleGialleHtml(rec.getStelle()) + "</html>", rec.getTesto(), rec.getDataRecensione(), risp
+                    nomeRist, cittaRist, "<html>" + StileTheKnife.stelleGialleHtml(rec.getStelle()) + "</html>", rec.getTesto().replace(" [MODIFICATA DAL CLIENTE]", ""), rec.getDataRecensione(), risp
             });
         }
     }
 
+    /**
+     * Modifica la recensione con limite di 400 caratteri e contatore in tempo reale 0/400.
+     */
     private void modificaRecensioneSelezionata() {
         int riga = tabellaMieRecensioni.getSelectedRow();
         if (riga < 0) {
@@ -1181,7 +1435,11 @@ public class FinestraClienteGuest extends JFrame {
         txtNuovoTesto.setWrapStyleWord(true);
         txtNuovoTesto.setBorder(StileTheKnife.creaBordoInput());
 
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        JLabel lblContatoreModifica = new JLabel("0/400", SwingConstants.RIGHT);
+        lblContatoreModifica.setFont(new Font("SansSerif", Font.BOLD, 12));
+        StileTheKnife.applicaLimiteCaratteri(txtNuovoTesto, lblContatoreModifica, 400);
+
+        JPanel panel = new JPanel(new BorderLayout(10, 8));
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         top.setOpaque(false);
         JLabel lblVoto = StileTheKnife.creaEtichetta("Nuova valutazione in stelle:");
@@ -1192,8 +1450,9 @@ public class FinestraClienteGuest extends JFrame {
 
         panel.add(top, BorderLayout.NORTH);
         panel.add(new JScrollPane(txtNuovoTesto), BorderLayout.CENTER);
+        panel.add(lblContatoreModifica, BorderLayout.SOUTH);
 
-        if (StileTheKnife.mostraDialogoStilizzato(this, "Modifica la tua Recensione", panel, "Salva Modifiche", 480, 340)) {
+        if (StileTheKnife.mostraDialogoStilizzato(this, "Modifica la tua Recensione", panel, "Salva Modifiche", 500, 380)) {
             String nuovoTesto = txtNuovoTesto.getText().trim();
             if (!nuovoTesto.isEmpty() && controller.modificaRecensione(rec.getIdRecensione(), (Integer) cmbStelle.getSelectedItem(), nuovoTesto)) {
                 aggiornaTabellaMieRecensioni();
