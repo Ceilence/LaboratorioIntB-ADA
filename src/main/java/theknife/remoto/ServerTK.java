@@ -130,11 +130,7 @@ public class ServerTK extends UnicastRemoteObject implements ServiziTheKnife {
      */
     @Override
     public List<Recensione> visualizzaRecensioni(int idRistorante) throws RemoteException {
-        List<Recensione> recensioni = recensioneDAO.visualizzaRecensioni(idRistorante);
-        for (Recensione rec : recensioni) {
-            rec.setIdUtente(0);
-        }
-        return recensioni;
+        return recensioneDAO.visualizzaRecensioni(idRistorante);
     }
 
     /**

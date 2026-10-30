@@ -60,6 +60,11 @@ public class Recensione implements Serializable {
     private String rispostaRistoratore;
 
     /**
+     * Username dell'utente che ha scritto la recensione <code>usernameAutore</code>.
+     */
+    private String usernameAutore;
+
+    /**
      * Costruttore vuoto della classe <code>Recensione</code>.
      */
     public Recensione() {
@@ -213,6 +218,22 @@ public class Recensione implements Serializable {
      */
     public void setRispostaRistoratore(String rispostaRistoratore) {
         this.rispostaRistoratore = rispostaRistoratore;
+    }
+    
+    /**
+     * Restituisce lo username dell'autore della recensione.
+     * @return lo username dell'autore, oppure <code>null</code>
+     */
+    public String getUsernameAutore() {
+        return usernameAutore;
+    }
+
+    /**
+     * Imposta lo username dell'autore della recensione.
+     * @param usernameAutore nuovo valore per <code>usernameAutore</code>
+     */
+    public void setUsernameAutore(String usernameAutore) {
+        this.usernameAutore = usernameAutore;
     }
 
     /**

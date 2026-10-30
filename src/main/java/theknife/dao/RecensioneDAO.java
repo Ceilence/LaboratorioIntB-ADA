@@ -92,13 +92,15 @@ public class RecensioneDAO {
     }
 
     /**
-     * Restituisce tutte le recensioni di un ristorante, ordinate dalla più recente.
+     * Restituisce tutte le recensioni di un ristorante includendo lo username dell'autore.
      * @param idRistorante l'ID del ristorante
-     * @return lista di oggetti <code>Recensione</code> del ristorante
+     * @return lista di oggetti <code>Recensione</code>
      */
     public List<Recensione> visualizzaRecensioni(int idRistorante) {
         List<Recensione> recensioni = new ArrayList<>();
-        String query = "SELECT * FROM Recensioni WHERE id_ristorante = ? ORDER BY data_recensione DESC, id_recensione DESC";
+        String query = "SELECT rec.*, u.username FROM Recensioni rec " +
+                "JOIN Utenti u ON rec.id_utente = u.id_utente " +
+                "WHERE rec.id_ristorante = ? ORDER BY rec.data_recensione DESC, rec.id_recensione DESC";
 
         try (Connection conn = DatabaseManager.connect();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -107,7 +109,9 @@ public class RecensioneDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    recensioni.add(estraiRecensione(rs));
+                    Recensione r = estraiRecensione(rs);
+                    r.setUsernameAutore(rs.getString("username"));
+                    recensioni.add(r);
                 }
             }
         } catch (SQLException e) {

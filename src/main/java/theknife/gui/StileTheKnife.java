@@ -38,10 +38,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Classe di utilità grafica con palette <code>VERDE_THEKNIFE</code>, font dedicato per il brand,
- * caricamento automatico di logo e bandiere nazionali e finestre di dialogo personalizzate.
+ * Classe di utilità grafica con cache in memoria per le bandiere, validazione password e stile moderno.
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
@@ -53,39 +54,70 @@ public class StileTheKnife {
     public static final Color VERDE_BOTTONE = VERDE_THEKNIFE;
     public static final Color VERDE_HOVER = new Color(10, 160, 140);
     public static final Color VERDE_CHIARO_SFONDO = new Color(224, 242, 241);
-    public static final Color GIALLO_STELLA = new Color(245, 166, 35);
+
+    /**
+     * Giallo dorato per tutte le stelle (sia in anteprima hover sia confermate/pubblicate) <code>GIALLO_STELLA</code>.
+     */
+    public static final Color GIALLO_STELLA = new Color(245, 176, 0);
+
     public static final Color BIANCO = Color.WHITE;
     public static final Color GRIGIO_SFONDO = new Color(244, 247, 246);
-    public static final Color TESTO_SCURO = new Color(38, 50, 56);
+    public static final Color TESTO_SCURO = new Color(30, 40, 45);
     public static final Color TESTO_GRIGIO = new Color(100, 115, 120);
     public static final Color GRIGIO_BORDO = new Color(215, 222, 220);
 
-    /**
-     * Font distintivo ed elegante specifico per la scritta "THE KNIFE" <code>FONT_BRAND</code>.
-     */
     public static final Font FONT_BRAND = new Font("Georgia", Font.BOLD | Font.ITALIC, 22);
-
-    /**
-     * Font grande per il titolo "THE KNIFE" nella schermata di benvenuto <code>FONT_BRAND_GRANDE</code>.
-     */
     public static final Font FONT_BRAND_GRANDE = new Font("Georgia", Font.BOLD | Font.ITALIC, 32);
-
     public static final Font FONT_TITOLO = new Font("SansSerif", Font.BOLD, 24);
     public static final Font FONT_SOTTOTITOLO = new Font("SansSerif", Font.BOLD, 16);
     public static final Font FONT_NORMALE = new Font("SansSerif", Font.PLAIN, 14);
     public static final Font FONT_BOTTONE = new Font("SansSerif", Font.BOLD, 14);
 
+    /**
+     * Cache in memoria per non ricaricare da disco le immagini delle bandiere durante lo scroll.
+     */
+    private static final Map<String, ImageIcon> CACHE_IMMAGINI = new HashMap<>();
+
     public StileTheKnife() {
     }
 
     /**
-     * Carica un'immagine cercandola nella cartella del progetto o in <code>src/main/resources</code>.
-     * @param nomeFile nome del file (es. <code>logo.png</code> o <code>Flag_of_Italy.png</code>)
-     * @param larghezza larghezza desiderata in pixel
-     * @param altezza altezza desiderata in pixel
-     * @return oggetto <code>ImageIcon</code> scalato, oppure <code>null</code> se non trovato
+     * Controlla che la password rispetti i criteri di sicurezza:
+     * almeno 8 caratteri, almeno una maiuscola, almeno una minuscola e almeno un numero.
+     * @param password la password da controllare
+     * @return <code>null</code> se la password è valida, oppure il messaggio di errore da mostrare
+     */
+    public static String validaPassword(String password) {
+        if (password == null || password.length() < 8) {
+            return "La password deve contenere almeno 8 caratteri.";
+        }
+        boolean haMaiuscola = false;
+        boolean haMinuscola = false;
+        boolean haNumero = false;
+        for (char c : password.toCharArray()) {
+            if (Character.isUpperCase(c)) haMaiuscola = true;
+            else if (Character.isLowerCase(c)) haMinuscola = true;
+            else if (Character.isDigit(c)) haNumero = true;
+        }
+        if (!haMaiuscola || !haMinuscola || !haNumero) {
+            return "La password deve contenere almeno:\n- 8 caratteri\n- Una lettera maiuscola (A-Z)\n- Una lettera minuscola (a-z)\n- Un numero (0-9)";
+        }
+        return null;
+    }
+
+    /**
+     * Carica un'immagine usando la cache in RAM per evitare rallentamenti o crash con molti ristoranti.
+     * @param nomeFile nome del file PNG
+     * @param larghezza larghezza in pixel
+     * @param altezza altezza in pixel
+     * @return <code>ImageIcon</code> ridimensionata
      */
     public static ImageIcon caricaImmagine(String nomeFile, int larghezza, int altezza) {
+        String chiaveCache = nomeFile + "_" + larghezza + "x" + altezza;
+        if (CACHE_IMMAGINI.containsKey(chiaveCache)) {
+            return CACHE_IMMAGINI.get(chiaveCache);
+        }
+
         try {
             Image img = null;
             File[] possibiliPercorsi = {
@@ -107,18 +139,16 @@ public class StileTheKnife {
                 }
             }
             if (img != null) {
-                return new ImageIcon(img.getScaledInstance(larghezza, altezza, Image.SCALE_SMOOTH));
+                ImageIcon scalata = new ImageIcon(img.getScaledInstance(larghezza, altezza, Image.SCALE_SMOOTH));
+                CACHE_IMMAGINI.put(chiaveCache, scalata);
+                return scalata;
             }
         } catch (Exception ignored) {
         }
+        CACHE_IMMAGINI.put(chiaveCache, null);
         return null;
     }
 
-    /**
-     * Crea un'etichetta con il logo ufficiale dell'app.
-     * @param dimensione lato in pixel
-     * @return <code>JLabel</code> con il logo
-     */
     public static JLabel creaLabelLogo(int dimensione) {
         JLabel lbl = new JLabel();
         ImageIcon icon = caricaImmagine("logo.png", dimensione, dimensione);
@@ -128,15 +158,6 @@ public class StileTheKnife {
         return lbl;
     }
 
-    /**
-     * Restituisce un <code>JLabel</code> con l'immagine della bandiera corrispondente alla nazione del ristorante.
-     * <p>
-     * Supporta China, France, Germany, Italy, Japan, Spain, United States e usa <code>Globe.png</code> per tutti gli altri stati.
-     * @param nazione stringa della nazione del ristorante
-     * @param larghezza larghezza della bandiera in pixel
-     * @param altezza altezza della bandiera in pixel
-     * @return <code>JLabel</code> contenente la bandiera
-     */
     public static JLabel creaLabelBandiera(String nazione, int larghezza, int altezza) {
         String fileBandiera = determinaFileBandiera(nazione);
         JLabel lbl = new JLabel();
@@ -160,11 +181,6 @@ public class StileTheKnife {
         return lbl;
     }
 
-    /**
-     * Associa il nome della nazione al file PNG richiesto.
-     * @param nazione nazione del ristorante
-     * @return nome del file immagine corrispondente
-     */
     public static String determinaFileBandiera(String nazione) {
         if (nazione == null) {
             return "Globe.png";
@@ -188,11 +204,6 @@ public class StileTheKnife {
         return "Globe.png";
     }
 
-    /**
-     * Genera una descrizione ricca e veritiera per la scheda dettagli del ristorante.
-     * @param r l'oggetto <code>Ristorante</code>
-     * @return testo descrittivo del ristorante
-     */
     public static String generaDescrizioneRistorante(Ristorante r) {
         if (r == null) {
             return "";
@@ -209,6 +220,19 @@ public class StileTheKnife {
                 + r.getNome() + " è un ristorante selezionato che propone una cucina di tipo " + r.getTipoCucina() + ". "
                 + "La fascia di prezzo media indicativa è di circa " + r.getFasciaPrezzo() + " € a persona, "
                 + "con particolare attenzione alla qualità delle materie prime e all'accoglienza. " + servizi;
+    }
+
+    /**
+     * Restituisce una stringa HTML con le stelle piene gialle e quelle vuote grigie.
+     * @param stelle numero di stelle da 1 a 5
+     * @return stringa HTML con stelle gialle
+     */
+    public static String stelleGialleHtml(int stelle) {
+        int piene = Math.max(0, Math.min(5, stelle));
+        String sPiene = "★".repeat(piene);
+        String sVuote = "☆".repeat(5 - piene);
+        return "<span style='color:#F5B000; font-size:14pt;'>" + sPiene + "</span>"
+                + "<span style='color:#B0BEC5; font-size:14pt;'>" + sVuote + "</span>";
     }
 
     public static JButton creaBottonePrimario(String testo) {
@@ -369,17 +393,6 @@ public class StileTheKnife {
         }
     }
 
-    /**
-     * Crea una finestra di dialogo modale stilizzata con barra superiore <code>VERDE_THEKNIFE</code>,
-     * logo e pulsanti Conferma/Annulla moderni (sostituisce i JOptionPane grigi di sistema).
-     * @param parent finestra chiamante
-     * @param titolo titolo nell'header verde
-     * @param contenuto pannello centrale del form
-     * @param testoConferma testo del bottone verde di conferma
-     * @param larghezza larghezza del dialogo
-     * @param altezza altezza del dialogo
-     * @return <code>true</code> se l'utente ha premuto Conferma, <code>false</code> se ha premuto Annulla
-     */
     public static boolean mostraDialogoStilizzato(JFrame parent, String titolo, JPanel contenuto,
                                                   String testoConferma, int larghezza, int altezza) {
         final boolean[] confermato = {false};

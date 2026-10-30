@@ -125,18 +125,21 @@ public class RistoranteDAO {
 
         List<Object> parametri = new ArrayList<>();
 
+        // Barra di ricerca: ricerca per contenimento della parola nel nome del ristorante
         if (nomeRistorante != null && !nomeRistorante.trim().isEmpty()) {
             query.append(" AND LOWER(r.nome) LIKE LOWER(?)");
             parametri.add("%" + nomeRistorante.trim() + "%");
         }
 
+        // Filtro locazione: ricerca ESATTA per città o nazione (es. 'Rome' trova solo 'Rome')
         if (locazione != null && !locazione.trim().isEmpty()) {
-            query.append(" AND (LOWER(r.citta) LIKE LOWER(?) OR LOWER(r.nazione) LIKE LOWER(?))");
-            String locPattern = "%" + locazione.trim() + "%";
-            parametri.add(locPattern);
-            parametri.add(locPattern);
+            query.append(" AND (LOWER(TRIM(r.citta)) = LOWER(?) OR LOWER(TRIM(r.nazione)) = LOWER(?))");
+            String locEsatta = locazione.trim();
+            parametri.add(locEsatta);
+            parametri.add(locEsatta);
         }
 
+        // Filtro cucina
         if (tipoCucina != null && !tipoCucina.trim().isEmpty()) {
             query.append(" AND LOWER(r.tipo_cucina) LIKE LOWER(?)");
             parametri.add("%" + tipoCucina.trim() + "%");
@@ -166,7 +169,7 @@ public class RistoranteDAO {
             parametri.add(mediaStelleMin);
         }
 
-        query.append(" ORDER BY r.nome ASC LIMIT 100");
+        query.append(" ORDER BY r.nome ASC");
 
         try (Connection conn = DatabaseManager.connect();
              PreparedStatement pstmt = conn.prepareStatement(query.toString())) {

@@ -61,6 +61,8 @@ public class FinestraRistoratore extends JFrame {
     private JTable tabellaRecensioni;
     private JLabel lblRiepilogoLocale;
 
+    private String ultimaImprontaRistoratore = "";
+
     public FinestraRistoratore(ControllerTheKnife controller) {
         super("TheKnife - Area Riservata Ristoratore");
         this.controller = controller;
@@ -160,27 +162,69 @@ public class FinestraRistoratore extends JFrame {
     }
 
     /**
-     * Aggiorna automaticamente le tabelle del ristoratore non appena un cliente scrive o modifica una recensione.
+     * Controlla ogni 2.5 secondi direttamente dal database se un cliente ha aggiunto,
+     * modificato o eliminato una recensione, aggiornando in automatico la vista del ristoratore.
      */
     private void avviaSincronizzazioneRealTime() {
-        timerSyncRealTime = new Timer(3000, e -> {
-            long versioneAttuale = controller.getVersioneDatiServer();
-            if (versioneAttuale != -1 && versioneAttuale != ultimaVersioneNota) {
-                ultimaVersioneNota = versioneAttuale;
-                int rigaRistSelezionata = tabellaRistoranti.getSelectedRow();
-                int rigaRecSelezionata = tabellaRecensioni.getSelectedRow();
-
-                caricaMieiRistoranti();
-                if (rigaRistSelezionata >= 0 && rigaRistSelezionata < mieiRistoranti.size()) {
-                    tabellaRistoranti.setRowSelectionInterval(rigaRistSelezionata, rigaRistSelezionata);
+        timerSyncRealTime = new Timer(2500, e -> {
+            int rigaRist = tabellaRistoranti.getSelectedRow();
+            if (rigaRist >= 0 && rigaRist < mieiRistoranti.size()) {
+                Ristorante r = mieiRistoranti.get(rigaRist);
+                List<Recensione> recAttuali = controller.visualizzaRecensioni(r.getIdRistorante());
+                StringBuilder sb = new StringBuilder();
+                for (Recensione rec : recAttuali) {
+                    sb.append(rec.getIdRecensione()).append(":").append(rec.getStelle()).append(":")
+                            .append(rec.getTesto()).append(":").append(rec.getRispostaRistoratore()).append("|");
+                }
+                String nuovaImpronta = sb.toString();
+                if (!nuovaImpronta.equals(ultimaImprontaRistoratore)) {
+                    ultimaImprontaRistoratore = nuovaImpronta;
+                    int rigaRecSel = tabellaRecensioni.getSelectedRow();
+                    caricaMieiRistoranti();
+                    if (rigaRist < tabellaRistoranti.getRowCount()) {
+                        tabellaRistoranti.setRowSelectionInterval(rigaRist, rigaRist);
+                    }
                     caricaRecensioniRistoranteSelezionato();
-                    if (rigaRecSelezionata >= 0 && rigaRecSelezionata < recensioniLocaleSelezionato.size()) {
-                        tabellaRecensioni.setRowSelectionInterval(rigaRecSelezionata, rigaRecSelezionata);
+                    if (rigaRecSel >= 0 && rigaRecSel < tabellaRecensioni.getRowCount()) {
+                        tabellaRecensioni.setRowSelectionInterval(rigaRecSel, rigaRecSel);
                     }
                 }
             }
         });
         timerSyncRealTime.start();
+    }
+
+    private void caricaRecensioniRistoranteSelezionato() {
+        int riga = tabellaRistoranti.getSelectedRow();
+        modelloRecensioni.setRowCount(0);
+        if (riga < 0 || riga >= mieiRistoranti.size()) {
+            lblRiepilogoLocale.setText("Seleziona un ristorante a sinistra per vedere le recensioni");
+            return;
+        }
+
+        Ristorante r = mieiRistoranti.get(riga);
+        double[] riepilogo = controller.visualizzaRiepilogo(r.getIdRistorante());
+        lblRiepilogoLocale.setText("<html>" + r.getNome() + "   |   Media: " + riepilogo[1]
+                + " <span style='color:#F5B000;'>★</span>  (" + (int) riepilogo[0] + " recensioni)</html>");
+
+        recensioniLocaleSelezionato = controller.visualizzaRecensioni(r.getIdRistorante());
+        StringBuilder sb = new StringBuilder();
+        for (Recensione rec : recensioniLocaleSelezionato) {
+            sb.append(rec.getIdRecensione()).append(":").append(rec.getStelle()).append(":")
+                    .append(rec.getTesto()).append(":").append(rec.getRispostaRistoratore()).append("|");
+
+            String risp = (rec.getRispostaRistoratore() != null && !rec.getRispostaRistoratore().isEmpty())
+                    ? rec.getRispostaRistoratore()
+                    : "[Ancora nessuna risposta]";
+            String autore = (rec.getUsernameAutore() != null) ? "@" + rec.getUsernameAutore() + ": " : "";
+            modelloRecensioni.addRow(new Object[]{
+                    "<html>" + StileTheKnife.stelleGialleHtml(rec.getStelle()) + "</html>",
+                    autore + rec.getTesto(),
+                    rec.getDataRecensione(),
+                    risp
+            });
+        }
+        ultimaImprontaRistoratore = sb.toString();
     }
 
     private JPanel creaPannelloSinistro() {
@@ -200,6 +244,8 @@ public class FinestraRistoratore extends JFrame {
                 return false;
             }
         };
+
+
 
         tabellaRistoranti = new JTable(modelloRistoranti);
         tabellaRistoranti.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -288,32 +334,6 @@ public class FinestraRistoratore extends JFrame {
         }
         if (!mieiRistoranti.isEmpty() && tabellaRistoranti.getSelectedRow() == -1) {
             tabellaRistoranti.setRowSelectionInterval(0, 0);
-        }
-    }
-
-    private void caricaRecensioniRistoranteSelezionato() {
-        int riga = tabellaRistoranti.getSelectedRow();
-        modelloRecensioni.setRowCount(0);
-        if (riga < 0 || riga >= mieiRistoranti.size()) {
-            lblRiepilogoLocale.setText("Seleziona un ristorante a sinistra per vedere le recensioni");
-            return;
-        }
-
-        Ristorante r = mieiRistoranti.get(riga);
-        double[] riepilogo = controller.visualizzaRiepilogo(r.getIdRistorante());
-        lblRiepilogoLocale.setText(r.getNome() + "   |   Media: " + riepilogo[1] + " ★  (" + (int) riepilogo[0] + " recensioni)");
-
-        recensioniLocaleSelezionato = controller.visualizzaRecensioni(r.getIdRistorante());
-        for (Recensione rec : recensioniLocaleSelezionato) {
-            String risp = (rec.getRispostaRistoratore() != null && !rec.getRispostaRistoratore().isEmpty())
-                    ? rec.getRispostaRistoratore()
-                    : "[Ancora nessuna risposta]";
-            modelloRecensioni.addRow(new Object[]{
-                    rec.getStelle() + " ★",
-                    rec.getTesto(),
-                    rec.getDataRecensione(),
-                    risp
-            });
         }
     }
 
