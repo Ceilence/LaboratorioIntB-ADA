@@ -28,8 +28,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 
 /**
- * Finestra iniziale di TheKnife con logo ufficiale, sfondo verde continuo che stacca le due sezioni
- * e testo ospite perfettamente leggibile senza tagli.
+ * Finestra iniziale di TheKnife con titolo nel font del brand e pulsanti perfettamente allineati.
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
@@ -41,26 +40,19 @@ public class FinestraIniziale extends JFrame {
     private JPasswordField txtPassword;
     private JTextField txtLuogoGuest;
 
-    /**
-     * Costruttore della finestra iniziale.
-     * @param controller il controller attivo del client
-     */
     public FinestraIniziale(ControllerTheKnife controller) {
         super("TheKnife - Scopri e Recensisci Ristoranti nel Mondo");
         this.controller = controller;
         inizializzaGUI();
     }
 
-    /**
-     * Costruisce il layout con sfondo verde continuo che divide nettamente Login e Guest.
-     */
     private void inizializzaGUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
         getContentPane().setBackground(StileTheKnife.VERDE_THEKNIFE);
         setLayout(new BorderLayout());
 
-        // 1. BANNER SUPERIORE CON LOGO
+        // 1. BANNER SUPERIORE CON LOGO E FONT DISTINTIVO PER "THE KNIFE"
         JPanel panelBanner = new JPanel(new FlowLayout(FlowLayout.CENTER, 18, 18));
         panelBanner.setBackground(StileTheKnife.VERDE_THEKNIFE);
 
@@ -71,7 +63,7 @@ public class FinestraIniziale extends JFrame {
         testiBanner.setLayout(new BoxLayout(testiBanner, BoxLayout.Y_AXIS));
 
         JLabel lblTitolo = new JLabel("THE KNIFE");
-        lblTitolo.setFont(new Font("SansSerif", Font.BOLD, 30));
+        lblTitolo.setFont(StileTheKnife.FONT_BRAND_GRANDE);
         lblTitolo.setForeground(StileTheKnife.BIANCO);
 
         JLabel lblSottotitolo = new JLabel("Trova i migliori ristoranti, consulta le recensioni e condividi la tua esperienza");
@@ -85,7 +77,7 @@ public class FinestraIniziale extends JFrame {
 
         add(panelBanner, BorderLayout.NORTH);
 
-        // 2. CORPO CENTRALE CON IL VERDE CHE CONTINUA FINO IN FONDO PER STACCARE I DUE PANNELLI
+        // 2. CORPO CENTRALE CON VERDE CHE CONTINUA FINO IN FONDO
         JPanel panelCentrale = new JPanel(new GridLayout(1, 2, 16, 0));
         panelCentrale.setBackground(StileTheKnife.VERDE_THEKNIFE);
         panelCentrale.setBorder(BorderFactory.createEmptyBorder(0, 16, 16, 16));
@@ -99,13 +91,9 @@ public class FinestraIniziale extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    /**
-     * Costruisce la colonna di sinistra per Login e Registrazione.
-     * @return il pannello <code>JPanel</code>
-     */
     private JPanel creaPannelloLogin() {
         JPanel card = StileTheKnife.creaCardBianca();
-        card.setPreferredSize(new Dimension(420, 410));
+        card.setPreferredSize(new Dimension(420, 415));
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
         JLabel lblIntestazione = new JLabel("Accedi al tuo Account");
@@ -131,13 +119,16 @@ public class FinestraIniziale extends JFrame {
 
         JButton btnLogin = StileTheKnife.creaBottonePrimario("Accedi alla Piattaforma");
         btnLogin.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnLogin.setPreferredSize(new Dimension(360, 42));
-        btnLogin.setMaximumSize(new Dimension(360, 42));
+        btnLogin.setPreferredSize(new Dimension(360, 44));
+        btnLogin.setMinimumSize(new Dimension(360, 44));
+        btnLogin.setMaximumSize(new Dimension(360, 44));
 
+        // Altezza 48px identica al boxNota di destra così i due bottoni primari sopra sono allineati al pixel!
         JButton btnRegistrati = StileTheKnife.creaBottoneSecondario("Non hai un account? Registrati ora");
         btnRegistrati.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnRegistrati.setPreferredSize(new Dimension(360, 42));
-        btnRegistrati.setMaximumSize(new Dimension(360, 42));
+        btnRegistrati.setPreferredSize(new Dimension(360, 48));
+        btnRegistrati.setMinimumSize(new Dimension(360, 48));
+        btnRegistrati.setMaximumSize(new Dimension(360, 48));
 
         btnLogin.addActionListener(e -> gestisciLogin());
         txtPassword.addActionListener(e -> gestisciLogin());
@@ -162,17 +153,12 @@ public class FinestraIniziale extends JFrame {
         return card;
     }
 
-    /**
-     * Costruisce la colonna di destra per l'Ospite usando <code>JTextArea</code> non editabile
-     * con a capo automatico, così il testo non viene mai tagliato su nessuno schermo.
-     * @return il pannello <code>JPanel</code>
-     */
     private JPanel creaPannelloGuest() {
         JPanel card = StileTheKnife.creaCardBianca();
-        card.setPreferredSize(new Dimension(420, 410));
+        card.setPreferredSize(new Dimension(420, 415));
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-        JLabel lblIntestazione = new JLabel("Esplora come Ospite (Guest)");
+        JLabel lblIntestazione = new JLabel("Esplora come Ospite");
         lblIntestazione.setFont(StileTheKnife.FONT_SOTTOTITOLO);
         lblIntestazione.setForeground(StileTheKnife.VERDE_THEKNIFE);
         lblIntestazione.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -201,21 +187,24 @@ public class FinestraIniziale extends JFrame {
 
         JButton btnGuest = StileTheKnife.creaBottonePrimario("Continua come Guest");
         btnGuest.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnGuest.setPreferredSize(new Dimension(360, 42));
-        btnGuest.setMaximumSize(new Dimension(360, 42));
+        btnGuest.setPreferredSize(new Dimension(360, 44));
+        btnGuest.setMinimumSize(new Dimension(360, 44));
+        btnGuest.setMaximumSize(new Dimension(360, 44));
 
+        // Altezza 48px identica a btnRegistrati di sinistra per allineamento orizzontale perfetto
         JTextArea txtNota = new JTextArea("Nota: Potrai registrarti o fare il login in qualsiasi momento dal menù in alto a destra.");
-        txtNota.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        txtNota.setFont(new Font("SansSerif", Font.PLAIN, 12));
         txtNota.setForeground(StileTheKnife.VERDE_THEKNIFE);
         txtNota.setBackground(StileTheKnife.VERDE_CHIARO_SFONDO);
         txtNota.setLineWrap(true);
         txtNota.setWrapStyleWord(true);
         txtNota.setEditable(false);
         txtNota.setFocusable(false);
-        txtNota.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
+        txtNota.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         txtNota.setAlignmentX(Component.LEFT_ALIGNMENT);
-        txtNota.setPreferredSize(new Dimension(360, 52));
-        txtNota.setMaximumSize(new Dimension(360, 52));
+        txtNota.setPreferredSize(new Dimension(360, 48));
+        txtNota.setMinimumSize(new Dimension(360, 48));
+        txtNota.setMaximumSize(new Dimension(360, 48));
 
         btnGuest.addActionListener(e -> gestisciAccessoGuest());
         txtLuogoGuest.addActionListener(e -> gestisciAccessoGuest());

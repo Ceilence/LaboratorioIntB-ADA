@@ -174,4 +174,5 @@ public interface ServiziTheKnife extends Remote {
     boolean modificaRistorante(Ristorante r, int idRistoratore) throws RemoteException;
     boolean eliminaRistorante(int idRistorante, int idRistoratore) throws RemoteException;
     boolean aggiornaUtente(Utente u, boolean cambiaPassword) throws RemoteException;
+    long getVersioneDati() throws RemoteException;
 }

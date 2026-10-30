@@ -502,4 +502,16 @@ public class ControllerTheKnife {
             return false;
         }
     }
+
+    /**
+     * Restituisce il numero di versione corrente dei dati sul server per l'aggiornamento in tempo reale.
+     * @return versione numerica dei dati, oppure <code>-1</code> in caso di errore
+     */
+    public long getVersioneDatiServer() {
+        try {
+            return serverRemoto.getVersioneDati();
+        } catch (Exception e) {
+            return -1;
+        }
+    }
 }
