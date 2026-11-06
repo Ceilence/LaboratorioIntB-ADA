@@ -872,6 +872,13 @@ public class FinestraClienteGuest extends JFrame {
 
         panelContenitoreRecensioni.revalidate();
         panelContenitoreRecensioni.repaint();
+        // Forza la scrollbar delle recensioni a partire sempre dall'alto
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            if (panelContenitoreRecensioni.getParent() instanceof javax.swing.JViewport viewport) {
+                viewport.setViewPosition(new java.awt.Point(0, 0));
+            }
+        });
+
     }
 
     /**
@@ -934,6 +941,7 @@ public class FinestraClienteGuest extends JFrame {
         txtTestoRec.setEditable(false);
         txtTestoRec.setFocusable(false);
         txtTestoRec.setBorder(BorderFactory.createEmptyBorder(4, 2, 4, 2));
+        txtTestoRec.setCaretPosition(0);
 
         panelCorpoDinamico.add(txtTestoRec, BorderLayout.CENTER);
 
@@ -1103,6 +1111,7 @@ public class FinestraClienteGuest extends JFrame {
             txtTestoRisp.setEditable(false);
             txtTestoRisp.setFocusable(false);
             txtTestoRisp.setBorder(null);
+            txtTestoRisp.setCaretPosition(0);
 
             boxRispostaEvidenziata.add(lblIntestazioneRisp, BorderLayout.NORTH);
             boxRispostaEvidenziata.add(txtTestoRisp, BorderLayout.CENTER);
