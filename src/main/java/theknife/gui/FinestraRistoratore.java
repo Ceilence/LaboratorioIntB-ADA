@@ -32,7 +32,6 @@ import javax.swing.Timer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -128,7 +127,7 @@ public class FinestraRistoratore extends JFrame {
         JMenuItem itemModificaProfilo = new JMenuItem("⚙  Modifica Profilo e Credenziali");
         itemModificaProfilo.setFont(StileTheKnife.FONT_NORMALE);
         itemModificaProfilo.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 20));
-        itemModificaProfilo.addActionListener(e -> new DialogModificaProfilo(this, controller, this::aggiornaTestoHeader).setVisible(true));
+        itemModificaProfilo.addActionListener(e -> new FinestraModificaProfilo(this, controller, this::aggiornaTestoHeader).setVisible(true));
 
         JMenuItem itemLogout = new JMenuItem("🚪  Logout");
         itemLogout.setFont(StileTheKnife.FONT_NORMALE);

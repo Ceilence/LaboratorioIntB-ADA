@@ -137,7 +137,7 @@ public class FinestraIniziale extends JFrame {
 
         btnLogin.addActionListener(e -> gestisciLogin());
         txtPassword.addActionListener(e -> gestisciLogin());
-        btnRegistrati.addActionListener(e -> new DialogRegistrazione(this, controller).setVisible(true));
+        btnRegistrati.addActionListener(e -> new FinestraRegistrazione(this, controller).setVisible(true));
 
         card.add(lblIntestazione);
         card.add(Box.createVerticalStrut(4));

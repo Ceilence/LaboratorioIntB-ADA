@@ -12,7 +12,6 @@ import theknife.essenziali.Utente;
 import theknife.gestore.ControllerTheKnife;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -37,7 +36,7 @@ import java.util.List;
  * @author Antonio Pardo
  * @author Davide Moretti
  */
-public class DialogDettagliRistorante extends JDialog {
+public class FinestraDettagliRistorante extends JDialog {
 
     /**
      * Controller del client <code>controller</code>.
@@ -65,7 +64,7 @@ public class DialogDettagliRistorante extends JDialog {
      * @param controller il controller attivo del client
      * @param ristorante l'oggetto <code>Ristorante</code> da visualizzare
      */
-    public DialogDettagliRistorante(JFrame parent, ControllerTheKnife controller, Ristorante ristorante) {
+    public FinestraDettagliRistorante(JFrame parent, ControllerTheKnife controller, Ristorante ristorante) {
         super(parent, "Dettagli Ristorante - " + ristorante.getNome(), true);
         this.controller = controller;
         this.ristorante = ristorante;

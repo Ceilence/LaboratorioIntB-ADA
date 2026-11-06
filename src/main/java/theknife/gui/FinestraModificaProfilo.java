@@ -30,7 +30,7 @@ import java.awt.Insets;
  * @author Antonio Pardo
  * @author Davide Moretti
  */
-public class DialogModificaProfilo extends JDialog {
+public class FinestraModificaProfilo extends JDialog {
 
     private final ControllerTheKnife controller;
     private final Runnable callbackAggiornamento;
@@ -46,7 +46,7 @@ public class DialogModificaProfilo extends JDialog {
      * @param controller il controller attivo
      * @param callbackAggiornamento azione da eseguire per aggiornare la barra superiore dopo il salvataggio
      */
-    public DialogModificaProfilo(JFrame parent, ControllerTheKnife controller, Runnable callbackAggiornamento) {
+    public FinestraModificaProfilo(JFrame parent, ControllerTheKnife controller, Runnable callbackAggiornamento) {
         super(parent, "Il Mio Account - Modifica Credenziali", true);
         this.controller = controller;
         this.callbackAggiornamento = callbackAggiornamento;

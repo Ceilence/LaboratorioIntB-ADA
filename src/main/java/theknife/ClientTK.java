@@ -64,7 +64,7 @@ public class ClientTK {
             hostServer = nuovoHost.trim().isEmpty() ? "localhost" : nuovoHost.trim();
         }
 
-        System.out.println("clientTK connesso con successo a serverTK (" + hostServer + "). Avvio interfaccia grafica...");
+        System.out.println("clientTK connesso con successo a serverTK (" + hostServer + ")");
 
         // Avvio dell'interfaccia grafica nel thread dedicato di Swing
         SwingUtilities.invokeLater(() -> {

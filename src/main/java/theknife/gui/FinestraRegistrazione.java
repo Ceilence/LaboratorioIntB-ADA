@@ -34,7 +34,7 @@ import java.sql.Date;
  * @author Antonio Pardo
  * @author Davide Moretti
  */
-public class DialogRegistrazione extends JDialog {
+public class FinestraRegistrazione extends JDialog {
 
     /**
      * Riferimento al controller del client <code>controller</code>.
@@ -81,7 +81,7 @@ public class DialogRegistrazione extends JDialog {
      * @param parent la finestra principale da cui viene aperta la finestra di dialogo
      * @param controller il controller collegato al server
      */
-    public DialogRegistrazione(JFrame parent, ControllerTheKnife controller) {
+    public FinestraRegistrazione(JFrame parent, ControllerTheKnife controller) {
         super(parent, "Registrazione Nuovo Utente - TheKnife", true);
         this.controller = controller;
         inizializzaGUI();

@@ -278,7 +278,7 @@ public class FinestraClienteGuest extends JFrame {
             aggiornaTabellaMieRecensioni();
             cardLayoutCentrale.show(panelContenitoreViste, "RECENSIONI");
         });
-        itemProfilo.addActionListener(e -> new DialogModificaProfilo(this, controller, this::aggiornaTestoHeader).setVisible(true));
+        itemProfilo.addActionListener(e -> new FinestraModificaProfilo(this, controller, this::aggiornaTestoHeader).setVisible(true));
         itemLogout.addActionListener(e -> {
             if (timerSyncRealTime != null) timerSyncRealTime.stop();
             controller.logout();
