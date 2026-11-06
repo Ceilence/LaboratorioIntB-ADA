@@ -1,3 +1,9 @@
+/*
+ * Autori del progetto:
+ * - Alessandro Frigerio, Matricola: 759926, Sede: CO
+ * - Antonio Pardo, Matricola: 760613, Sede: CO
+ * - Davide Moretti, Matricola: 762176, Sede: CO
+ */
 package theknife.dao;
 
 import theknife.db.DatabaseManager;
@@ -13,11 +19,13 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 /**
- * Classe Data Access Object (DAO) per la gestione della persistenza dell'entitá <code>Utente</code>.
+ * Classe Data Access Object (DAO) per la gestione della persistenza dell'entità <code>Utente</code>.
  * <p>
  * Fornisce i metodi per la registrazione, l'autenticazione con password cifrata in SHA-256
  * e la ricerca degli utenti all'interno della tabella <code>Utenti</code> del database.
- * @author Alessandro Frigerio, Antonio Pardo, Davide Moretti
+ * @author Alessandro Frigerio
+ * @author Antonio Pardo
+ * @author Davide Moretti
  */
 public class UtenteDAO {
 
@@ -190,7 +198,7 @@ public class UtenteDAO {
     }
 
     /**
-     * Aggiorna i dati anagrafici, lo username e (opzionalmente) la password di un utente.
+     * Aggiorna i dati anagrafici, lo username e la password di un utente.
      * @param u l'oggetto <code>Utente</code> con i nuovi dati
      * @param cambiaPassword <code>true</code> se l'utente ha inserito una nuova password da cifrare, <code>false</code> per mantenere quella attuale
      * @return <code>true</code> se l'aggiornamento riesce, <code>false</code> altrimenti

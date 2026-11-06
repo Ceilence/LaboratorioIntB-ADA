@@ -53,9 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Finestra principale per Clienti e Ospiti con paginazione a 20 schede per pagina,
- * stelle interattive gialle con reset automatico, username visibile agli utenti loggati
- * e sincronizzazione automatica in tempo reale.
+ * Finestra principale per Clienti e Ospiti.
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
@@ -114,7 +112,7 @@ public class FinestraClienteGuest extends JFrame {
     private JLabel lblValutazioneMedia;
     private JButton btnAggiungiPreferito;
 
-    // Stelle interattive (partono da 0 = bianche/spente)
+    // Stelle interattive
     private int stelleSelezionateInline = 0;
     private final JLabel[] lblStelleInterattive = new JLabel[5];
     private JLabel lblTestoVotoScelto;
@@ -141,6 +139,7 @@ public class FinestraClienteGuest extends JFrame {
     }
 
     private void inizializzaGUI() {
+        StileTheKnife.applicaIconaFinestra(this);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1240, 780);
         setMinimumSize(new Dimension(880, 580));
@@ -159,11 +158,10 @@ public class FinestraClienteGuest extends JFrame {
         });
 
         Utente utente = controller.getSessione().getUtenteCorrente();
-
-        // 1. TOP BAR
-        JPanel topBar = new JPanel(new BorderLayout());
-        topBar.setBackground(StileTheKnife.VERDE_THEKNIFE);
-        topBar.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
+        
+        JPanel barraInAlto = new JPanel(new BorderLayout());
+        barraInAlto.setBackground(StileTheKnife.VERDE_THEKNIFE);
+        barraInAlto.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
 
         JPanel boxSinistroTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
         boxSinistroTop.setOpaque(false);
@@ -182,7 +180,7 @@ public class FinestraClienteGuest extends JFrame {
         aggiornaTestoHeader();
         boxSinistroTop.add(lblStatoHeader);
 
-        topBar.add(boxSinistroTop, BorderLayout.WEST);
+        barraInAlto.add(boxSinistroTop, BorderLayout.WEST);
 
         JPanel boxDestroTop = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 4));
         boxDestroTop.setOpaque(false);
@@ -203,8 +201,8 @@ public class FinestraClienteGuest extends JFrame {
             boxDestroTop.add(btnAccedi);
         }
 
-        topBar.add(boxDestroTop, BorderLayout.EAST);
-        add(topBar, BorderLayout.NORTH);
+        barraInAlto.add(boxDestroTop, BorderLayout.EAST);
+        add(barraInAlto, BorderLayout.NORTH);
 
         // 2. CONTENITORE VISTE
         cardLayoutCentrale = new CardLayout();

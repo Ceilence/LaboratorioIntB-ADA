@@ -102,14 +102,14 @@ public class RistoranteDAO {
      * Cerca i ristoranti combinando il testo della barra di ricerca e i vari filtri.
      * <p>
      * Se un filtro viene passato come <code>null</code>, viene semplicemente ignorato nella query.
-     * @param nomeRistorante nome o parola chiave cercata nella barra di ricerca (può essere <code>null</code>)
-     * @param locazione città o nazione del ristorante (può essere <code>null</code>)
-     * @param tipoCucina tipo di cucina cercata (può essere <code>null</code>)
-     * @param prezzoMin prezzo minimo in euro (può essere <code>null</code>)
-     * @param prezzoMax prezzo massimo in euro (può essere <code>null</code>)
-     * @param delivery true per cercare solo ristoranti con delivery (può essere <code>null</code>)
-     * @param prenotazioneOnline true per cercare solo ristoranti con prenotazione online (può essere <code>null</code>)
-     * @param mediaStelleMin media minima delle stelle da 1 a 5 (può essere <code>null</code>)
+     * @param nomeRistorante nome o parola chiave cercata nella barra di ricerca 
+     * @param locazione città o nazione del ristorante 
+     * @param tipoCucina tipo di cucina cercata 
+     * @param prezzoMin prezzo minimo in euro 
+     * @param prezzoMax prezzo massimo in euro 
+     * @param delivery true per cercare solo ristoranti con delivery 
+     * @param prenotazioneOnline true per cercare solo ristoranti con prenotazione online 
+     * @param mediaStelleMin media minima delle stelle da 1 a 5 
      * @return lista di oggetti <code>Ristorante</code> che rispettano i filtri inseriti
      */
     public List<Ristorante> cercaRistorante(String nomeRistorante, String locazione, String tipoCucina,
@@ -131,7 +131,7 @@ public class RistoranteDAO {
             parametri.add("%" + nomeRistorante.trim() + "%");
         }
 
-        // Filtro locazione: ricerca ESATTA per città o nazione (es. 'Rome' trova solo 'Rome')
+        // Filtro locazione: ricerca esatta per città o nazione
         if (locazione != null && !locazione.trim().isEmpty()) {
             query.append(" AND (LOWER(TRIM(r.citta)) = LOWER(?) OR LOWER(TRIM(r.nazione)) = LOWER(?))");
             String locEsatta = locazione.trim();

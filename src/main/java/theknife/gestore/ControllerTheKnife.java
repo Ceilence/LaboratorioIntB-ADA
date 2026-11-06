@@ -195,7 +195,7 @@ public class ControllerTheKnife {
     }
 
     /**
-     * Richiede al server la lista delle recensioni di un ristorante in forma anonima.
+     * Richiede al server la lista delle recensioni di un ristorante.
      * @param idRistorante l'ID del ristorante
      * @return lista di oggetti <code>Recensione</code>
      */

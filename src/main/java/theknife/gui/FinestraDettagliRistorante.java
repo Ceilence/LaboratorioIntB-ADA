@@ -28,10 +28,10 @@ import java.awt.GridLayout;
 import java.util.List;
 
 /**
- * Finestra di dialogo ridimensionabile che mostra i dettagli di un ristorante e le sue recensioni.
+ * Finestra di dialogo che mostra i dettagli di un ristorante e le sue recensioni.
  * <p>
  * Implementa a livello grafico <code>visualizzaRistorante()</code>, <code>visualizzaRecensioni()</code>
- * in forma anonima e, per i soli clienti loggati, l'inserimento di recensioni e l'aggiunta ai preferiti.
+ * e, per i soli clienti loggati, l'inserimento di recensioni e l'aggiunta ai preferiti.
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
@@ -82,11 +82,11 @@ public class FinestraDettagliRistorante extends JDialog {
         getContentPane().setBackground(StileTheKnife.GRIGIO_SFONDO);
         setLayout(new BorderLayout(15, 15));
 
-        // 1. HEADER CON NOME RISTORANTE E VALUTAZIONE MEDIA
         JPanel panelHeader = new JPanel(new BorderLayout(10, 5));
         panelHeader.setBackground(StileTheKnife.VERDE_THEKNIFE);
         panelHeader.setBorder(BorderFactory.createEmptyBorder(18, 25, 18, 25));
 
+        // Nome del ristorante selezionato
         JLabel lblNome = new JLabel(ristorante.getNome());
         lblNome.setFont(StileTheKnife.FONT_TITOLO);
         lblNome.setForeground(StileTheKnife.BIANCO);
@@ -99,7 +99,7 @@ public class FinestraDettagliRistorante extends JDialog {
         panelHeader.add(lblRiepilogo, BorderLayout.EAST);
         add(panelHeader, BorderLayout.NORTH);
 
-        // 2. CORPO CENTRALE: INFO RISTORANTE + LISTA RECENSIONI ANONIME
+        // Corpo centrale con info ristorante
         JPanel panelCentro = new JPanel(new BorderLayout(15, 15));
         panelCentro.setBackground(StileTheKnife.GRIGIO_SFONDO);
         panelCentro.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -132,7 +132,7 @@ public class FinestraDettagliRistorante extends JDialog {
 
         add(panelCentro, BorderLayout.CENTER);
 
-        // 3. BARRA INFERIORE (AZIONI CLIENTE O AVVISO GUEST)
+        // Barra inferiore
         JPanel panelSud = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 12));
         panelSud.setBackground(StileTheKnife.BIANCO);
         panelSud.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, StileTheKnife.GRIGIO_BORDO));
@@ -167,7 +167,7 @@ public class FinestraDettagliRistorante extends JDialog {
     }
 
     /**
-     * Ricarica dal server il riepilogo delle stelle e la lista delle recensioni anonime.
+     * Ricarica dal server il riepilogo delle stelle e la lista delle recensioni.
      */
     private void aggiornaRecensioniERiepilogo() {
         double[] riepilogo = controller.visualizzaRiepilogo(ristorante.getIdRistorante());

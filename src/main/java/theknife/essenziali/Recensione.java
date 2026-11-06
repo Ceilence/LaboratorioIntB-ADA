@@ -55,7 +55,7 @@ public class Recensione implements Serializable {
     private Date dataRecensione;
 
     /**
-     * Risposta del ristoratore alla recensione <code>rispostaRistoratore</code> (può essere null).
+     * Risposta del ristoratore alla recensione <code>rispostaRistoratore</code>.
      */
     private String rispostaRistoratore;
 
@@ -236,10 +236,7 @@ public class Recensione implements Serializable {
         this.usernameAutore = usernameAutore;
     }
 
-    /**
-     * Restituisce una stringa con i dati principali della recensione.
-     * @return stringa con stelle, testo e data
-     */
+    // Metodo toString per testing.
     @Override
     public String toString() {
         return stelle + "/5 stelle - \"" + testo + "\" (" + dataRecensione + ")";

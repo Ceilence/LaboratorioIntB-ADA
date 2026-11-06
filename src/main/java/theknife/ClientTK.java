@@ -34,7 +34,7 @@ public class ClientTK {
      * @param args argomenti da riga di comando (opzionale: indirizzo IP del server in <code>args[0]</code>)
      */
     public static void main(String[] args) {
-        // Imposta lo stile grafico del sistema operativo per rendere le finestre più moderne
+        // Imposta lo stile grafico del sistema operativo
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ignored) {
@@ -56,7 +56,7 @@ public class ClientTK {
                     hostServer
             );
 
-            // Se l'utente preme Annulla o chiude la finestra, termina il client in modo pulito
+            // Se l'utente preme Annulla o chiude la finestra, termina il client
             if (nuovoHost == null) {
                 System.out.println("Avvio di clientTK annullato dall'utente.");
                 System.exit(0);

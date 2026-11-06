@@ -27,9 +27,7 @@ import java.awt.Insets;
 import java.sql.Date;
 
 /**
- * Finestra di dialogo modale per la registrazione di un nuovo utente (Cliente o Ristoratore).
- * <p>
- * Implementa a livello grafico la funzionalità <code>registrazione()</code> richiesta dalle specifiche.
+ * Finestra di dialogo per la registrazione di un nuovo utente.
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
@@ -72,13 +70,13 @@ public class FinestraRegistrazione extends JDialog {
     private JTextField txtDomicilio;
 
     /**
-     * Menu a tendina per selezionare il ruolo (cliente o ristoratore) <code>cmbRuolo</code>.
+     * Menu a tendina per selezionare il ruolo <code>cmbRuolo</code>.
      */
     private JComboBox<String> cmbRuolo;
 
     /**
-     * Costruttore che crea e mostra il form di registrazione.
-     * @param parent la finestra principale da cui viene aperta la finestra di dialogo
+     * Costruttore che crea la finestra di registrazione.
+     * @param parent la finestra chiamante
      * @param controller il controller collegato al server
      */
     public FinestraRegistrazione(JFrame parent, ControllerTheKnife controller) {
@@ -88,27 +86,30 @@ public class FinestraRegistrazione extends JDialog {
     }
 
     /**
-     * Costruisce il layout e posiziona tutti i campi di input con il tema bianco/verde.
+     * Costruisce il layout della finestra.
      */
     private void inizializzaGUI() {
-        setSize(460, 520);
+        StileTheKnife.applicaIconaFinestra(this);
+        setSize(500, 540);
         setLocationRelativeTo(getParent());
         setResizable(false);
         setLayout(new BorderLayout());
 
-        // Intestazione verde in alto
-        JPanel panelHeader = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 15));
+        // Intestazione verde con logo
+        JPanel panelHeader = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 12));
         panelHeader.setBackground(StileTheKnife.VERDE_THEKNIFE);
+        panelHeader.add(StileTheKnife.creaLabelLogo(36));
+
         JLabel lblTitolo = new JLabel("Crea il tuo account TheKnife");
         lblTitolo.setFont(StileTheKnife.FONT_SOTTOTITOLO);
         lblTitolo.setForeground(StileTheKnife.BIANCO);
         panelHeader.add(lblTitolo);
         add(panelHeader, BorderLayout.NORTH);
 
-        // Pannello centrale bianco con i campi del form
+        // Pannello centrale con i campi
         JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBackground(StileTheKnife.BIANCO);
-        panelForm.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
+        panelForm.setBorder(BorderFactory.createEmptyBorder(18, 25, 18, 25));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(6, 6, 6, 6);
@@ -118,7 +119,9 @@ public class FinestraRegistrazione extends JDialog {
         txtNome = StileTheKnife.creaCampoTesto(18);
         txtCognome = StileTheKnife.creaCampoTesto(18);
         txtUsername = StileTheKnife.creaCampoTesto(18);
-        txtPassword = StileTheKnife.creaCampoPassword(18);
+        txtPassword = StileTheKnife.creaCampoPassword(14);
+        JPanel panelPasswordConOcchio = StileTheKnife.creaPannelloPasswordConOcchio(txtPassword, 0);
+
         txtDataNascita = StileTheKnife.creaCampoTesto(18);
         txtDataNascita.setToolTipText("Formato AAAA-MM-GG (es. 2002-05-15) oppure lascia vuoto");
         txtDomicilio = StileTheKnife.creaCampoTesto(18);
@@ -130,10 +133,19 @@ public class FinestraRegistrazione extends JDialog {
         aggiungiRigaForm(panelForm, gbc, 0, "Nome *:", txtNome);
         aggiungiRigaForm(panelForm, gbc, 1, "Cognome *:", txtCognome);
         aggiungiRigaForm(panelForm, gbc, 2, "Username / Email *:", txtUsername);
-        aggiungiRigaForm(panelForm, gbc, 3, "Password *:", txtPassword);
+        aggiungiRigaForm(panelForm, gbc, 3, "Password *:", panelPasswordConOcchio);
         aggiungiRigaForm(panelForm, gbc, 4, "Data nascita (AAAA-MM-GG):", txtDataNascita);
         aggiungiRigaForm(panelForm, gbc, 5, "Città di domicilio *:", txtDomicilio);
         aggiungiRigaForm(panelForm, gbc, 6, "Tipo di profilo *:", cmbRuolo);
+
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.gridwidth = 2;
+        JLabel lblRequisitiPwd = StileTheKnife.creaEtichetta(
+                "<html><small>La password deve avere almeno 8 caratteri, una maiuscola, una minuscola e un numero.</small></html>"
+        );
+        lblRequisitiPwd.setForeground(StileTheKnife.TESTO_GRIGIO);
+        panelForm.add(lblRequisitiPwd, gbc);
 
         add(panelForm, BorderLayout.CENTER);
 
@@ -154,26 +166,26 @@ public class FinestraRegistrazione extends JDialog {
     }
 
     /**
-     * Metodo di supporto per aggiungere una riga (etichetta + campo) nel <code>GridBagLayout</code>.
-     * @param panel il pannello contenitore
-     * @param gbc i vincoli del layout
-     * @param riga l'indice della riga
-     * @param testoEtichetta il testo della label
-     * @param campo il componente di input da affiancare
+     * Aggiunge una riga al form di registrazione.
+     * @param panel pannello del form
+     * @param gbc vincoli del layout
+     * @param riga indice della riga
+     * @param testoEtichetta testo della label
+     * @param campo componente di input
      */
     private void aggiungiRigaForm(JPanel panel, GridBagConstraints gbc, int riga, String testoEtichetta, java.awt.Component campo) {
         gbc.gridx = 0;
         gbc.gridy = riga;
-        gbc.weightx = 0.35;
+        gbc.weightx = 0.38;
         panel.add(StileTheKnife.creaEtichetta(testoEtichetta), gbc);
 
         gbc.gridx = 1;
-        gbc.weightx = 0.65;
+        gbc.weightx = 0.62;
         panel.add(campo, gbc);
     }
 
     /**
-     * Valida i dati inseriti dall'utente e invia la richiesta di registrazione al server.
+     * Verifica tutti i campi obbligatori, controlla la sicurezza della password e registra l'utente.
      */
     private void eseguiRegistrazione() {
         String nome = txtNome.getText().trim();
@@ -191,6 +203,15 @@ public class FinestraRegistrazione extends JDialog {
             return;
         }
 
+        // Controllo requisiti password (almeno 8 caratteri, maiuscola, minuscola e numero)
+        boolean errorePassword = StileTheKnife.validaPassword(password);
+        if (!errorePassword) {
+            JOptionPane.showMessageDialog(this,
+                    "La password non rispetta i criteri:\nminimo 8 caratteri, una lettera maiuscola, una minuscola, un numero"
+                    , "Password non valida", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         Date dataNascita = null;
         if (!dataStr.isEmpty()) {
             try {
@@ -204,16 +225,14 @@ public class FinestraRegistrazione extends JDialog {
         }
 
         Utente nuovoUtente = new Utente(nome, cognome, username, password, dataNascita, domicilio, ruolo);
-        boolean registrato = controller.registrazione(nuovoUtente);
-
-        if (registrato) {
+        if (controller.registrazione(nuovoUtente)) {
             JOptionPane.showMessageDialog(this,
-                    "Registrazione completata con successo!\nOra puoi effettuare il login con il tuo username '" + username + "'.",
+                    "Registrazione completata con successo!",
                     "Benvenuto in TheKnife", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } else {
             JOptionPane.showMessageDialog(this,
-                    "Impossibile completare la registrazione.\nLo username '" + username + "' potrebbe essere già in uso.",
+                    "Impossibile completare la registrazione.\nLo username '" + username + "' è già utilizzato da un altro utente.",
                     "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
         }
     }

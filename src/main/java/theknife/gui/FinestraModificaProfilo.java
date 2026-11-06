@@ -25,7 +25,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 /**
- * Finestra di dialogo per modificare i dati personali e le credenziali (username/password) dell'utente loggato.
+ * Finestra di dialogo per modificare i dati personali e la password dell'utente loggato.
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
@@ -41,10 +41,10 @@ public class FinestraModificaProfilo extends JDialog {
     private JPasswordField txtNuovaPassword;
 
     /**
-     * Costruttore del dialogo di modifica profilo.
-     * @param parent la finestra principale
-     * @param controller il controller attivo
-     * @param callbackAggiornamento azione da eseguire per aggiornare la barra superiore dopo il salvataggio
+     * Costruttore del JDialog di modifica profilo.
+     * @param parent la finestra principale chiamante
+     * @param controller il controller attivo del client
+     * @param callbackAggiornamento azione per aggiornare l'intestazione della finestra principale
      */
     public FinestraModificaProfilo(JFrame parent, ControllerTheKnife controller, Runnable callbackAggiornamento) {
         super(parent, "Il Mio Account - Modifica Credenziali", true);
@@ -54,10 +54,11 @@ public class FinestraModificaProfilo extends JDialog {
     }
 
     /**
-     * Costruisce il form con i dati attuali dell'utente precompilati.
+     * Costruisce il form precompilato.
      */
     private void inizializzaGUI() {
-        setSize(480, 440);
+        StileTheKnife.applicaIconaFinestra(this);
+        setSize(500, 460);
         setLocationRelativeTo(getParent());
         setResizable(false);
         setLayout(new BorderLayout());
@@ -89,18 +90,22 @@ public class FinestraModificaProfilo extends JDialog {
         txtUsername.setText(u.getUsername());
         txtDomicilio = StileTheKnife.creaCampoTesto(18);
         txtDomicilio.setText(u.getLuogoDomicilio());
-        txtNuovaPassword = StileTheKnife.creaCampoPassword(18);
+
+        txtNuovaPassword = StileTheKnife.creaCampoPassword(14);
+        JPanel panelNuovaPasswordConOcchio = StileTheKnife.creaPannelloPasswordConOcchio(txtNuovaPassword, 0);
 
         aggiungiRiga(form, gbc, 0, "Nome *:", txtNome);
         aggiungiRiga(form, gbc, 1, "Cognome *:", txtCognome);
         aggiungiRiga(form, gbc, 2, "Username / Email *:", txtUsername);
         aggiungiRiga(form, gbc, 3, "Città di domicilio *:", txtDomicilio);
-        aggiungiRiga(form, gbc, 4, "Nuova Password (opzionale):", txtNuovaPassword);
+        aggiungiRiga(form, gbc, 4, "Nuova Password (opzionale):", panelNuovaPasswordConOcchio);
 
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 2;
-        JLabel lblHint = StileTheKnife.creaEtichetta("<html><small>Lascia vuoto il campo password se non vuoi cambiarla.</small></html>");
+        JLabel lblHint = StileTheKnife.creaEtichetta(
+                "<html><small>Lascia vuoto il campo password per mantenere quella attuale. Se la cambi, deve avere almeno 8 caratteri, una maiuscola, una minuscola e un numero.</small></html>"
+        );
         lblHint.setForeground(StileTheKnife.TESTO_GRIGIO);
         form.add(lblHint, gbc);
 
@@ -108,6 +113,8 @@ public class FinestraModificaProfilo extends JDialog {
 
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 12));
         footer.setBackground(StileTheKnife.GRIGIO_SFONDO);
+        footer.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, StileTheKnife.GRIGIO_BORDO));
+
         JButton btnAnnulla = StileTheKnife.creaBottoneSecondario("Annulla");
         JButton btnSalva = StileTheKnife.creaBottonePrimario("Salva Modifiche");
 
@@ -119,6 +126,14 @@ public class FinestraModificaProfilo extends JDialog {
         add(footer, BorderLayout.SOUTH);
     }
 
+    /**
+     * Aggiunge una riga a un pannello.
+     * @param p
+     * @param gbc
+     * @param riga
+     * @param etichetta
+     * @param comp
+     */
     private void aggiungiRiga(JPanel p, GridBagConstraints gbc, int riga, String etichetta, java.awt.Component comp) {
         gbc.gridx = 0;
         gbc.gridy = riga;
@@ -129,6 +144,9 @@ public class FinestraModificaProfilo extends JDialog {
         p.add(comp, gbc);
     }
 
+    /**
+     * Valida i campi e controlla che l'eventuale nuova password rispetti i requisiti di sicurezza.
+     */
     private void salvaModifiche() {
         String nome = txtNome.getText().trim();
         String cognome = txtCognome.getText().trim();
@@ -139,6 +157,16 @@ public class FinestraModificaProfilo extends JDialog {
         if (nome.isEmpty() || cognome.isEmpty() || user.isEmpty() || dom.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Compila tutti i campi obbligatori (*).", "Attenzione", JOptionPane.WARNING_MESSAGE);
             return;
+        }
+
+        if (!pass.isEmpty()) {
+            boolean errorePassword = StileTheKnife.validaPassword(pass);
+            if (!errorePassword) {
+                JOptionPane.showMessageDialog(this,
+                        "La password non rispetta i criteri:\nminimo 8 caratteri, una lettera maiuscola, una minuscola, un numero",
+                        "Password non valida", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
         }
 
         if (controller.aggiornaProfiloUtente(nome, cognome, user, dom, pass)) {

@@ -43,9 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Finestra principale per il ruolo <code>ristoratore</code> con tabella recensioni divisa in 6 colonne
- * (Stelle, Nome Utente, Commento, Data, La Tua Risposta, Modificata), pallino rosso lampeggiante
- * per le recensioni modificate e finestra di risposta ampia e scorrevole.
+ * Finestra principale per il ruolo <code>ristoratore</code>.
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
@@ -78,6 +76,7 @@ public class FinestraRistoratore extends JFrame {
     }
 
     private void inizializzaGUI() {
+        StileTheKnife.applicaIconaFinestra(this);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1260, 740);
         setMinimumSize(new Dimension(880, 520));
@@ -94,7 +93,7 @@ public class FinestraRistoratore extends JFrame {
             }
         });
 
-        // 1. BARRA SUPERIORE
+        // Barra superiore
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(StileTheKnife.VERDE_THEKNIFE);
         topBar.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
@@ -151,7 +150,7 @@ public class FinestraRistoratore extends JFrame {
         topBar.add(panelAzioniTop, BorderLayout.EAST);
         add(topBar, BorderLayout.NORTH);
 
-        // 2. CORPO CENTRALE CON DIVISORE VERDE CONTINUO
+        // Corpo centrale
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, creaPannelloSinistro(), creaPannelloDestro());
         splitPane.setResizeWeight(0.42);
         splitPane.setDividerLocation(510);

@@ -50,17 +50,17 @@ public class Ristorante implements Serializable {
     private String indirizzo;
 
     /**
-     * Coordinata di latitudine <code>latitudine</code>.
+     * Coordinata di latitudine <code>latitudine</code> del ristorante.
      */
     private double latitudine;
 
     /**
-     * Coordinata di longitudine <code>longitudine</code>.
+     * Coordinata di longitudine <code>longitudine</code> del ristorante.
      */
     private double longitudine;
 
     /**
-     * Prezzo medio in euro <code>fasciaPrezzo</code>.
+     * Prezzo medio in euro <code>fasciaPrezzo</code> del ristorante.
      */
     private int fasciaPrezzo;
 
@@ -80,7 +80,7 @@ public class Ristorante implements Serializable {
     private String tipoCucina;
 
     /**
-     * ID dell'utente ristoratore proprietario del locale <code>idRistoratore</code> (può essere null).
+     * ID dell'utente ristoratore proprietario del locale <code>idRistoratore</code> .
      */
     private Integer idRistoratore;
 
@@ -103,7 +103,7 @@ public class Ristorante implements Serializable {
      * @param delivery true se ha il delivery, false altrimenti
      * @param prenotazioneOnline true se ha la prenotazione online, false altrimenti
      * @param tipoCucina tipo di cucina offerta
-     * @param idRistoratore ID del ristoratore proprietario (può essere null)
+     * @param idRistoratore ID del ristoratore proprietario
      */
     public Ristorante(int idRistorante, String nome, String nazione, String citta, String indirizzo,
                       double latitudine, double longitudine, int fasciaPrezzo,
@@ -344,10 +344,7 @@ public class Ristorante implements Serializable {
         this.idRistoratore = idRistoratore;
     }
 
-    /**
-     * Restituisce una stringa con le informazioni principali del ristorante.
-     * @return stringa descrittiva del ristorante
-     */
+    // Metodo toString per testing.
     @Override
     public String toString() {
         return nome + " (" + citta + ", " + nazione + ") - Cucina: " + tipoCucina + " - Prezzo: " + fasciaPrezzo + "€";

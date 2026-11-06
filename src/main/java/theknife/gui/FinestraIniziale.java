@@ -28,7 +28,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 
 /**
- * Finestra iniziale di TheKnife con titolo nel font del brand e pulsanti perfettamente allineati.
+ * Finestra iniziale di TheKnife.
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
@@ -47,6 +47,7 @@ public class FinestraIniziale extends JFrame {
     }
 
     private void inizializzaGUI() {
+        StileTheKnife.applicaIconaFinestra(this);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
         getContentPane().setBackground(StileTheKnife.VERDE_THEKNIFE);
@@ -118,9 +119,9 @@ public class FinestraIniziale extends JFrame {
 
         JLabel lblPass = StileTheKnife.creaEtichetta("Password:");
         lblPass.setAlignmentX(Component.LEFT_ALIGNMENT);
-        txtPassword = StileTheKnife.creaCampoPassword(20);
-        txtPassword.setAlignmentX(Component.LEFT_ALIGNMENT);
-        StileTheKnife.fissaDimensioneInput(txtPassword, 360);
+        txtPassword = StileTheKnife.creaCampoPassword(16);
+        JPanel panelPassConOcchio = StileTheKnife.creaPannelloPasswordConOcchio(txtPassword, 360);
+        panelPassConOcchio.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JButton btnLogin = StileTheKnife.creaBottonePrimario("Accedi alla Piattaforma");
         btnLogin.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -149,7 +150,7 @@ public class FinestraIniziale extends JFrame {
         card.add(Box.createVerticalStrut(16));
         card.add(lblPass);
         card.add(Box.createVerticalStrut(6));
-        card.add(txtPassword);
+        card.add(panelPassConOcchio);
         card.add(Box.createVerticalGlue());
         card.add(btnLogin);
         card.add(Box.createVerticalStrut(12));

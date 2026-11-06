@@ -14,7 +14,7 @@ import java.sql.SQLException;
  * Classe che gestisce la connessione al database PostgreSQL tramite JDBC.
  * <p>
  * Non memorizza alcuna password di default nel codice per motivi di sicurezza,
- * richiedendo la configurazione dinamica all'avvio di <code>serverTK</code>.
+ * richiedendola all'avvio di <code>serverTK</code>.
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti

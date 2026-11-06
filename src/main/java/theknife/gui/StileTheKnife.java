@@ -50,8 +50,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Classe di utilità grafica con palette <code>VERDE_THEKNIFE</code>, cache immagini,
- * pulsanti con ripristino automatico del colore e filtro per il limite di 400 caratteri.
+ * Classe di utilità grafica.
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
@@ -84,11 +83,11 @@ public class StileTheKnife {
     }
 
     /**
-     * Applica a una <code>JTextArea</code> un limite massimo di caratteri (es. 400) e aggiorna
-     * in tempo reale l'etichetta contatore (es. <code>0/400</code>).
+     * Applica a una <code>JTextArea</code> un limite massimo di caratteri e aggiorna
+     * in tempo reale l'etichetta contatore.
      * @param textArea la casella di testo da limitare
      * @param lblContatore l'etichetta che mostra il conteggio in tempo reale
-     * @param maxCaratteri il numero massimo di caratteri consentiti (es. 400)
+     * @param maxCaratteri il numero massimo di caratteri consentiti
      */
     public static void applicaLimiteCaratteri(JTextArea textArea, JLabel lblContatore, int maxCaratteri) {
         if (textArea.getDocument() instanceof AbstractDocument doc) {
@@ -153,23 +152,34 @@ public class StileTheKnife {
         }
     }
 
-    public static String validaPassword(String password) {
+    /**
+     * Controlla che la password rispetti i requisiti minimi di sicurezza:
+     * almeno 8 caratteri, una lettera maiuscola, una lettera minuscola e un numero.
+     * @param password la password in chiaro da verificare
+     * @return <code>null</code> se la password è valida, oppure il messaggio di errore da mostrare all'utente
+     */
+    public static boolean validaPassword(String password) {
         if (password == null || password.length() < 8) {
-            return "La password deve contenere almeno 8 caratteri.";
+            return false;
         }
         boolean haMaiuscola = false;
         boolean haMinuscola = false;
         boolean haNumero = false;
+
         for (char c : password.toCharArray()) {
-            if (Character.isUpperCase(c)) haMaiuscola = true;
-            else if (Character.isLowerCase(c)) haMinuscola = true;
-            else if (Character.isDigit(c)) haNumero = true;
+            if (Character.isUpperCase(c)) {
+                haMaiuscola = true;
+            } else if (Character.isLowerCase(c)) {
+                haMinuscola = true;
+            } else if (Character.isDigit(c)) {
+                haNumero = true;
+            }
         }
-        if (!haMaiuscola || !haMinuscola || !haNumero) {
-            return "La password deve contenere almeno:\n- 8 caratteri\n- Una lettera maiuscola (A-Z)\n- Una lettera minuscola (a-z)\n- Un numero (0-9)";
-        }
-        return null;
+
+        return haMaiuscola && haMinuscola && haNumero;
     }
+
+
 
     public static ImageIcon caricaImmagine(String nomeFile, int larghezza, int altezza) {
         String chiaveCache = nomeFile + "_" + larghezza + "x" + altezza;
@@ -486,6 +496,7 @@ public class StileTheKnife {
                                                   String testoConferma, int larghezza, int altezza) {
         final boolean[] confermato = {false};
         JDialog dialog = new JDialog(parent, titolo, true);
+        applicaIconaFinestra(dialog);
         dialog.setSize(larghezza, altezza);
         dialog.setLocationRelativeTo(parent);
         dialog.setResizable(false);
@@ -528,5 +539,72 @@ public class StileTheKnife {
     public static String formattaFasciaPrezzo(int prezzo) {
         int numSimboli = Math.max(1, Math.min(4, Math.round(prezzo / 25.0f)));
         return "€".repeat(numSimboli) + " (" + prezzo + "€)";
+    }
+
+    /**
+     * Imposta l'immagine <code>logo.png</code> come icona della finestra nella barra del titolo
+     * del sistema operativo (in alto a sinistra) e nella barra delle applicazioni.
+     * @param finestra il <code>JFrame</code> o <code>JDialog</code> a cui applicare l'icona
+     */
+    public static void applicaIconaFinestra(java.awt.Window finestra) {
+        ImageIcon icona = caricaImmagine("logo.png", 64, 64);
+        if (icona != null && finestra != null) {
+            finestra.setIconImage(icona.getImage());
+        }
+    }
+
+    /**
+     * Crea un pannello che affianca alla casella della password un riquadro cliccabile con l'occhio
+     * per mostrare o nascondere la password che si sta scrivendo.
+     * @param pwdField il componente <code>JPasswordField</code> già creato
+     * @param larghezzaTotale larghezza complessiva (in pixel) del campo più il pulsante occhio
+     * @return un <code>JPanel</code> pronto da inserire nel form al posto del singolo <code>JPasswordField</code>
+     */
+    public static JPanel creaPannelloPasswordConOcchio(JPasswordField pwdField, int larghezzaTotale) {
+        JPanel panel = new JPanel(new BorderLayout(5, 0));
+        panel.setOpaque(false);
+
+        JButton btnOcchio = new JButton("👁");
+        btnOcchio.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        btnOcchio.setBackground(VERDE_CHIARO_SFONDO);
+        btnOcchio.setForeground(VERDE_THEKNIFE);
+        btnOcchio.setFocusPainted(false);
+        btnOcchio.setBorderPainted(false);
+        btnOcchio.setContentAreaFilled(false);
+        btnOcchio.setOpaque(true);
+        btnOcchio.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnOcchio.setToolTipText("Mostra / Nascondi password");
+
+        Dimension dimOcchio = new Dimension(40, 38);
+        btnOcchio.setPreferredSize(dimOcchio);
+        btnOcchio.setMinimumSize(dimOcchio);
+        btnOcchio.setMaximumSize(dimOcchio);
+        btnOcchio.setBorder(BorderFactory.createLineBorder(GRIGIO_BORDO, 1));
+
+        btnOcchio.addActionListener(e -> {
+            if (pwdField.getEchoChar() != (char) 0) {
+                // Mostra la password in chiaro
+                pwdField.setEchoChar((char) 0);
+                btnOcchio.setBackground(VERDE_THEKNIFE);
+                btnOcchio.setForeground(BIANCO);
+            } else {
+                // Torna a nascondere la password con i pallini
+                pwdField.setEchoChar('\u2022');
+                btnOcchio.setBackground(VERDE_CHIARO_SFONDO);
+                btnOcchio.setForeground(VERDE_THEKNIFE);
+            }
+            pwdField.requestFocusInWindow();
+        });
+
+        panel.add(pwdField, BorderLayout.CENTER);
+        panel.add(btnOcchio, BorderLayout.EAST);
+
+        if (larghezzaTotale > 0) {
+            Dimension d = new Dimension(larghezzaTotale, 38);
+            panel.setPreferredSize(d);
+            panel.setMinimumSize(d);
+            panel.setMaximumSize(d);
+        }
+        return panel;
     }
 }

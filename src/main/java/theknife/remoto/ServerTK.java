@@ -54,6 +54,7 @@ public class ServerTK extends UnicastRemoteObject implements ServiziTheKnife {
      */
     private final RecensioneDAO recensioneDAO;
     private final java.util.concurrent.atomic.AtomicLong versioneDati = new java.util.concurrent.atomic.AtomicLong(1);
+
     /**
      * Costruttore che inizializza l'oggetto remoto <code>ServerTK</code> e i relativi DAO.
      * @throws RemoteException se si verifica un errore nell'esportazione dell'oggetto RMI

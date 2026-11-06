@@ -1,3 +1,9 @@
+/*
+ * Autori del progetto:
+ * - Alessandro Frigerio, Matricola: 759926, Sede: CO
+ * - Antonio Pardo, Matricola: 760613, Sede: CO
+ * - Davide Moretti, Matricola: 762176, Sede: CO
+ */
 package theknife.db;
 
 import org.apache.commons.csv.CSVFormat;
@@ -13,8 +19,9 @@ import java.util.Random;
  * <p>
  * Implementa la lettura formattata tramite la libreria <em>Apache Commons CSV</em>
  * e l'inserimento all'interno della tabella <code>RistorantiTheKnife</code> usando JDBC.
- *
- * @author Alessandro Frigerio, Antonio Pardo, Davide Moretti
+ * @author Alessandro Frigerio
+ * @author Antonio Pardo
+ * @author Davide Moretti
  */
 public class ImportatoreCSV {
 

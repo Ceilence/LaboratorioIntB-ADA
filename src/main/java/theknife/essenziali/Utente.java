@@ -1,15 +1,23 @@
+/*
+ * Autori del progetto:
+ * - Alessandro Frigerio, Matricola: 759926, Sede: CO
+ * - Antonio Pardo, Matricola: 760613, Sede: CO
+ * - Davide Moretti, Matricola: 762176, Sede: CO
+ */
 package theknife.essenziali;
 
 import java.io.Serializable;
 import java.sql.Date;
 
 /**
- * Classe che rappresenta l'entitá Utente all'interno del sistema.
+ * Classe che rappresenta l'entità Utente all'interno del sistema.
  * <p>
  * Mappa la struttura della tabella relazionale <code>Utenti</code> del database e gestisce
  * sia i profili di tipo cliente sia quelli di tipo ristoratore tramite l'attributo <code>ruolo</code>.
  * Implementa <code>Serializable</code> per il trasferimento dati tra client e server.
- * @author Alessandro Frigerio, Antonio Pardo, Davide Moretti
+ * @author Alessandro Frigerio
+ * @author Antonio Pardo
+ * @author Davide Moretti
  */
 public class Utente implements Serializable {
 
@@ -49,7 +57,7 @@ public class Utente implements Serializable {
     private Date dataNascita;
 
     /**
-     * Cittá o indirizzo di domicilio dell'utente <code>luogoDomicilio</code>.
+     * Città o indirizzo di domicilio dell'utente <code>luogoDomicilio</code>.
      */
     private String luogoDomicilio;
 
@@ -272,10 +280,7 @@ public class Utente implements Serializable {
         return "ristoratore".equalsIgnoreCase(this.ruolo) || "gestore".equalsIgnoreCase(this.ruolo);
     }
 
-    /**
-     * Restituisce una rappresentazione testuale dell'oggetto <code>Utente</code>.
-     * @return stringa contenente username, nome, cognome e ruolo dell'utente
-     */
+    // Metodo toString per testing.
     @Override
     public String toString() {
         return username + " (" + nome + " " + cognome + " - " + ruolo + ")";

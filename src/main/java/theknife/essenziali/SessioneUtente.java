@@ -67,7 +67,7 @@ public class SessioneUtente {
     }
 
     /**
-     * Restituisce il luogo di riferimento dell'utente attivo (il luogo scelto dal Guest o il domicilio del loggato).
+     * Restituisce il luogo di riferimento dell'utente attivo.
      * @return il nome del luogo associato alla sessione, oppure <code>null</code> se nessuno è entrato
      */
     public String getLuogoRiferimento() {
@@ -78,7 +78,7 @@ public class SessioneUtente {
     }
 
     /**
-     * Indica se c'è un utente attivo (Guest o registrato) nella sessione.
+     * Indica se c'è un utente attivo nella sessione.
      * @return <code>true</code> se la sessione è attiva, <code>false</code> se si è ancora nel menù iniziale
      */
     public boolean isSessioneAttiva() {
