@@ -50,42 +50,67 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Classe di utilità grafica.
+ * Classe di utilità grafica che raccoglie colori, font e metodi statici
+ * per la creazione e personalizzazione dei componenti dell'interfaccia.
+ *
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
  */
 public class StileTheKnife {
 
+    /** Colore verde principale del brand TheKnife. */
     public static final Color VERDE_THEKNIFE = new Color(0, 102, 102);
+    /** Alias per il colore primario dell'applicazione. */
     public static final Color VERDE_PRIMARIO = VERDE_THEKNIFE;
+    /** Colore di sfondo predefinito per i bottoni primari. */
     public static final Color VERDE_BOTTONE = VERDE_THEKNIFE;
+    /** Colore verde più chiaro per l'effetto al passaggio del mouse sui bottoni. */
     public static final Color VERDE_HOVER = new Color(10, 160, 140);
+    /** Colore verde chiaro usato per gli sfondi secondari e la selezione. */
     public static final Color VERDE_CHIARO_SFONDO = new Color(224, 242, 241);
+    /** Colore giallo utilizzato per rappresentare le stelle delle recensioni. */
     public static final Color GIALLO_STELLA = new Color(245, 176, 0);
+    /** Colore rosso usato per messaggi di errore o avvisi. */
     public static final Color ROSSO_NOTIFICA = new Color(220, 38, 38);
+    /** Colore bianco standard. */
     public static final Color BIANCO = Color.WHITE;
+    /** Colore grigio chiaro per lo sfondo dei pannelli principali. */
     public static final Color GRIGIO_SFONDO = new Color(244, 247, 246);
+    /** Colore scuro per il testo principale. */
     public static final Color TESTO_SCURO = new Color(30, 40, 45);
+    /** Colore grigio per testi secondari o didascalie. */
     public static final Color TESTO_GRIGIO = new Color(100, 115, 120);
+    /** Colore grigio chiaro per i bordi dei componenti e delle tabelle. */
     public static final Color GRIGIO_BORDO = new Color(215, 222, 220);
 
+    /** Font utilizzato per il logo testuale di dimensione standard. */
     public static final Font FONT_BRAND = new Font("Georgia", Font.BOLD | Font.ITALIC, 22);
+    /** Font utilizzato per il logo testuale di dimensione grande. */
     public static final Font FONT_BRAND_GRANDE = new Font("Georgia", Font.BOLD | Font.ITALIC, 32);
+    /** Font utilizzato per i titoli principali delle schermate. */
     public static final Font FONT_TITOLO = new Font("SansSerif", Font.BOLD, 24);
+    /** Font utilizzato per i sottotitoli e le intestazioni di sezione. */
     public static final Font FONT_SOTTOTITOLO = new Font("SansSerif", Font.BOLD, 16);
+    /** Font standard per il testo normale e i campi di input. */
     public static final Font FONT_NORMALE = new Font("SansSerif", Font.PLAIN, 14);
+    /** Font in grassetto utilizzato per il testo dei pulsanti. */
     public static final Font FONT_BOTTONE = new Font("SansSerif", Font.BOLD, 14);
 
+    /** Mappa per salvare in cache le immagini già caricate e ridimensionate. */
     private static final Map<String, ImageIcon> CACHE_IMMAGINI = new HashMap<>();
 
+    /**
+     * Costruttore vuoto della classe.
+     */
     public StileTheKnife() {
     }
 
     /**
      * Applica a una <code>JTextArea</code> un limite massimo di caratteri e aggiorna
      * in tempo reale l'etichetta contatore.
-     * @param textArea la casella di testo da limitare
+     *
+     * @param textArea     la casella di testo da limitare
      * @param lblContatore l'etichetta che mostra il conteggio in tempo reale
      * @param maxCaratteri il numero massimo di caratteri consentiti
      */
@@ -155,8 +180,9 @@ public class StileTheKnife {
     /**
      * Controlla che la password rispetti i requisiti minimi di sicurezza:
      * almeno 8 caratteri, una lettera maiuscola, una lettera minuscola e un numero.
+     *
      * @param password la password in chiaro da verificare
-     * @return <code>null</code> se la password è valida, oppure il messaggio di errore da mostrare all'utente
+     * @return <code>true</code> se la password rispetta i requisiti, <code>false</code> altrimenti
      */
     public static boolean validaPassword(String password) {
         if (password == null || password.length() < 8) {
@@ -179,8 +205,15 @@ public class StileTheKnife {
         return haMaiuscola && haMinuscola && haNumero;
     }
 
-
-
+    /**
+     * Carica un'immagine dai file di progetto o dalle risorse, la ridimensiona
+     * e la salva in cache per evitare caricamenti ripetuti.
+     *
+     * @param nomeFile  il nome del file dell'immagine (es. "logo.png")
+     * @param larghezza la larghezza desiderata in pixel
+     * @param altezza   l'altezza desiderata in pixel
+     * @return l'oggetto <code>ImageIcon</code> ridimensionato, oppure <code>null</code> se non trovato
+     */
     public static ImageIcon caricaImmagine(String nomeFile, int larghezza, int altezza) {
         String chiaveCache = nomeFile + "_" + larghezza + "x" + altezza;
         if (CACHE_IMMAGINI.containsKey(chiaveCache)) {
@@ -218,6 +251,12 @@ public class StileTheKnife {
         return null;
     }
 
+    /**
+     * Crea un'etichetta contenente l'icona del logo dell'applicazione.
+     *
+     * @param dimensione larghezza e altezza dell'icona in pixel
+     * @return la <code>JLabel</code> con il logo caricato
+     */
     public static JLabel creaLabelLogo(int dimensione) {
         JLabel lbl = new JLabel();
         ImageIcon icon = caricaImmagine("logo.png", dimensione, dimensione);
@@ -227,6 +266,15 @@ public class StileTheKnife {
         return lbl;
     }
 
+    /**
+     * Crea un'etichetta con l'immagine della bandiera associata alla nazione indicata.
+     * Se l'immagine non è disponibile, mostra una sigla testuale di fallback.
+     *
+     * @param nazione   il nome della nazione
+     * @param larghezza la larghezza dell'icona in pixel
+     * @param altezza   l'altezza dell'icona in pixel
+     * @return la <code>JLabel</code> configurata con la bandiera
+     */
     public static JLabel creaLabelBandiera(String nazione, int larghezza, int altezza) {
         String fileBandiera = determinaFileBandiera(nazione);
         JLabel lbl = new JLabel();
@@ -250,6 +298,12 @@ public class StileTheKnife {
         return lbl;
     }
 
+    /**
+     * Restituisce il nome del file immagine della bandiera corrispondente alla nazione passata.
+     *
+     * @param nazione il nome della nazione (in italiano o inglese)
+     * @return il nome del file della bandiera, oppure "Globe.png" come valore predefinito
+     */
     public static String determinaFileBandiera(String nazione) {
         if (nazione == null) {
             return "Globe.png";
@@ -273,6 +327,13 @@ public class StileTheKnife {
         return "Globe.png";
     }
 
+    /**
+     * Genera una breve descrizione testuale del ristorante a partire dai suoi dati
+     * (posizione, tipo di cucina, prezzo e servizi disponibili).
+     *
+     * @param r il ristorante di cui generare la descrizione
+     * @return la stringa con la descrizione formattata
+     */
     public static String generaDescrizioneRistorante(Ristorante r) {
         if (r == null) {
             return "";
@@ -291,6 +352,13 @@ public class StileTheKnife {
                 + "con particolare attenzione alla qualità delle materie prime e all'accoglienza. " + servizi;
     }
 
+    /**
+     * Genera una stringa in formato HTML per mostrare graficamente le stelle di valutazione
+     * (da 0 a 5), colorando di giallo quelle piene e di grigio quelle vuote.
+     *
+     * @param stelle il numero di stelle piene da visualizzare
+     * @return la stringa HTML con le stelle formattate
+     */
     public static String stelleGialleHtml(int stelle) {
         int piene = Math.max(0, Math.min(5, stelle));
         String sPiene = "★".repeat(piene);
@@ -302,6 +370,7 @@ public class StileTheKnife {
     /**
      * Crea un pulsante primario che ripristina sempre il colore originale quando il mouse esce
      * o quando il pulsante viene disabilitato.
+     *
      * @param testo il testo del pulsante
      * @return il componente <code>JButton</code>
      */
@@ -348,7 +417,8 @@ public class StileTheKnife {
 
     /**
      * Crea un pulsante secondario che torna sempre del suo colore originale anche se
-     * viene cliccato o disabilitato mentre il cursore è sopra (es. bottoni paginazione).
+     * viene cliccato o disabilitato mentre il cursore è sopra.
+     *
      * @param testo il testo del pulsante
      * @return il componente <code>JButton</code>
      */
@@ -396,6 +466,12 @@ public class StileTheKnife {
         return btn;
     }
 
+    /**
+     * Crea un campo di testo (<code>JTextField</code>).
+     *
+     * @param colonne il numero di colonne per dimensionare il campo
+     * @return il <code>JTextField</code> stilizzato
+     */
     public static JTextField creaCampoTesto(int colonne) {
         JTextField txt = new JTextField(colonne);
         txt.setFont(FONT_NORMALE);
@@ -405,6 +481,13 @@ public class StileTheKnife {
         return txt;
     }
 
+    /**
+     * Crea un campo per l'inserimento della password (<code>JPasswordField</code>)
+     * con i caratteri oscurati da pallini.
+     *
+     * @param colonne il numero di colonne per dimensionare il campo
+     * @return il <code>JPasswordField</code> stilizzato
+     */
     public static JPasswordField creaCampoPassword(int colonne) {
         JPasswordField pwd = new JPasswordField(colonne);
         pwd.setFont(FONT_NORMALE);
@@ -415,6 +498,12 @@ public class StileTheKnife {
         return pwd;
     }
 
+    /**
+     * Crea un'etichetta di testo (<code>JLabel</code>) con font e colore standard.
+     *
+     * @param testo il testo da mostrare nell'etichetta
+     * @return la <code>JLabel</code> configurata
+     */
     public static JLabel creaEtichetta(String testo) {
         JLabel lbl = new JLabel(testo);
         lbl.setFont(FONT_NORMALE);
@@ -422,6 +511,12 @@ public class StileTheKnife {
         return lbl;
     }
 
+    /**
+     * Crea un pannello a sfondo bianco con margini interni predefiniti,
+     * usato come contenitore in stile "card".
+     *
+     * @return il <code>JPanel</code> configurato
+     */
     public static JPanel creaCardBianca() {
         JPanel card = new JPanel();
         card.setBackground(BIANCO);
@@ -429,6 +524,12 @@ public class StileTheKnife {
         return card;
     }
 
+    /**
+     * Crea il bordo standard per i campi di input, composto da una linea grigia
+     * esterna e una spaziatura interna (padding).
+     *
+     * @return l'oggetto <code>Border</code> creato
+     */
     public static Border creaBordoInput() {
         return BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(GRIGIO_BORDO, 1),
@@ -436,6 +537,13 @@ public class StileTheKnife {
         );
     }
 
+    /**
+     * Blocca le dimensioni di un componente
+     * all'altezza standard di 38 pixel e alla larghezza specificata.
+     *
+     * @param comp      il componente grafico da ridimensionare
+     * @param larghezza la larghezza desiderata in pixel
+     */
     public static void fissaDimensioneInput(JComponent comp, int larghezza) {
         Dimension d = new Dimension(larghezza, 38);
         comp.setPreferredSize(d);
@@ -443,6 +551,12 @@ public class StileTheKnife {
         comp.setMaximumSize(d);
     }
 
+    /**
+     * Personalizza un <code>JSplitPane</code> applicando un bordo e un divisore
+     * centrale dello stesso colore verde del tema.
+     *
+     * @param split il componente <code>JSplitPane</code> da stilizzare
+     */
     public static void applicaSplitVerdeContinuo(JSplitPane split) {
         split.setDividerSize(6);
         split.setBorder(BorderFactory.createMatteBorder(0, 4, 4, 4, VERDE_THEKNIFE));
@@ -461,6 +575,12 @@ public class StileTheKnife {
         });
     }
 
+    /**
+     * Applica lo stile grafico generale a una <code>JTable</code>,
+     * formattando l'altezza delle righe, i colori di selezione e l'intestazione.
+     *
+     * @param tabella la tabella a cui applicare lo stile
+     */
     public static void applicaStileTabella(JTable tabella) {
         tabella.setFont(FONT_NORMALE);
         tabella.setRowHeight(34);
@@ -492,6 +612,18 @@ public class StileTheKnife {
         }
     }
 
+    /**
+     * Mostra una finestra di dialogo modale personalizzata con intestazione verde,
+     * contenuto centrale e pulsanti di conferma e annullamento in basso.
+     *
+     * @param parent        il frame genitore su cui centrare il dialogo
+     * @param titolo        il titolo mostrato nella barra superiore
+     * @param contenuto     il pannello centrale con i componenti da visualizzare
+     * @param testoConferma il testo del pulsante di conferma
+     * @param larghezza     la larghezza della finestra in pixel
+     * @param altezza       l'altezza della finestra in pixel
+     * @return <code>true</code> se l'utente clicca sul pulsante di conferma, <code>false</code> se annulla
+     */
     public static boolean mostraDialogoStilizzato(JFrame parent, String titolo, JPanel contenuto,
                                                   String testoConferma, int larghezza, int altezza) {
         final boolean[] confermato = {false};
@@ -536,6 +668,13 @@ public class StileTheKnife {
         return confermato[0];
     }
 
+    /**
+     * Converte il prezzo numerico in una stringa con simboli di euro (da € a €€€€)
+     * seguiti dal valore effettivo tra parentesi.
+     *
+     * @param prezzo il prezzo medio in euro
+     * @return la stringa formattata della fascia di prezzo
+     */
     public static String formattaFasciaPrezzo(int prezzo) {
         int numSimboli = Math.max(1, Math.min(4, Math.round(prezzo / 25.0f)));
         return "€".repeat(numSimboli) + " (" + prezzo + "€)";
@@ -543,7 +682,8 @@ public class StileTheKnife {
 
     /**
      * Imposta l'immagine <code>logo.png</code> come icona della finestra nella barra del titolo
-     * del sistema operativo (in alto a sinistra) e nella barra delle applicazioni.
+     * del sistema operativo e nella barra delle applicazioni.
+     *
      * @param finestra il <code>JFrame</code> o <code>JDialog</code> a cui applicare l'icona
      */
     public static void applicaIconaFinestra(java.awt.Window finestra) {
@@ -556,7 +696,8 @@ public class StileTheKnife {
     /**
      * Crea un pannello che affianca alla casella della password un riquadro cliccabile con l'occhio
      * per mostrare o nascondere la password che si sta scrivendo.
-     * @param pwdField il componente <code>JPasswordField</code> già creato
+     *
+     * @param pwdField        il componente <code>JPasswordField</code> già creato
      * @param larghezzaTotale larghezza complessiva (in pixel) del campo più il pulsante occhio
      * @return un <code>JPanel</code> pronto da inserire nel form al posto del singolo <code>JPasswordField</code>
      */

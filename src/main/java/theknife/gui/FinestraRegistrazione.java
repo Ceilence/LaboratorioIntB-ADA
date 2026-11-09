@@ -28,56 +28,31 @@ import java.sql.Date;
 
 /**
  * Finestra di dialogo per la registrazione di un nuovo utente.
+ * Consente l'inserimento dei dati anagrafici, delle credenziali e
+ * la scelta del ruolo (cliente o ristoratore) nel sistema.
+ *
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
  */
 public class FinestraRegistrazione extends JDialog {
 
-    /**
-     * Riferimento al controller del client <code>controller</code>.
-     */
     private final ControllerTheKnife controller;
 
-    /**
-     * Campo per il nome dell'utente <code>txtNome</code>.
-     */
     private JTextField txtNome;
-
-    /**
-     * Campo per il cognome dell'utente <code>txtCognome</code>.
-     */
     private JTextField txtCognome;
-
-    /**
-     * Campo per lo username o email <code>txtUsername</code>.
-     */
     private JTextField txtUsername;
-
-    /**
-     * Campo per la password <code>txtPassword</code>.
-     */
     private JPasswordField txtPassword;
-
-    /**
-     * Campo per la data di nascita facoltativa <code>txtDataNascita</code>.
-     */
     private JTextField txtDataNascita;
-
-    /**
-     * Campo per la città di domicilio <code>txtDomicilio</code>.
-     */
     private JTextField txtDomicilio;
-
-    /**
-     * Menu a tendina per selezionare il ruolo <code>cmbRuolo</code>.
-     */
     private JComboBox<String> cmbRuolo;
 
     /**
-     * Costruttore che crea la finestra di registrazione.
-     * @param parent la finestra chiamante
-     * @param controller il controller collegato al server
+     * Costruttore della finestra di registrazione.
+     * Inizializza il componente modale bloccando l'interazione con la finestra chiamante.
+     *
+     * @param parent     la finestra <code>JFrame</code> genitore
+     * @param controller il controller principale per inoltrare la richiesta al server
      */
     public FinestraRegistrazione(JFrame parent, ControllerTheKnife controller) {
         super(parent, "Registrazione Nuovo Utente - TheKnife", true);
@@ -86,7 +61,8 @@ public class FinestraRegistrazione extends JDialog {
     }
 
     /**
-     * Costruisce il layout della finestra.
+     * Inizializza i layout e assembla i componenti grafici del modulo
+     * di registrazione.
      */
     private void inizializzaGUI() {
         StileTheKnife.applicaIconaFinestra(this);
@@ -95,7 +71,6 @@ public class FinestraRegistrazione extends JDialog {
         setResizable(false);
         setLayout(new BorderLayout());
 
-        // Intestazione verde con logo
         JPanel panelHeader = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 12));
         panelHeader.setBackground(StileTheKnife.VERDE_THEKNIFE);
         panelHeader.add(StileTheKnife.creaLabelLogo(36));
@@ -106,7 +81,6 @@ public class FinestraRegistrazione extends JDialog {
         panelHeader.add(lblTitolo);
         add(panelHeader, BorderLayout.NORTH);
 
-        // Pannello centrale con i campi
         JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBackground(StileTheKnife.BIANCO);
         panelForm.setBorder(BorderFactory.createEmptyBorder(18, 25, 18, 25));
@@ -149,7 +123,6 @@ public class FinestraRegistrazione extends JDialog {
 
         add(panelForm, BorderLayout.CENTER);
 
-        // Barra pulsanti in basso
         JPanel panelBottoni = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 12));
         panelBottoni.setBackground(StileTheKnife.GRIGIO_SFONDO);
         panelBottoni.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, StileTheKnife.GRIGIO_BORDO));
@@ -166,12 +139,14 @@ public class FinestraRegistrazione extends JDialog {
     }
 
     /**
-     * Aggiunge una riga al form di registrazione.
-     * @param panel pannello del form
-     * @param gbc vincoli del layout
-     * @param riga indice della riga
-     * @param testoEtichetta testo della label
-     * @param campo componente di input
+     * Metodo di supporto per inserire in modo ordinato un'etichetta
+     * e il rispettivo componente di input all'interno del layout a griglia.
+     *
+     * @param panel          il pannello contenitore
+     * @param gbc            le costanti del GridBagLayout per il posizionamento
+     * @param riga           l'indice della riga in cui inserire i componenti
+     * @param testoEtichetta il testo descrittivo del campo
+     * @param campo          il componente grafico destinato all'input dell'utente
      */
     private void aggiungiRigaForm(JPanel panel, GridBagConstraints gbc, int riga, String testoEtichetta, java.awt.Component campo) {
         gbc.gridx = 0;
@@ -185,7 +160,9 @@ public class FinestraRegistrazione extends JDialog {
     }
 
     /**
-     * Verifica tutti i campi obbligatori, controlla la sicurezza della password e registra l'utente.
+     * Recupera i dati dal modulo, ne convalida i vincoli di obbligatorietà e di sicurezza,
+     * gestisce la conversione delle date e trasmette la richiesta al controller.
+     * Se la registrazione ha esito positivo chiude la finestra, altrimenti mostra l'errore.
      */
     private void eseguiRegistrazione() {
         String nome = txtNome.getText().trim();
@@ -203,7 +180,6 @@ public class FinestraRegistrazione extends JDialog {
             return;
         }
 
-        // Controllo requisiti password (almeno 8 caratteri, maiuscola, minuscola e numero)
         boolean errorePassword = StileTheKnife.validaPassword(password);
         if (!errorePassword) {
             JOptionPane.showMessageDialog(this,

@@ -43,7 +43,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Finestra principale per il ruolo <code>ristoratore</code>.
+ * Finestra principale per gli utenti con ruolo <code>ristoratore</code>.
+ * Permette di visualizzare e gestire i propri locali e di rispondere 
+ * alle recensioni lasciate dai clienti.
+ *
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
@@ -66,6 +69,12 @@ public class FinestraRistoratore extends JFrame {
     private JTable tabellaRecensioni;
     private JLabel lblRiepilogoLocale;
 
+    /**
+     * Costruttore della finestra dell'area riservata al ristoratore.
+     * Inizializza l'interfaccia e avvia i thread di aggiornamento in tempo reale.
+     *
+     * @param controller il controller principale per le operazioni di backend
+     */
     public FinestraRistoratore(ControllerTheKnife controller) {
         super("TheKnife - Area Riservata Ristoratore");
         this.controller = controller;
@@ -75,6 +84,10 @@ public class FinestraRistoratore extends JFrame {
         avviaAnimazionePallinoLampeggiante();
     }
 
+    /**
+     * Inizializza l'interfaccia grafica impostando layout, colori, componenti
+     * della barra superiore e lo split panel centrale.
+     */
     private void inizializzaGUI() {
         StileTheKnife.applicaIconaFinestra(this);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -160,13 +173,18 @@ public class FinestraRistoratore extends JFrame {
         add(splitPane, BorderLayout.CENTER);
     }
 
+    /**
+     * Aggiorna l'intestazione superiore inserendo nome, cognome e username
+     * del ristoratore attualmente connesso in sessione.
+     */
     private void aggiornaTestoHeader() {
         Utente u = controller.getSessione().getUtenteCorrente();
         lblTitoloHeader.setText("Pannello Ristoratore: " + u.getNome() + " " + u.getCognome() + " (@" + u.getUsername() + ")");
     }
 
     /**
-     * Fa lampeggiare il pallino rosso nella colonna "Modificata" ogni 500 millisecondi.
+     * Fa lampeggiare il pallino rosso nella colonna "Modificata" della tabella 
+     * delle recensioni alternandone la visibilità ogni 500 millisecondi.
      */
     private void avviaAnimazionePallinoLampeggiante() {
         timerPallinoLampeggiante = new Timer(500, e -> {
@@ -178,6 +196,9 @@ public class FinestraRistoratore extends JFrame {
         timerPallinoLampeggiante.start();
     }
 
+    /**
+     * Controlla in background ogni 2,5 secondi se ci sono stati cambiamenti e aggiorna i dati.
+     */
     private void avviaSincronizzazioneRealTime() {
         timerSyncRealTime = new Timer(2500, e -> {
             int rigaRist = tabellaRistoranti.getSelectedRow();
@@ -207,6 +228,12 @@ public class FinestraRistoratore extends JFrame {
         timerSyncRealTime.start();
     }
 
+    /**
+     * Crea il pannello dedicato alla gestione
+     * dei ristoranti del proprietario.
+     *
+     * @return il <code>JPanel</code> configurato per i ristoranti
+     */
     private JPanel creaPannelloSinistro() {
         JPanel panel = StileTheKnife.creaCardBianca();
         panel.setMinimumSize(new Dimension(320, 250));
@@ -264,8 +291,10 @@ public class FinestraRistoratore extends JFrame {
     }
 
     /**
-     * Costruisce il pannello di destra con le 6 colonne richieste:
-     * Stelle, Nome Utente, Commento, Data, La Tua Risposta e Modificata (con pallino rosso lampeggiante).
+     * Costruisce il pannello di destra contenente la tabella delle recensioni 
+     * per il ristorante selezionato a sinistra.
+     *
+     * @return il <code>JPanel</code> configurato per mostrare le recensioni
      */
     private JPanel creaPannelloDestro() {
         JPanel panel = StileTheKnife.creaCardBianca();
@@ -289,7 +318,6 @@ public class FinestraRistoratore extends JFrame {
         tabellaRecensioni.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         StileTheKnife.applicaStileTabella(tabellaRecensioni);
 
-        // Larghezza ottimizzata per le 6 colonne
         tabellaRecensioni.getColumnModel().getColumn(0).setPreferredWidth(95);  // Stelle
         tabellaRecensioni.getColumnModel().getColumn(1).setPreferredWidth(100); // Nome Utente
         tabellaRecensioni.getColumnModel().getColumn(2).setPreferredWidth(190); // Commento
@@ -325,6 +353,10 @@ public class FinestraRistoratore extends JFrame {
         return panel;
     }
 
+    /**
+     * Richiede al controller la lista dei ristoranti gestiti dall'utente corrente 
+     * e popola il relativo modello della tabella.
+     */
     private void caricaMieiRistoranti() {
         mieiRistoranti = controller.visualizzaMieiRistoranti();
         modelloRistoranti.setRowCount(0);
@@ -346,6 +378,10 @@ public class FinestraRistoratore extends JFrame {
         }
     }
 
+    /**
+     * Recupera l'elenco delle recensioni legate al ristorante selezionato 
+     * e aggiorna la tabella per mostrarle.
+     */
     private void caricaRecensioniRistoranteSelezionato() {
         int riga = tabellaRistoranti.getSelectedRow();
         modelloRecensioni.setRowCount(0);
@@ -387,9 +423,9 @@ public class FinestraRistoratore extends JFrame {
     }
 
     /**
-     * Apre una finestra di dialogo ben proporzionata (560x480) divisa in due parti uguali:
-     * sopra il commento completo del cliente (scorrevole e mai tagliato) e sotto un ampio box
-     * con contatore 0/400 per scrivere o modificare la risposta del ristoratore.
+     * Apre una finestra di dialogo divisa in due parti:
+     * sopra mostra il commento completo del cliente (scorrevole), sotto offre un box di
+     * testo con contatore caratteri (max 400) per scrivere o modificare la risposta.
      */
     private void rispondiOModificaRisposta() {
         int riga = tabellaRecensioni.getSelectedRow();
@@ -403,10 +439,9 @@ public class FinestraRistoratore extends JFrame {
         String rispostaAttuale = rec.getRispostaRistoratore() != null ? rec.getRispostaRistoratore() : "";
         String autore = (rec.getUsernameAutore() != null) ? rec.getUsernameAutore() : "Cliente";
 
-        // Usiamo GridLayout(2, 1) così il commento sopra non schiaccia mai la casella di risposta sotto!
         JPanel panel = new JPanel(new GridLayout(2, 1, 0, 14));
 
-        // 1. Meta superiore: Commento completo del cliente in JTextArea scorrevole
+        // Commento completo del cliente in JTextArea scorrevole
         JPanel boxRecCliente = new JPanel(new BorderLayout(6, 6));
         boxRecCliente.setBackground(StileTheKnife.VERDE_CHIARO_SFONDO);
         boxRecCliente.setBorder(BorderFactory.createCompoundBorder(
@@ -434,7 +469,7 @@ public class FinestraRistoratore extends JFrame {
         boxRecCliente.add(lblStelle, BorderLayout.NORTH);
         boxRecCliente.add(scrollCommento, BorderLayout.CENTER);
 
-        // 2. Metà inferiore: Casella ampia per la risposta del ristoratore + contatore 0/400
+        // Casella ampia per la risposta del ristoratore + contatore 0/400
         JPanel boxInputRisposta = new JPanel(new BorderLayout(6, 6));
         boxInputRisposta.setOpaque(false);
 
@@ -470,6 +505,12 @@ public class FinestraRistoratore extends JFrame {
         }
     }
 
+    /**
+     * Apre il modulo di creazione o modifica di un ristorante in una finestra di dialogo.
+     * Raccoglie i dati inseriti e richiede il salvataggio tramite il controller.
+     *
+     * @param esistente l'oggetto <code>Ristorante</code> da modificare, oppure <code>null</code> per crearne uno nuovo
+     */
     private void apriDialogRistorante(Ristorante esistente) {
         boolean modalitaModifica = (esistente != null);
 
@@ -563,6 +604,10 @@ public class FinestraRistoratore extends JFrame {
         }
     }
 
+    /**
+     * Richiede la conferma all'utente e, se accettata, chiama il controller per 
+     * eliminare il ristorante attualmente selezionato nella tabella.
+     */
     private void eliminaRistoranteSelezionato() {
         int riga = tabellaRistoranti.getSelectedRow();
         if (riga < 0) {
