@@ -216,7 +216,7 @@ public class FinestraDettagliRistorante extends JDialog {
     }
 
     /**
-     * Mostra un form per permettere al cliente di votare da 1 a 5 stelle e inserire il testo della recensione.
+     * Mostra una sezione che permette al cliente di votare da 1 a 5 stelle e inserire il testo della recensione.
      */
     private void apriDialogNuovaRecensione() {
         JComboBox<Integer> cmbStelle = new JComboBox<>(new Integer[]{5, 4, 3, 2, 1});
