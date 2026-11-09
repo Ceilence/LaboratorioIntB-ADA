@@ -1426,8 +1426,8 @@ public class FinestraClienteGuest extends JFrame {
 
             String fileFlag = StileTheKnife.determinaFileBandiera(r.getNazione());
             ImageIcon icon = StileTheKnife.caricaImmagine(fileFlag, 36, 24);
-            if (icon == null && !fileFlag.equals("Globe.png")) {
-                icon = StileTheKnife.caricaImmagine("Globe.png", 36, 24);
+            if (icon == null && !fileFlag.equals("src/media/Globe.png")) {
+                icon = StileTheKnife.caricaImmagine("src/media/Globe.png", 36, 24);
             }
             if (icon != null) {
                 lblBandiera.setIcon(icon);

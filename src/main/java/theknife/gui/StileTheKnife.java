@@ -209,7 +209,7 @@ public class StileTheKnife {
      * Carica un'immagine dai file di progetto o dalle risorse, la ridimensiona
      * e la salva in cache per evitare caricamenti ripetuti.
      *
-     * @param nomeFile  il nome del file dell'immagine (es. "logo.png")
+     * @param nomeFile  il nome del file dell'immagine (es. "src/media/logo.png")
      * @param larghezza la larghezza desiderata in pixel
      * @param altezza   l'altezza desiderata in pixel
      * @return l'oggetto <code>ImageIcon</code> ridimensionato, oppure <code>null</code> se non trovato
@@ -259,7 +259,7 @@ public class StileTheKnife {
      */
     public static JLabel creaLabelLogo(int dimensione) {
         JLabel lbl = new JLabel();
-        ImageIcon icon = caricaImmagine("logo.png", dimensione, dimensione);
+        ImageIcon icon = caricaImmagine("src/media/logo.png", dimensione, dimensione);
         if (icon != null) {
             lbl.setIcon(icon);
         }
@@ -280,8 +280,8 @@ public class StileTheKnife {
         JLabel lbl = new JLabel();
         lbl.setPreferredSize(new Dimension(larghezza, altezza));
         ImageIcon icon = caricaImmagine(fileBandiera, larghezza, altezza);
-        if (icon == null && !fileBandiera.equals("Globe.png")) {
-            icon = caricaImmagine("Globe.png", larghezza, altezza);
+        if (icon == null && !fileBandiera.equals("src/media/Globe.png")) {
+            icon = caricaImmagine("src/media/Globe.png", larghezza, altezza);
         }
         if (icon != null) {
             lbl.setIcon(icon);
@@ -302,29 +302,29 @@ public class StileTheKnife {
      * Restituisce il nome del file immagine della bandiera corrispondente alla nazione passata.
      *
      * @param nazione il nome della nazione (in italiano o inglese)
-     * @return il nome del file della bandiera, oppure "Globe.png" come valore predefinito
+     * @return il nome del file della bandiera, oppure "src/media/Globe.png" come valore predefinito
      */
     public static String determinaFileBandiera(String nazione) {
         if (nazione == null) {
-            return "Globe.png";
+            return "src/media/Globe.png";
         }
         String n = nazione.trim().toLowerCase();
         if (n.contains("italy") || n.contains("italia")) {
-            return "Flag_of_Italy.png";
+            return "src/media/Flag_of_Italy.png";
         } else if (n.contains("france") || n.contains("francia")) {
-            return "Flag_of_France.png";
+            return "src/media/Flag_of_France.png";
         } else if (n.contains("germany") || n.contains("germania")) {
-            return "Flag_of_Germany.png";
+            return "src/media/Flag_of_Germany.png";
         } else if (n.contains("spain") || n.contains("spagna")) {
-            return "Flag_of_Spain.png";
+            return "src/media/Flag_of_Spain.png";
         } else if (n.contains("japan") || n.contains("giappone")) {
-            return "Flag_of_Japan.png";
+            return "src/media/Flag_of_Japan.png";
         } else if (n.contains("china") || n.contains("cina") || n.contains("hong kong") || n.contains("macau")) {
-            return "Flag_of_China.png";
+            return "src/media/Flag_of_China.png";
         } else if (n.contains("united states") || n.equals("usa") || n.contains("stati uniti")) {
-            return "Flag_of_United_States.png";
+            return "src/media/Flag_of_United_States.png";
         }
-        return "Globe.png";
+        return "src/media/Globe.png";
     }
 
     /**
@@ -681,13 +681,13 @@ public class StileTheKnife {
     }
 
     /**
-     * Imposta l'immagine <code>logo.png</code> come icona della finestra nella barra del titolo
+     * Imposta l'immagine <code>src/media/logo.png</code> come icona della finestra nella barra del titolo
      * del sistema operativo e nella barra delle applicazioni.
      *
      * @param finestra il <code>JFrame</code> o <code>JDialog</code> a cui applicare l'icona
      */
     public static void applicaIconaFinestra(java.awt.Window finestra) {
-        ImageIcon icona = caricaImmagine("logo.png", 64, 64);
+        ImageIcon icona = caricaImmagine("src/media/logo.png", 64, 64);
         if (icona != null && finestra != null) {
             finestra.setIconImage(icona.getImage());
         }
