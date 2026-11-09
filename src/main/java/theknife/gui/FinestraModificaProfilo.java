@@ -1,5 +1,6 @@
 /*
  * Autori del progetto:
+ *
  * - Alessandro Frigerio, Matricola: 759926, Sede: CO
  * - Antonio Pardo, Matricola: 760613, Sede: CO
  * - Davide Moretti, Matricola: 762176, Sede: CO
@@ -25,26 +26,42 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 /**
- * Finestra di dialogo per modificare i dati personali e la password dell'utente loggato.
+ * Finestra di dialogo per la modifica dei dati personali e delle credenziali dell'utente autenticato.
+ * Permette all'utente di aggiornare nome, cognome, username, luogo di domicilio e password.
+ *
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
  */
 public class FinestraModificaProfilo extends JDialog {
 
+    /** Riferimento al controller principale. */
     private final ControllerTheKnife controller;
+
+    /** Funzione invocata al termine dell'aggiornamento per aggiornare l'interfaccia. */
     private final Runnable callbackAggiornamento;
+
+    /** Campo di testo per la modifica del nome dell'utente. */
     private JTextField txtNome;
+
+    /** Campo di testo per la modifica del cognome dell'utente. */
     private JTextField txtCognome;
+
+    /** Campo di testo per la modifica dell'username o email dell'utente. */
     private JTextField txtUsername;
+
+    /** Campo di testo per la modifica della città di domicilio dell'utente. */
     private JTextField txtDomicilio;
+
+    /** Campo di testo per l'inserimento dell'eventuale nuova password. */
     private JPasswordField txtNuovaPassword;
 
     /**
-     * Costruttore del JDialog di modifica profilo.
-     * @param parent la finestra principale chiamante
-     * @param controller il controller attivo del client
-     * @param callbackAggiornamento azione per aggiornare l'intestazione della finestra principale
+     * Costruttore della finestra per la modifica del profilo.
+     *
+     * @param parent La finestra principale chiamante, rispetto alla quale centrare il JDialog.
+     * @param controller Il controller principale.
+     * @param callbackAggiornamento Azione da eseguire a salvataggio completato.
      */
     public FinestraModificaProfilo(JFrame parent, ControllerTheKnife controller, Runnable callbackAggiornamento) {
         super(parent, "Il Mio Account - Modifica Credenziali", true);
@@ -54,7 +71,8 @@ public class FinestraModificaProfilo extends JDialog {
     }
 
     /**
-     * Costruisce il form precompilato.
+     * Inizializza e posiziona le componenti grafiche della finestra.
+     * Costruisce il form precompilandolo con i dati attuali dell'utente.
      */
     private void inizializzaGUI() {
         StileTheKnife.applicaIconaFinestra(this);
@@ -127,12 +145,14 @@ public class FinestraModificaProfilo extends JDialog {
     }
 
     /**
-     * Aggiunge una riga a un pannello.
-     * @param p
-     * @param gbc
-     * @param riga
-     * @param etichetta
-     * @param comp
+     * Metodo per aggiungere una riga (etichetta e componente di input)
+     * all'interno del pannello.
+     *
+     * @param p Il pannello contenitore nel quale aggiungere gli elementi.
+     * @param gbc I vincoli di posizionamento del layout.
+     * @param riga L'indice della riga in cui inserire l'etichetta e il componente.
+     * @param etichetta Il testo da visualizzare a sinistra.
+     * @param comp Il componente grafico di input da visualizzare a destra.
      */
     private void aggiungiRiga(JPanel p, GridBagConstraints gbc, int riga, String etichetta, java.awt.Component comp) {
         gbc.gridx = 0;
@@ -145,7 +165,10 @@ public class FinestraModificaProfilo extends JDialog {
     }
 
     /**
-     * Valida i campi e controlla che l'eventuale nuova password rispetti i requisiti di sicurezza.
+     * Valida i dati inseriti nel form, assicurandosi che i campi obbligatori siano compilati.
+     * Se è stata inserita una nuova password, ne verifica i requisiti di sicurezza.
+     * In caso di successo, comunica al controller l'aggiornamento, esegue la callback
+     * e chiude la finestra di dialogo.
      */
     private void salvaModifiche() {
         String nome = txtNome.getText().trim();

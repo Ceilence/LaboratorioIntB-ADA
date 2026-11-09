@@ -1,8 +1,12 @@
 /*
- * Autori del progetto:
- * - Alessandro Frigerio, Matricola: 759926, Sede: CO
- * - Antonio Pardo, Matricola: 760613, Sede: CO
- * - Davide Moretti, Matricola: 762176, Sede: CO
+- Autori del progetto:
+
+- Alessandro Frigerio, Matricola: 759926, Sede: CO
+
+- Antonio Pardo, Matricola: 760613, Sede: CO
+
+- Davide Moretti, Matricola: 762176, Sede: CO
+
  */
 package theknife.gui;
 
@@ -29,23 +33,41 @@ import java.awt.GridLayout;
 
 /**
  * Finestra iniziale di TheKnife.
+ * Gestisce l'interfaccia per il login degli utenti registrati e l'accesso rapido come ospite.
+ *
  * @author Alessandro Frigerio
  * @author Antonio Pardo
  * @author Davide Moretti
  */
 public class FinestraIniziale extends JFrame {
 
+    /** Riferimento al controller principale. */
     private final ControllerTheKnife controller;
+
+    /** Campo di testo per l'inserimento dell'username o email dell'utente. */
     private JTextField txtUsername;
+
+    /** Campo di testo per l'inserimento della password. */
     private JPasswordField txtPassword;
+
+    /** Campo di testo per l'inserimento del luogo di ricerca per l'ospite. */
     private JTextField txtLuogoGuest;
 
+    /**
+     * Costruttore della finestra iniziale.
+     *
+     * @param controller Il controller principale.
+     */
     public FinestraIniziale(ControllerTheKnife controller) {
-        super("TheKnife - Scopri e Recensisci Ristoranti nel Mondo");
+        super("TheKnife");
         this.controller = controller;
         inizializzaGUI();
     }
 
+    /**
+     * Inizializza le componenti grafiche della finestra e imposta il layout principale.
+     * Costruisce il pannello superiore e i pannelli per l'autenticazione.
+     */
     private void inizializzaGUI() {
         StileTheKnife.applicaIconaFinestra(this);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -53,7 +75,7 @@ public class FinestraIniziale extends JFrame {
         getContentPane().setBackground(StileTheKnife.VERDE_THEKNIFE);
         setLayout(new BorderLayout());
 
-        // 1. BANNER SUPERIORE ALLINEATO A SINISTRA AL BORDO DEL RIQUADRO BIANCO (16px di margine)
+        // Pannello superiore
         JPanel panelBanner = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         panelBanner.setBackground(StileTheKnife.VERDE_THEKNIFE);
         panelBanner.setBorder(BorderFactory.createEmptyBorder(18, 16, 18, 16));
@@ -71,19 +93,13 @@ public class FinestraIniziale extends JFrame {
         lblTitolo.setForeground(StileTheKnife.BIANCO);
         lblTitolo.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lblSottotitolo = new JLabel("Trova i migliori ristoranti, consulta le recensioni e condividi la tua esperienza");
-        lblSottotitolo.setFont(StileTheKnife.FONT_NORMALE);
-        lblSottotitolo.setForeground(StileTheKnife.VERDE_CHIARO_SFONDO);
-        lblSottotitolo.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         testiBanner.add(lblTitolo);
         testiBanner.add(Box.createVerticalStrut(4));
-        testiBanner.add(lblSottotitolo);
         panelBanner.add(testiBanner);
 
         add(panelBanner, BorderLayout.NORTH);
 
-        // 2. CORPO CENTRALE CON VERDE CHE CONTINUA FINO IN FONDO (margine sinistro identico: 16px)
+        // Pannello centrale
         JPanel panelCentrale = new JPanel(new GridLayout(1, 2, 16, 0));
         panelCentrale.setBackground(StileTheKnife.VERDE_THEKNIFE);
         panelCentrale.setBorder(BorderFactory.createEmptyBorder(0, 16, 16, 16));
@@ -97,6 +113,11 @@ public class FinestraIniziale extends JFrame {
         setLocationRelativeTo(null);
     }
 
+    /**
+     * Crea e configura il pannello di login per gli utenti registrati (clienti e ristoratori).
+     *
+     * @return JPanel contenente il form per l'autenticazione.
+     */
     private JPanel creaPannelloLogin() {
         JPanel card = StileTheKnife.creaCardBianca();
         card.setPreferredSize(new Dimension(420, 415));
@@ -129,7 +150,6 @@ public class FinestraIniziale extends JFrame {
         btnLogin.setMinimumSize(new Dimension(360, 44));
         btnLogin.setMaximumSize(new Dimension(360, 44));
 
-        // Altezza 48px identica al boxNota di destra così i due bottoni primari sopra sono allineati al pixel!
         JButton btnRegistrati = StileTheKnife.creaBottoneSecondario("Non hai un account? Registrati ora");
         btnRegistrati.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnRegistrati.setPreferredSize(new Dimension(360, 48));
@@ -159,6 +179,11 @@ public class FinestraIniziale extends JFrame {
         return card;
     }
 
+    /**
+     * Crea e configura il pannello per l'accesso anonimo in modalità Guest.
+     *
+     * @return JPanel contenente il form per la ricerca come ospite.
+     */
     private JPanel creaPannelloGuest() {
         JPanel card = StileTheKnife.creaCardBianca();
         card.setPreferredSize(new Dimension(420, 415));
@@ -197,7 +222,6 @@ public class FinestraIniziale extends JFrame {
         btnGuest.setMinimumSize(new Dimension(360, 44));
         btnGuest.setMaximumSize(new Dimension(360, 44));
 
-        // Altezza 48px identica a btnRegistrati di sinistra per allineamento orizzontale perfetto
         JTextArea txtNota = new JTextArea("Nota: Potrai registrarti o fare il login in qualsiasi momento dal menù in alto a destra.");
         txtNota.setFont(new Font("SansSerif", Font.PLAIN, 12));
         txtNota.setForeground(StileTheKnife.VERDE_THEKNIFE);
@@ -230,6 +254,11 @@ public class FinestraIniziale extends JFrame {
         return card;
     }
 
+    /**
+     * Raccoglie i dati inseriti nei campi di login e richiede l'autenticazione al controller.
+     * In caso di successo, reindirizza l'utente alla schermata principale,
+     * altrimenti mostra un avviso di errore.
+     */
     private void gestisciLogin() {
         String username = txtUsername.getText().trim();
         String password = new String(txtPassword.getPassword());
@@ -246,6 +275,10 @@ public class FinestraIniziale extends JFrame {
         }
     }
 
+    /**
+     * Prende il luogo inserito nel campo di accesso rapido e avvia la sessione come ospite.
+     * Mostra un messaggio di errore se il campo è vuoto.
+     */
     private void gestisciAccessoGuest() {
         String luogo = txtLuogoGuest.getText().trim();
         if (luogo.isEmpty()) {
@@ -256,6 +289,12 @@ public class FinestraIniziale extends JFrame {
         apriSchermataPrincipale(controller.getSessione().getUtenteCorrente());
     }
 
+    /**
+     * Chiude la finestra iniziale e istanzia la schermata principale corretta
+     * a seconda del tipo di utente o della modalità di accesso.
+     *
+     * @param utenteAttivo L'istanza dell'utente autenticato o dell'ospite.
+     */
     private void apriSchermataPrincipale(Utente utenteAttivo) {
         dispose();
         if (utenteAttivo.isRistoratore()) {

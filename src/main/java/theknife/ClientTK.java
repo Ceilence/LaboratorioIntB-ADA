@@ -43,7 +43,7 @@ public class ClientTK {
         String hostServer = (args.length > 0 && !args[0].trim().isEmpty()) ? args[0].trim() : "localhost";
         ControllerTheKnife controller = new ControllerTheKnife(hostServer);
 
-        // Ciclo di controllo: se ServerTK non è raggiungibile, chiede l'IP tramite finestra di dialogo
+        // Se il server non è raggiungibile, chiede l'ip tramite finestra di dialogo
         while (!controller.connettiAlServer(hostServer)) {
             String nuovoHost = (String) JOptionPane.showInputDialog(
                     null,
@@ -56,7 +56,6 @@ public class ClientTK {
                     hostServer
             );
 
-            // Se l'utente preme Annulla o chiude la finestra, termina il client
             if (nuovoHost == null) {
                 System.out.println("Avvio di clientTK annullato dall'utente.");
                 System.exit(0);
@@ -66,7 +65,7 @@ public class ClientTK {
 
         System.out.println("clientTK connesso con successo a serverTK (" + hostServer + ")");
 
-        // Avvio dell'interfaccia grafica nel thread dedicato di Swing
+        // Avvio dell'interfaccia grafica
         SwingUtilities.invokeLater(() -> {
             new theknife.gui.FinestraIniziale(controller).setVisible(true);
         });

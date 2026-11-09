@@ -274,7 +274,7 @@ public class ServerTK extends UnicastRemoteObject implements ServiziTheKnife {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("=== AVVIO MODULO serverTK (TheKnife) ===");
+        System.out.println("Avvio server...");
         System.out.print("Inserisci l'host del DB PostgreSQL [premi Invio per 'localhost']: ");
         String host = scanner.nextLine().trim();
         if (host.isEmpty()) {
@@ -297,7 +297,7 @@ public class ServerTK extends UnicastRemoteObject implements ServiziTheKnife {
             try (Connection testConn = DatabaseManager.connect()) {
                 if (testConn != null) {
                     connesso = true;
-                    System.out.println("Connessione al database PostgreSQL stabilita con successo!");
+                    System.out.println("Connessione al database stabilita con successo");
                 } else {
                     System.out.println("Errore: password errata o database non raggiungibile su '" + host + "'. Riprova.\n");
                     System.out.print("Inserisci la password del DB per l'utente '" + dbUser + "': ");
@@ -315,27 +315,63 @@ public class ServerTK extends UnicastRemoteObject implements ServiziTheKnife {
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.rebind("TheKnifeService", server);
 
-            System.out.println("\n>>> serverTK ATTIVO E IN ATTESA DI CONNESSIONI DAI CLIENT (Porta 1099) <<<");
+            System.out.println("\nServer attivo e in attesa...");
         } catch (RemoteException e) {
             System.err.println("Errore durante l'avvio del server RMI:");
             e.printStackTrace();
         }
     }
+
+    /**
+     * Aggiorna i dati di un ristorante esistente nel database in modo sincronizzato,
+     * verificando che l'utente richiedente sia l'effettivo ristoratore proprietario.
+     *
+     * @param r L'oggetto <code>Ristorante</code> contenente i dati aggiornati.
+     * @param idRistoratore L'ID del ristoratore che richiede la modifica.
+     * @return <code>true</code> se la modifica è andata a buon fine, <code>false</code> altrimenti.
+     * @throws RemoteException in caso di errori di comunicazione RMI.
+     */
     @Override
     public synchronized boolean modificaRistorante(Ristorante r, int idRistoratore) throws RemoteException {
         return ristoranteDAO.modificaRistorante(r, idRistoratore);
     }
 
+    /**
+     * Elimina un ristorante dal database in modo sincronizzato,
+     * assicurandosi che il richiedente sia il ristoratore proprietario.
+     *
+     * @param idRistorante L'identificativo univoco del ristorante da eliminare.
+     * @param idRistoratore L'ID del ristoratore che richiede l'eliminazione.
+     * @return <code>true</code> se l'eliminazione è avvenuta con successo, <code>false</code> altrimenti.
+     * @throws RemoteException in caso di errori di comunicazione RMI.
+     */
     @Override
     public synchronized boolean eliminaRistorante(int idRistorante, int idRistoratore) throws RemoteException {
         return ristoranteDAO.eliminaRistorante(idRistorante, idRistoratore);
     }
 
+    /**
+     * Aggiorna il profilo di un utente nel database in modo sincronizzato.
+     * Permette di modificare i dati personali e le credenziali di accesso.
+     *
+     * @param u L'oggetto <code>Utente</code> con i dati aggiornati.
+     * @param cambiaPassword Flag booleano; se <code>true</code> indica che l'utente ha richiesto
+     *                       l'aggiornamento della password e che questa deve essere salvata.
+     * @return <code>true<code/> se il profilo è stato aggiornato correttamente, <code>false</code> altrimenti.
+     * @throws RemoteException in caso di errori di comunicazione RMI.
+     */
     @Override
     public synchronized boolean aggiornaUtente(Utente u, boolean cambiaPassword) throws RemoteException {
         return utenteDAO.aggiornaUtente(u, cambiaPassword);
     }
 
+    /**
+     * Restituisce la versione corrente dei dati gestiti dal server.
+     * Questo metodo è utile per i client per verificare se ci sono stati aggiornamenti
+     *
+     * @return un intero (<code>long</code>) che rappresenta il numero di versione attuale dei dati.
+     * @throws RemoteException in caso di errori di comunicazione RMI.
+     */
     @Override
     public long getVersioneDati() throws RemoteException {
         return versioneDati.get();
