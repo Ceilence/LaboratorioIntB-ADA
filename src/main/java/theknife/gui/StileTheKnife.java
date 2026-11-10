@@ -1,8 +1,8 @@
 /*
  * Autori del progetto:
- * - Alessandro Frigerio, Matricola: 759926, Sede: CO
- * - Antonio Pardo, Matricola: 760613, Sede: CO
- * - Davide Moretti, Matricola: 762176, Sede: CO
+ * Alessandro Frigerio, Matricola: 759926, Sede: CO
+ * Antonio Pardo, Matricola: 760613, Sede: CO
+ * Davide Moretti, Matricola: 762176, Sede: CO
  */
 package theknife.gui;
 
@@ -206,8 +206,8 @@ public class StileTheKnife {
     }
 
     /**
-     * Carica un'immagine dai file di progetto o dalle risorse, la ridimensiona
-     * e la salva in cache per evitare caricamenti ripetuti.
+     * Carica un'immagine dalle risorse interne al .jar o dai file di progetto,
+     * la ridimensiona e la salva in memoria per evitare caricamenti ripetuti.
      *
      * @param nomeFile  il nome del file dell'immagine (es. "src/media/logo.png" o "logo.png")
      * @param larghezza la larghezza desiderata in pixel
@@ -222,22 +222,39 @@ public class StileTheKnife {
 
         try {
             Image img = null;
-            File[] possibiliPercorsi = {
-                    new File(nomeFile),
-                    new File("src/media/" + nomeFile)
+
+            String soloNome = new File(nomeFile).getName();
+
+
+            String[] risorseJar = {
+                    "/media/" + soloNome,
+                    "/" + nomeFile.replace("\\", "/").replaceFirst("^src/", ""),
+                    "/" + nomeFile.replace("\\", "/")
             };
-            for (File f : possibiliPercorsi) {
-                if (f.exists()) {
-                    img = new ImageIcon(f.getAbsolutePath()).getImage();
+            for (String pathRisorsa : risorseJar) {
+                URL urlRisorsa = StileTheKnife.class.getResource(pathRisorsa);
+                if (urlRisorsa != null) {
+                    img = new ImageIcon(urlRisorsa).getImage();
                     break;
                 }
             }
+
+
             if (img == null) {
-                URL urlRisorsa = StileTheKnife.class.getResource("/" + nomeFile);
-                if (urlRisorsa != null) {
-                    img = new ImageIcon(urlRisorsa).getImage();
+                File[] possibiliPercorsi = {
+                        new File(nomeFile),
+                        new File("src/media/" + soloNome),
+                        new File("../" + nomeFile),
+                        new File("../src/media/" + soloNome)
+                };
+                for (File f : possibiliPercorsi) {
+                    if (f.exists() && f.isFile()) {
+                        img = new ImageIcon(f.getAbsolutePath()).getImage();
+                        break;
+                    }
                 }
             }
+
             if (img != null) {
                 ImageIcon scalata = new ImageIcon(img.getScaledInstance(larghezza, altezza, Image.SCALE_SMOOTH));
                 CACHE_IMMAGINI.put(chiaveCache, scalata);
@@ -245,7 +262,6 @@ public class StileTheKnife {
             }
         } catch (Exception ignored) {
         }
-        CACHE_IMMAGINI.put(chiaveCache, null);
         return null;
     }
 
@@ -693,7 +709,7 @@ public class StileTheKnife {
 
     /**
      * Crea un pannello che affianca alla casella della password un riquadro cliccabile con l'occhio
-     * per mostrare o nascondere la password che si sta scrivendo.
+     * per mostrare o nascondociazione la password che si sta scrivendo.
      *
      * @param pwdField        il componente <code>JPasswordField</code> già creato
      * @param larghezzaTotale larghezza complessiva (in pixel) del campo più il pulsante occhio
