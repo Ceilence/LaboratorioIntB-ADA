@@ -209,7 +209,7 @@ public class StileTheKnife {
      * Carica un'immagine dai file di progetto o dalle risorse, la ridimensiona
      * e la salva in cache per evitare caricamenti ripetuti.
      *
-     * @param nomeFile  il nome del file dell'immagine (es. "src/media/logo.png")
+     * @param nomeFile  il nome del file dell'immagine (es. "src/media/logo.png" o "logo.png")
      * @param larghezza la larghezza desiderata in pixel
      * @param altezza   l'altezza desiderata in pixel
      * @return l'oggetto <code>ImageIcon</code> ridimensionato, oppure <code>null</code> se non trovato
@@ -224,9 +224,7 @@ public class StileTheKnife {
             Image img = null;
             File[] possibiliPercorsi = {
                     new File(nomeFile),
-                    new File("src/main/resources/" + nomeFile),
-                    new File("resources/" + nomeFile),
-                    new File("img/" + nomeFile)
+                    new File("src/media/" + nomeFile)
             };
             for (File f : possibiliPercorsi) {
                 if (f.exists()) {
