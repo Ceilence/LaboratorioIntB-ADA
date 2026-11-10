@@ -3,67 +3,81 @@ digraph ER_Ristrutturato {
     graph [
         label="Schema ER Ristrutturato - Database PostgreSQL \"the_knife\"\n\n"
         labelloc="t"
-        fontname="SansSerif"
+        fontname="Helvetica,Arial,sans-serif"
         fontsize=16
-        fontcolor="#000000"
-        pad="0.4"
-        nodesep="0.8"
-        ranksep="0.85"
+        fontcolor="#004D40"
+        pad="0.5"
+        nodesep="0.9"
+        ranksep="0.9"
         bgcolor="#FFFFFF"
     ];
 
-    node [fontname="SansSerif", fontsize=11];
-    edge [fontname="SansSerif", fontsize=10, color="#006666", fontcolor="#000000"];
+    node [fontname="Helvetica,Arial,sans-serif", fontsize=11];
+    edge [fontname="Helvetica,Arial,sans-serif", fontsize=10, color="#006666", fontcolor="#000000"];
 
-    // ================= ENTITÀ RISTRUTTURATE (Stile Verde con icona E) =================
+    // ================= ENTITÀ RISTRUTTURATE =================
     Utenti [shape=none, margin=0, label=<
-        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" COLOR="#006666" BGCOLOR="#FFFFFF">
-            <TR><TD BGCOLOR="#E0F2F1" ALIGN="CENTER" BORDER="1" SIDES="B"><FONT COLOR="#004D40"><B>🟢 (E)  Utenti</B></FONT></TD></TR>
-            <TR><TD ALIGN="LEFT" BORDER="1" SIDES="B"><B><U>id_utente</U> : SERIAL [PK]</B></TD></TR>
-            <TR><TD ALIGN="LEFT">nome : VARCHAR(100)<BR ALIGN="LEFT"/>cognome : VARCHAR(100)<BR ALIGN="LEFT"/>username : VARCHAR(100) [UNIQUE]<BR ALIGN="LEFT"/>password : VARCHAR(255)<BR ALIGN="LEFT"/>data_nascita : DATE (0..1)<BR ALIGN="LEFT"/>luogo_domicilio : VARCHAR(100)<BR ALIGN="LEFT"/>ruolo : VARCHAR(20) ['cliente' | 'ristoratore']<BR ALIGN="LEFT"/></TD></TR>
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#006666" BGCOLOR="#FFFFFF">
+            <TR><TD COLSPAN="2" BGCOLOR="#006666" ALIGN="CENTER" CELLPADDING="6"><FONT COLOR="#FFFFFF"><B>[E] Utenti</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT" BORDER="1" SIDES="B" BGCOLOR="#E0F2F1"><B><U>id_utente</U></B></TD><TD ALIGN="RIGHT" BORDER="1" SIDES="B" BGCOLOR="#E0F2F1"><B> [PK]</B></TD></TR>
+            <TR><TD ALIGN="LEFT">nome</TD><TD ALIGN="RIGHT">VARCHAR(100)</TD></TR>
+            <TR><TD ALIGN="LEFT">cognome</TD><TD ALIGN="RIGHT">VARCHAR(100)</TD></TR>
+            <TR><TD ALIGN="LEFT">username</TD><TD ALIGN="RIGHT">VARCHAR(100) [UNIQUE]</TD></TR>
+            <TR><TD ALIGN="LEFT">password</TD><TD ALIGN="RIGHT">VARCHAR(255)</TD></TR>
+            <TR><TD ALIGN="LEFT">data_nascita</TD><TD ALIGN="RIGHT">DATE (0..1)</TD></TR>
+            <TR><TD ALIGN="LEFT">luogo_domicilio</TD><TD ALIGN="RIGHT">VARCHAR(100)</TD></TR>
+            <TR><TD ALIGN="LEFT">ruolo</TD><TD ALIGN="RIGHT">VARCHAR(20) ['cliente'|'ristoratore']</TD></TR>
         </TABLE>
     >];
 
     RistorantiTheKnife [shape=none, margin=0, label=<
-        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" COLOR="#006666" BGCOLOR="#FFFFFF">
-            <TR><TD BGCOLOR="#E0F2F1" ALIGN="CENTER" BORDER="1" SIDES="B"><FONT COLOR="#004D40"><B>🟢 (E)  RistorantiTheKnife</B></FONT></TD></TR>
-            <TR><TD ALIGN="LEFT" BORDER="1" SIDES="B"><B><U>id_ristorante</U> : SERIAL [PK]</B></TD></TR>
-            <TR><TD ALIGN="LEFT">nome : VARCHAR(150)<BR ALIGN="LEFT"/>nazione : VARCHAR(100)<BR ALIGN="LEFT"/>citta : VARCHAR(100)<BR ALIGN="LEFT"/>indirizzo : VARCHAR(255)<BR ALIGN="LEFT"/>latitudine : DOUBLE PRECISION<BR ALIGN="LEFT"/>longitudine : DOUBLE PRECISION<BR ALIGN="LEFT"/>fascia_prezzo : INTEGER<BR ALIGN="LEFT"/>delivery : BOOLEAN<BR ALIGN="LEFT"/>prenotazione_online : BOOLEAN<BR ALIGN="LEFT"/>tipo_cucina : VARCHAR(150)<BR ALIGN="LEFT"/>id_ristoratore : INTEGER [FK] (0..1)<BR ALIGN="LEFT"/></TD></TR>
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#006666" BGCOLOR="#FFFFFF">
+            <TR><TD COLSPAN="2" BGCOLOR="#006666" ALIGN="CENTER" CELLPADDING="6"><FONT COLOR="#FFFFFF"><B>[E] RistorantiTheKnife</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT" BORDER="1" SIDES="B" BGCOLOR="#E0F2F1"><B><U>id_ristorante</U></B></TD><TD ALIGN="RIGHT" BORDER="1" SIDES="B" BGCOLOR="#E0F2F1"><B> [PK]</B></TD></TR>
+            <TR><TD ALIGN="LEFT">nome</TD><TD ALIGN="RIGHT">VARCHAR(150)</TD></TR>
+            <TR><TD ALIGN="LEFT">nazione</TD><TD ALIGN="RIGHT">VARCHAR(100)</TD></TR>
+            <TR><TD ALIGN="LEFT">citta</TD><TD ALIGN="RIGHT">VARCHAR(100)</TD></TR>
+            <TR><TD ALIGN="LEFT">indirizzo</TD><TD ALIGN="RIGHT">VARCHAR(255)</TD></TR>
+            <TR><TD ALIGN="LEFT">latitudine</TD><TD ALIGN="RIGHT">DOUBLE PRECISION</TD></TR>
+            <TR><TD ALIGN="LEFT">longitudine</TD><TD ALIGN="RIGHT">DOUBLE PRECISION</TD></TR>
+            <TR><TD ALIGN="LEFT">fascia_prezzo</TD><TD ALIGN="RIGHT">INTEGER</TD></TR>
+            <TR><TD ALIGN="LEFT">delivery</TD><TD ALIGN="RIGHT">BOOLEAN</TD></TR>
+            <TR><TD ALIGN="LEFT">prenotazione_online</TD><TD ALIGN="RIGHT">BOOLEAN</TD></TR>
+            <TR><TD ALIGN="LEFT">tipo_cucina</TD><TD ALIGN="RIGHT">VARCHAR(150)</TD></TR>
         </TABLE>
     >];
 
     Recensioni [shape=none, margin=0, label=<
-        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" COLOR="#006666" BGCOLOR="#FFFFFF">
-            <TR><TD BGCOLOR="#E0F2F1" ALIGN="CENTER" BORDER="1" SIDES="B"><FONT COLOR="#004D40"><B>🟢 (E)  Recensioni</B></FONT></TD></TR>
-            <TR><TD ALIGN="LEFT" BORDER="1" SIDES="B"><B><U>id_recensione</U> : SERIAL [PK]</B></TD></TR>
-            <TR><TD ALIGN="LEFT">id_utente : INTEGER [FK]<BR ALIGN="LEFT"/>id_ristorante : INTEGER [FK]<BR ALIGN="LEFT"/>stelle : INTEGER [CHECK 1..5]<BR ALIGN="LEFT"/>testo : VARCHAR(400)<BR ALIGN="LEFT"/>data_recensione : DATE<BR ALIGN="LEFT"/>risposta_ristoratore : VARCHAR(400) (0..1)<BR ALIGN="LEFT"/><I>UNIQUE (id_utente, id_ristorante)</I><BR ALIGN="LEFT"/></TD></TR>
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#006666" BGCOLOR="#FFFFFF">
+            <TR><TD COLSPAN="2" BGCOLOR="#006666" ALIGN="CENTER" CELLPADDING="6"><FONT COLOR="#FFFFFF"><B>[E] Recensioni</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT" BORDER="1" SIDES="B" BGCOLOR="#E0F2F1"><B><U>id_recensione</U></B></TD><TD ALIGN="RIGHT" BORDER="1" SIDES="B" BGCOLOR="#E0F2F1"><B> [PK]</B></TD></TR>
+            <TR><TD ALIGN="LEFT">stelle</TD><TD ALIGN="RIGHT">INTEGER [CHECK 1..5]</TD></TR>
+            <TR><TD ALIGN="LEFT">testo</TD><TD ALIGN="RIGHT">VARCHAR(400)</TD></TR>
+            <TR><TD ALIGN="LEFT">data_recensione</TD><TD ALIGN="RIGHT">DATE</TD></TR>
+            <TR><TD ALIGN="LEFT">risposta_ristoratore</TD><TD ALIGN="RIGHT">VARCHAR(400) (0..1)</TD></TR>
         </TABLE>
     >];
 
-    // ================= RELAZIONI (Rombi ER Ristrutturati) =================
-    node [shape=diamond, style=filled, fillcolor="#E0F2F1", color="#006666", fontcolor="#004D40", fontname="SansSerif-Bold", height=0.8, width=1.6, fixedsize=false];
+    // ================= RELAZIONI RISTRUTTURATE =================
+    node [shape=diamond, style=filled, fillcolor="#E0F2F1", color="#006666", fontcolor="#004D40", fontname="Helvetica-Bold", height=0.8, width=1.6, fixedsize=false];
 
-    Gestisce  [label="Gestisce\n(id_ristoratore)"];
-    Preferiti [label="Preferiti\n(Tabella Ponte)"];
-    Scrive    [label="Scrive\n(id_utente)"];
-    Riceve    [label="Riceve\n(id_ristorante)"];
+    Gestisce  [label="Gestisce"];
+    Preferiti [label="Preferiti"];
+    Scrive    [label="Scrive"];
+    Riceve    [label="Riceve"];
 
     // ================= COLLEGAMENTI E CARDINALITÀ =================
     edge [dir=none];
 
-    // Utenti (Ristoratore) - Gestisce - Ristorante
     Utenti -> Gestisce             [label="  (0, N)  "];
     Gestisce -> RistorantiTheKnife [label="  (0, 1)  "];
 
-    // Utenti (Cliente) - Preferiti - RistorantiTheKnife
     Utenti -> Preferiti             [label="  (0, N)  "];
     Preferiti -> RistorantiTheKnife [label="  (0, N)  "];
 
-    // Utenti (Cliente) - Scrive - Recensioni (con cardinalità (0, 1) sul ramo)
     Utenti -> Scrive     [label="  (0, N)  "];
     Scrive -> Recensioni [label="  (1, 1)  "];
 
-    // RistorantiTheKnife - Riceve - Recensioni
     RistorantiTheKnife -> Riceve [label="  (0, N)  "];
     Riceve -> Recensioni         [label="  (1, 1)  "];
 }

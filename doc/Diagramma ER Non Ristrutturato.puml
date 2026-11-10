@@ -3,56 +3,69 @@ digraph ER_Concettuale {
     graph [
         label="Schema Concettuale ER (NON Ristrutturato) - TheKnife\n\n"
         labelloc="t"
-        fontname="SansSerif"
+        fontname="Helvetica,Arial,sans-serif"
         fontsize=16
-        fontcolor="#000000"
-        pad="0.4"
-        nodesep="0.7"
-        ranksep="0.8"
+        fontcolor="#004D40"
+        pad="0.5"
+        nodesep="0.9"
+        ranksep="0.9"
         bgcolor="#FFFFFF"
     ];
 
-    node [fontname="SansSerif", fontsize=11];
-    edge [fontname="SansSerif", fontsize=10, color="#006666", fontcolor="#000000"];
+    node [fontname="Helvetica,Arial,sans-serif", fontsize=11];
+    edge [fontname="Helvetica,Arial,sans-serif", fontsize=10, color="#006666", fontcolor="#000000"];
 
-    // ================= ENTITÀ (Stile Verde con icona E) =================
+    // ================= ENTITÀ =================
     UTENTE [shape=none, margin=0, label=<
-        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" COLOR="#006666" BGCOLOR="#FFFFFF">
-            <TR><TD BGCOLOR="#E0F2F1" ALIGN="CENTER" BORDER="1" SIDES="B"><FONT COLOR="#004D40"><B>🟢 (E)  UTENTE</B></FONT></TD></TR>
-            <TR><TD ALIGN="LEFT" BORDER="1" SIDES="B"><B><U>username</U> (PK)</B></TD></TR>
-            <TR><TD ALIGN="LEFT">nome<BR ALIGN="LEFT"/>cognome<BR ALIGN="LEFT"/>password_cifrata<BR ALIGN="LEFT"/>luogo_domicilio<BR ALIGN="LEFT"/>data_nascita (0..1)<BR ALIGN="LEFT"/></TD></TR>
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#006666" BGCOLOR="#FFFFFF">
+            <TR><TD COLSPAN="2" BGCOLOR="#006666" ALIGN="CENTER" CELLPADDING="6"><FONT COLOR="#FFFFFF"><B>[E] UTENTE</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT" BORDER="1" SIDES="B" BGCOLOR="#E0F2F1"><B><U>username</U></B></TD><TD ALIGN="RIGHT" BORDER="1" SIDES="B" BGCOLOR="#E0F2F1"><B>[PK]</B></TD></TR>
+            <TR><TD ALIGN="LEFT">nome</TD><TD ALIGN="RIGHT"></TD></TR>
+            <TR><TD ALIGN="LEFT">cognome</TD><TD ALIGN="RIGHT"></TD></TR>
+            <TR><TD ALIGN="LEFT">password_cifrata</TD><TD ALIGN="RIGHT"></TD></TR>
+            <TR><TD ALIGN="LEFT">luogo_domicilio</TD><TD ALIGN="RIGHT"></TD></TR>
+            <TR><TD ALIGN="LEFT">data_nascita</TD><TD ALIGN="RIGHT"><FONT COLOR="#555555">(0..1)</FONT></TD></TR>
         </TABLE>
     >];
 
     CLIENTE [shape=none, margin=0, label=<
-        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="8" COLOR="#006666" BGCOLOR="#FFFFFF">
-            <TR><TD BGCOLOR="#E0F2F1" ALIGN="CENTER"><FONT COLOR="#004D40"><B>🟢 (E)  CLIENTE</B></FONT></TD></TR>
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="8" COLOR="#006666" BGCOLOR="#E0F2F1">
+            <TR><TD ALIGN="CENTER"><FONT COLOR="#004D40"><B>[E] CLIENTE</B></FONT></TD></TR>
         </TABLE>
     >];
 
     RISTORATORE [shape=none, margin=0, label=<
-        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="8" COLOR="#006666" BGCOLOR="#FFFFFF">
-            <TR><TD BGCOLOR="#E0F2F1" ALIGN="CENTER"><FONT COLOR="#004D40"><B>🟢 (E)  RISTORATORE</B></FONT></TD></TR>
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="8" COLOR="#006666" BGCOLOR="#E0F2F1">
+            <TR><TD ALIGN="CENTER"><FONT COLOR="#004D40"><B>[E] RISTORATORE</B></FONT></TD></TR>
         </TABLE>
     >];
 
     RISTORANTE [shape=none, margin=0, label=<
-        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" COLOR="#006666" BGCOLOR="#FFFFFF">
-            <TR><TD BGCOLOR="#E0F2F1" ALIGN="CENTER" BORDER="1" SIDES="B"><FONT COLOR="#004D40"><B>🟢 (E)  RISTORANTE</B></FONT></TD></TR>
-            <TR><TD ALIGN="LEFT" BORDER="1" SIDES="B"><B><U>nome + indirizzo + citta</U> (ID)</B></TD></TR>
-            <TR><TD ALIGN="LEFT">fascia_prezzo<BR ALIGN="LEFT"/>delivery<BR ALIGN="LEFT"/>prenotazione_online<BR ALIGN="LEFT"/>tipo_cucina<BR ALIGN="LEFT"/>Locazione (nazione, citta, indirizzo)<BR ALIGN="LEFT"/>Coordinate (latitudine, longitudine)<BR ALIGN="LEFT"/></TD></TR>
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#006666" BGCOLOR="#FFFFFF">
+            <TR><TD COLSPAN="2" BGCOLOR="#006666" ALIGN="CENTER" CELLPADDING="6"><FONT COLOR="#FFFFFF"><B>[E] RISTORANTE</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT" BORDER="1" SIDES="B" BGCOLOR="#E0F2F1"><B><U>nome, indirizzo, città </U></B></TD><TD ALIGN="RIGHT" BORDER="1" SIDES="B" BGCOLOR="#E0F2F1"><B>[PK]</B></TD></TR>
+            <TR><TD ALIGN="LEFT">fascia_prezzo</TD><TD ALIGN="RIGHT"></TD></TR>
+            <TR><TD ALIGN="LEFT">delivery</TD><TD ALIGN="RIGHT"></TD></TR>
+            <TR><TD ALIGN="LEFT">prenotazione_online</TD><TD ALIGN="RIGHT"></TD></TR>
+            <TR><TD ALIGN="LEFT">tipo_cucina</TD><TD ALIGN="RIGHT"></TD></TR>
+            <TR><TD ALIGN="LEFT"><B>Locazione</B></TD><TD ALIGN="RIGHT"><FONT COLOR="#555555">(nazione, citta, indirizzo)</FONT></TD></TR>
+            <TR><TD ALIGN="LEFT"><B>Coordinate</B></TD><TD ALIGN="RIGHT"><FONT COLOR="#555555">(latitudine, longitudine)</FONT></TD></TR>
         </TABLE>
     >];
 
     RECENSIONE [shape=none, margin=0, label=<
-        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" COLOR="#006666" BGCOLOR="#FFFFFF">
-            <TR><TD BGCOLOR="#E0F2F1" ALIGN="CENTER" BORDER="1" SIDES="B"><FONT COLOR="#004D40"><B>🟢 (E)  RECENSIONE</B></FONT></TD></TR>
-            <TR><TD ALIGN="LEFT">stelle (1..5)<BR ALIGN="LEFT"/>testo<BR ALIGN="LEFT"/>data_recensione<BR ALIGN="LEFT"/>risposta_ristoratore (0..1)<BR ALIGN="LEFT"/>flag_modificata (0..1)<BR ALIGN="LEFT"/></TD></TR>
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#006666" BGCOLOR="#FFFFFF">
+            <TR><TD COLSPAN="2" BGCOLOR="#006666" ALIGN="CENTER" CELLPADDING="6"><FONT COLOR="#FFFFFF"><B>[E] RECENSIONE</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT" BORDER="1" SIDES="B" BGCOLOR="#E0F2F1"><B><I>Cliente(FK) + Ristorante(FK) </I></B></TD><TD ALIGN="RIGHT" BORDER="1" SIDES="B" BGCOLOR="#E0F2F1"><B>[PK]</B></TD></TR>
+            <TR><TD ALIGN="LEFT">stelle</TD><TD ALIGN="RIGHT"><FONT COLOR="#555555">(1..5)</FONT></TD></TR>
+            <TR><TD ALIGN="LEFT">testo</TD><TD ALIGN="RIGHT"></TD></TR>
+            <TR><TD ALIGN="LEFT">data_recensione</TD><TD ALIGN="RIGHT"></TD></TR>
+            <TR><TD ALIGN="LEFT">risposta_ristoratore</TD><TD ALIGN="RIGHT"><FONT COLOR="#555555">(0..1)</FONT></TD></TR>
         </TABLE>
     >];
 
-    // ================= RELAZIONI (Rombi ER Classici) =================
-    node [shape=diamond, style=filled, fillcolor="#E0F2F1", color="#006666", fontcolor="#004D40", fontname="SansSerif-Bold", height=0.8, width=1.6, fixedsize=false];
+    // ================= RELAZIONI =================
+    node [shape=diamond, style=filled, fillcolor="#E0F2F1", color="#006666", fontcolor="#004D40", fontname="Helvetica-Bold", height=0.75, width=1.5, fixedsize=false];
 
     Gestisce   [label="Gestisce"];
     Preferisce [label="Preferisce"];
@@ -60,25 +73,21 @@ digraph ER_Concettuale {
     Riceve     [label="Riceve"];
 
     // ================= GENERALIZZAZIONE (t, e) =================
-    CLIENTE -> UTENTE [arrowhead="onormal", label=" (t, e)"];
-    RISTORATORE -> UTENTE [arrowhead="onormal", label=" (t, e)"];
+    UTENTE -> CLIENTE     [dir=back, arrowtail="onormal", label="  (t, e)  "];
+    UTENTE -> RISTORATORE [dir=back, arrowtail="onormal", label="  (t, e)  "];
 
     // ================= COLLEGAMENTI E CARDINALITÀ =================
     edge [dir=none];
 
-    // Ristoratore - Gestisce - Ristorante
     RISTORATORE -> Gestisce [label="  (0, N)  "];
     Gestisce -> RISTORANTE  [label="  (0, 1)  "];
 
-    // Cliente - Preferisce - Ristorante
     CLIENTE -> Preferisce    [label="  (0, N)  "];
     Preferisce -> RISTORANTE [label="  (0, N)  "];
 
-    // Cliente - Scrive - Recensione (con cardinalità (0, 1) sul ramo!)
     CLIENTE -> Scrive    [label="  (0, N)  "];
-    Scrive -> RECENSIONE [label="  (0, 1)  "];
+    Scrive -> RECENSIONE [label="  (1, 1)  "];
 
-    // Ristorante - Riceve - Recensione
     RISTORANTE -> Riceve [label="  (0, N)  "];
     Riceve -> RECENSIONE [label="  (1, 1)  "];
 }
