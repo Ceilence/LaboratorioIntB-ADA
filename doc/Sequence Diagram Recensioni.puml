@@ -1,0 +1,91 @@
+@startuml
+skinparam shadowing false
+skinparam sequence {
+    ArrowColor #006666
+    ActorBorderColor #006666
+    LifeLineBorderColor #006666
+    ParticipantBorderColor #006666
+    ParticipantBackgroundColor #E0F2F1
+}
+
+title Sequence Diagram 2: Gestione Recensioni, Sync Real-Time e Risposta Ristoratore
+
+actor "Cliente Loggato" as Cli
+participant "FinestraClienteGuest\n(Client 1)" as GUICli
+participant "ControllerTheKnife\n(Client 1)" as CtrlCli
+participant "ServerTK\n(RMI Server)" as Server
+participant "RecensioneDAO" as RecDAO
+database "PostgreSQL\n(the_knife)" as DB
+participant "FinestraRistoratore\n(Client 2)" as GUIRist
+actor "Ristoratore" as Rist
+
+== 1. Inserimento nuova recensione ==
+Cli -> GUICli : Seleziona stelle, scrive commento \ne clicca "Pubblica"
+activate GUICli
+GUICli -> CtrlCli : aggiungiRecensione(idRistorante, stelle, testo)
+activate CtrlCli
+CtrlCli -> Server : synchronized aggiungiRecensione(nuovaRecensione) [RMI]
+activate Server
+Server -> RecDAO : aggiungiRecensione(r)
+activate RecDAO
+RecDAO -> DB : INSERT INTO Recensioni ... WHERE LOWER(ruolo) = 'cliente'
+activate DB
+DB --> RecDAO : 1 riga inserita
+deactivate DB
+RecDAO --> Server : true
+deactivate RecDAO
+Server --> CtrlCli : true
+deactivate Server
+CtrlCli --> GUICli : true
+deactivate CtrlCli
+GUICli -> GUICli : Resetta campi \ne mette la recensione in cima
+deactivate GUICli
+
+== 2. Sincronizzazione in tempo reale e risposta del ristoratore ==
+loop Ogni 2.5 secondi
+    GUIRist -> Server : visualizzaRecensioni(idRistorante) [RMI]
+    Server -> RecDAO : visualizzaRecensioni(idRistorante)
+    RecDAO -> DB : SELECT rec.*, u.username FROM Recensioni...
+    DB --> GUIRist : Rileva nuova impronta dati e aggiorna la tabella
+end
+
+Rist -> GUIRist : Seleziona la recensione e clicca "Rispondi / Modifica Risposta"
+activate GUIRist
+GUIRist -> Server : synchronized rispostaRecensioni(idRec, idRistoratore, risposta) [RMI]
+activate Server
+Server -> RecDAO : rispostaRecensioni(idRec, idRistoratore, risposta)
+activate RecDAO
+RecDAO -> DB : UPDATE Recensioni SET risposta_ristoratore = ? ...
+activate DB
+DB --> RecDAO : true
+deactivate DB
+RecDAO --> Server : true
+deactivate RecDAO
+Server --> GUIRist : true
+deactivate Server
+deactivate GUIRist
+
+== 3. Modifica del cliente e notifica al ristoratore ==
+Cli -> GUICli : Clicca "Modifica" sulla propria recensione,\ncambia stelle/testo e clicca "Salva Modifiche"
+activate GUICli
+GUICli -> CtrlCli : modificaRecensione(idRecensione, nuoveStelle, nuovoTesto)
+activate CtrlCli
+CtrlCli -> Server : synchronized modificaRecensione(...) [RMI]
+activate Server
+Server -> RecDAO : modificaRecensione(...)
+activate RecDAO
+RecDAO -> DB : UPDATE Recensioni SET stelle = ?, testo = testo || ' [MODIFICATA DAL CLIENTE]'
+activate DB
+DB --> RecDAO : true
+deactivate DB
+RecDAO --> Server : true
+deactivate RecDAO
+Server --> CtrlCli : true
+deactivate Server
+CtrlCli --> GUICli : true
+deactivate CtrlCli
+deactivate GUICli
+
+GUIRist -> Server : Timer rileva il flag di modifica
+Server --> GUIRist : Attiva la notifica nella colonna "Modificata"
+@enduml

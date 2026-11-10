@@ -1,0 +1,224 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing true
+skinparam roundcorner 10
+skinparam class {
+    BackgroundColor LightGrey
+    BorderColor Black
+    HeaderBackgroundColor #E0F2F1
+    ArrowColor Black
+}
+
+title TheKnife - UML Class Diagram (Architettura Client / Server)
+
+package "theknife.essenziali" {
+    class Utente implements java.io.Serializable {
+        - idUtente : int
+        - nome : String
+        - cognome : String
+        - username : String
+        - password : String
+        - dataNascita : Date
+        - luogoDomicilio : String
+        - ruolo : String
+        + {static} creaGuest(luogo : String) : Utente
+        + isGuest() : boolean
+        + isCliente() : boolean
+        + isRistoratore() : boolean
+    }
+
+    class Ristorante implements java.io.Serializable {
+        - idRistorante : int
+        - nome : String
+        - nazione : String
+        - citta : String
+        - indirizzo : String
+        - latitudine : double
+        - longitudine : double
+        - fasciaPrezzo : int
+        - delivery : boolean
+        - prenotazioneOnline : boolean
+        - tipoCucina : String
+        - idRistoratore : Integer
+    }
+
+    class Recensione implements java.io.Serializable {
+        - idRecensione : int
+        - idUtente : int
+        - idRistorante : int
+        - stelle : int
+        - testo : String
+        - dataRecensione : Date
+        - rispostaRistoratore : String
+        - usernameAutore : String
+    }
+
+    class SessioneUtente {
+        - utenteCorrente : Utente
+        + entraComeGuest(luogo : String) : boolean
+        + impostaUtenteLoggato(u : Utente) : void
+        + logout() : void
+        + getUtenteCorrente() : Utente
+        + getLuogoRiferimento() : String
+        + isSessioneAttiva() : boolean
+    }
+
+    SessioneUtente "1" o--> "0..1" Utente : mantiene >
+}
+
+package "theknife.remoto (Livello Comunicazione RMI)" {
+    interface ServiziTheKnife extends java.rmi.Remote {
+        + registrazione(u : Utente) : boolean
+        + login(user : String, pass : String) : Utente
+        + aggiornaUtente(u : Utente, cambiaPass : boolean) : boolean
+        + cercaRistorante(nome : String, loc : String, cucina : String, pMin : Integer, pMax : Integer, del : Boolean, pren : Boolean, stelle : Double) : List<Ristorante>
+        + visualizzaRistorante(idRistorante : int) : Ristorante
+        + visualizzaRecensioni(idRistorante : int) : List<Recensione>
+        + visualizzaRiepilogo(idRistorante : int) : double[]
+        + aggiungiPreferito(idCliente : int, idRistorante : int) : boolean
+        + rimuoviPreferito(idCliente : int, idRistorante : int) : boolean
+        + visualizzaPreferiti(idCliente : int) : List<Ristorante>
+        + aggiungiRecensione(r : Recensione) : boolean
+        + modificaRecensione(idRec : int, idCli : int, stelle : int, testo : String) : boolean
+        + eliminaRecensione(idRec : int, idCli : int) : boolean
+        + visualizzaRecensioniPerCliente(idCliente : int) : List<Recensione>
+        + aggiungiRistorante(r : Ristorante, idRistoratore : int) : boolean
+        + modificaRistorante(r : Ristorante, idRistoratore : int) : boolean
+        + eliminaRistorante(idRist : int, idRistoratore : int) : boolean
+        + rispostaRecensioni(idRec : int, idRistoratore : int, risposta : String) : boolean
+        + getRistorantiPerRistoratore(idRistoratore : int) : List<Ristorante>
+    }
+
+    class ServerTK extends java.rmi.server.UnicastRemoteObject implements ServiziTheKnife {
+        - ristoranteDAO : RistoranteDAO
+        - utenteDAO : UtenteDAO
+        - recensioneDAO : RecensioneDAO
+        + {static} main(args : String[]) : void
+    }
+}
+
+package "theknife.dao (Data Access Object - Lato Server)" {
+    class UtenteDAO {
+        + registraUtente(u : Utente) : boolean
+        + esisteUsername(username : String) : boolean
+        + getUtentePerId(idUtente : int) : Utente
+        - estraiUtente(rs : ResultSet) : Utente
+        + login(user : String, pass : String) : Utente
+        + aggiornaUtente(u : Utente, cambiaPass : boolean) : boolean
+        - cifraPassword(pass : String) : String
+    }
+
+    class RistoranteDAO {
+        + aggiungiRistorante(r : Ristorante, idRist : int) : boolean
+        + modificaRistorante(r : Ristorante, idRist : int) : boolean
+        + eliminaRistorante(idRist : int, idRistoratore : int) : boolean
+        + visualizzaRistorante(idRistorante : int) : Ristorante
+        + cercaRistorante(...) : List<Ristorante>
+        + getRistorantiPerRistoratore(idRist : int) : List<Ristorante>
+        + aggiungiPreferito(idCli : int, idRist : int) : boolean
+        + rimuoviPreferito(idCli : int, idRist : int) : boolean
+        + visualizzaPreferiti(idCli : int) : List<Ristorante>
+        - estraiRistorante(rs : ResultSet) : Ristorante
+    }
+
+    class RecensioneDAO {
+        + aggiungiRecensione(r : Recensione) : boolean
+        + modificaRecensione(idRec : int, idCli : int, stelle : int, testo : String) : boolean
+        + eliminaRecensione(idRec : int, idCli : int) : boolean
+        + rispostaRecensioni(idRec : int, idRist : int, risp : String) : boolean
+        + visualizzaRecensioni(idRist : int) : List<Recensione>
+        + visualizzaRecensioniPerCliente(idCli : int) : List<Recensione>
+        + visualizzaRiepilogo(idRist : int) : double[]
+        - estraiRecensione(rs : ResultSet) : Recensione
+    }
+}
+
+package "theknife.db (Gestione DBMS PostgreSQL)" {
+    class DatabaseManager {
+        - {static} url : String
+        - {static} user : String
+        - {static} password : String
+        + {static} configuraDatabase(host : String, user : String, pass : String) : void
+        + {static} connect() : Connection
+    }
+
+    class ImportatoreCSV {
+        + {static} importaDati(percorsoFile : String) : void
+    }
+}
+
+package "theknife.gestore (Controller - Lato Client)" {
+    class ControllerTheKnife {
+        - sessione : SessioneUtente
+        - serverRemoto : ServiziTheKnife
+        + connettiAlServer(host : String) : boolean
+        + accediComeGuest(luogo : String) : List<Ristorante>
+        + login(user : String, pass : String) : boolean
+        + registrazione(u : Utente) : boolean
+        + logout() : void
+        + getRistorantiVicini() : List<Ristorante>
+        + cercaRistorante(...) : List<Ristorante>
+        + visualizzaRistorante(id : int) : Ristorante
+        + visualizzaRecensioni(id : int) : List<Recensione>
+        + visualizzaRiepilogo(id : int) : double[]
+        + aggiungiPreferito(id : int) : boolean
+        + rimuoviPreferito(id : int) : boolean
+        + visualizzaPreferiti() : List<Ristorante>
+        + aggiungiRecensione(idRist : int, stelle : int, testo : String) : boolean
+        + modificaRecensione(idRec : int, stelle : int, testo : String) : boolean
+        + eliminaRecensione(idRec : int) : boolean
+        + visualizzaMieRecensioniCliente() : List<Recensione>
+        + visualizzaMieiRistoranti() : List<Ristorante>
+        - verificaPermessoCliente(azione : String) : boolean
+        - verificaPermessoRistoratore(azione : String) : boolean
+        + aggiornaProfiloUtente(...) : boolean
+        + aggiungiRistorante(r : Ristorante) : boolean
+        + modificaRistorante(r : Ristorante) : boolean
+        + eliminaRistorante(id : int) : boolean
+        + rispostaRecensioni(idRec : int, risposta : String) : boolean
+        + getVersioneDatiServer() : long
+    }
+}
+
+package "theknife.gui (Interfaccia Grafica Swing - Lato Client)" {
+    class FinestraIniziale extends javax.swing.JFrame
+    class FinestraClienteGuest extends javax.swing.JFrame
+    class FinestraRistoratore extends javax.swing.JFrame
+    class DialogRegistrazione extends javax.swing.JDialog
+    class FinestraModificaProfilo extends javax.swing.JDialog
+    class StileTheKnife
+}
+
+package "theknife" {
+    class ClientTK {
+        + {static} main(args : String[]) : void
+    }
+}
+
+' Relazioni Architetturali
+ClientTK ..> ControllerTheKnife : istanzia >
+ClientTK ..> FinestraIniziale : avvia >
+FinestraIniziale --> ControllerTheKnife
+FinestraIniziale ..> DialogRegistrazione : apre >
+FinestraIniziale ..> FinestraClienteGuest : apre >
+FinestraIniziale ..> FinestraRistoratore : apre >
+FinestraClienteGuest --> ControllerTheKnife
+FinestraRistoratore --> ControllerTheKnife
+FinestraClienteGuest ..> FinestraModificaProfilo : apre >
+FinestraRistoratore ..> FinestraModificaProfilo : apre >
+
+ControllerTheKnife *--> SessioneUtente
+ControllerTheKnife --> ServiziTheKnife : invoca via RMI >
+
+ServerTK *--> UtenteDAO
+ServerTK *--> RistoranteDAO
+ServerTK *--> RecensioneDAO
+ServerTK ..> DatabaseManager : configura >
+ServerTK ..> ImportatoreCSV : esegue all'avvio >
+
+UtenteDAO ..> DatabaseManager : usa JDBC >
+RistoranteDAO ..> DatabaseManager : usa JDBC >
+RecensioneDAO ..> DatabaseManager : usa JDBC >
+ImportatoreCSV ..> DatabaseManager : usa JDBC >
+@enduml

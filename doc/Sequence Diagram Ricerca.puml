@@ -1,0 +1,91 @@
+@startuml
+skinparam shadowing false
+skinparam sequence {
+    ArrowColor #006666
+    ActorBorderColor #006666
+    LifeLineBorderColor #006666
+    ParticipantBorderColor #006666
+    ParticipantBackgroundColor #E0F2F1
+}
+
+title Sequence Diagram 1: Accesso, Ricerca Combinata e Dettaglio Ristorante
+
+actor "Utente\n(Guest / Cliente)" as User
+participant "FinestraClienteGuest\n(GUI Client)" as GUI
+participant "ControllerTheKnife\n(Client)" as Ctrl
+participant "SessioneUtente\n(Client)" as Sess
+participant "ServerTK\n(RMI Server)" as Server
+participant "RistoranteDAO" as RistDAO
+participant "RecensioneDAO" as RecDAO
+database "PostgreSQL\n(the_knife)" as DB
+
+User -> GUI : Inserisce filtri (locazione, cucina, prezzo, delivery, stelle)\ne clicca su "Cerca"
+activate GUI
+
+GUI -> Ctrl : cercaRistorante(nome, locazione, cucina, pMin, pMax, del, pren, stelle)
+activate Ctrl
+
+alt locazione non specificata nel filtro
+    Ctrl -> Sess : getLuogoRiferimento()
+    activate Sess
+    Sess --> Ctrl : luogoDomicilio / luogoGuest
+    deactivate Sess
+end
+
+Ctrl -> Server : cercaRistorante(...) [Chiamata RMI]
+activate Server
+
+Server -> RistDAO : cercaRistorante(...)
+activate RistDAO
+RistDAO -> DB : SELECT r.* FROM RistorantiTheKnife r LEFT JOIN Recensioni...
+activate DB
+DB --> RistDAO : ResultSet ristoranti
+deactivate DB
+RistDAO --> Server : List<Ristorante>
+deactivate RistDAO
+
+Server --> Ctrl : List<Ristorante>
+deactivate Server
+Ctrl --> GUI : List<Ristorante>
+deactivate Ctrl
+
+GUI -> GUI : impostaNuovaListaPaginata(20 per pagina)\ne seleziona il primo ristorante
+
+User -> GUI : Seleziona un Ristorante dalla lista a sinistra
+GUI -> Ctrl : visualizzaRistorante(idRistorante)
+activate Ctrl
+Ctrl -> Server : visualizzaRistorante(idRistorante) [RMI]
+activate Server
+Server -> RistDAO : visualizzaRistorante(idRistorante)
+activate RistDAO
+RistDAO -> DB : SELECT * FROM RistorantiTheKnife WHERE id_ristorante = ?
+activate DB
+DB --> RistDAO : Dati Ristorante
+deactivate DB
+RistDAO --> Server : Ristorante
+deactivate RistDAO
+Server --> Ctrl : Ristorante
+deactivate Server
+Ctrl --> GUI : Ristorante
+deactivate Ctrl
+
+GUI -> Ctrl : visualizzaRiepilogo(idRistorante) & visualizzaRecensioni(idRistorante)
+activate Ctrl
+Ctrl -> Server : visualizzaRiepilogo(id) & visualizzaRecensioni(id) [RMI]
+activate Server
+Server -> RecDAO : visualizzaRiepilogo(id) & visualizzaRecensioni(id)
+activate RecDAO
+RecDAO -> DB : SELECT COUNT(*), AVG(stelle)... / SELECT rec.*, u.username...
+activate DB
+DB --> RecDAO : Riepilogo e Lista Recensioni
+deactivate DB
+RecDAO --> Server : double[] riepilogo, List<Recensione>
+deactivate RecDAO
+Server --> Ctrl : double[] riepilogo, List<Recensione>
+deactivate Server
+Ctrl --> GUI : Dati aggiornati
+deactivate Ctrl
+
+GUI --> User : Mostra scheda completa, bandiera, descrizione,\nmedia stelle e recensioni (anonime se Guest)
+deactivate GUI
+@enduml
