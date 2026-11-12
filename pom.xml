@@ -76,7 +76,7 @@
                         </configuration>
                     </execution>
 
-                    <!-- 2. Eseguibile Client: bin/ClientTK.jar -->
+                    <!-- Eseguibile Client: bin/ClientTK.jar -->
                     <execution>
                         <id>build-client-jar</id>
                         <phase>package</phase>
