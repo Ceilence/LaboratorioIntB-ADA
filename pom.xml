@@ -49,7 +49,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.5.2</version>
                 <executions>
-                    <!-- 1. Eseguibile Server: bin/ServerTK.jar -->
+                    <!-- Eseguibile Server: bin/ServerTK.jar -->
                     <execution>
                         <id>build-server-jar</id>
                         <phase>package</phase>
