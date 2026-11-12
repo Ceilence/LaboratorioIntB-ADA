@@ -9,7 +9,7 @@
       <resource>
         <directory>src</directory>
         <includes>
-          <include>media/**</include>
+          <include>risorse/**</include>
         </includes>
       </resource>
     </resources>

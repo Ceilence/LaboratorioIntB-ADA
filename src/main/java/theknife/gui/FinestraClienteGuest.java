@@ -315,7 +315,7 @@ public class FinestraClienteGuest extends JFrame {
      * @param controller il controller attivo del client per comunicare con il server
      */
     public FinestraClienteGuest(ControllerTheKnife controller) {
-        super("TheKnife - Scopri i Ristoranti");
+        super("TheKnife");
         this.controller = controller;
         inizializzaGUI();
         eseguiRicercaIniziale();

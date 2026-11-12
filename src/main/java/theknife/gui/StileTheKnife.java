@@ -209,7 +209,7 @@ public class StileTheKnife {
      * Carica un'immagine dalle risorse interne al .jar o dai file di progetto,
      * la ridimensiona e la salva in memoria per evitare caricamenti ripetuti.
      *
-     * @param nomeFile  il nome del file dell'immagine (es. "src/media/logo.png" o "logo.png")
+     * @param nomeFile  il nome del file dell'immagine (es. "src/risorse/logo.png" o "logo.png")
      * @param larghezza la larghezza desiderata in pixel
      * @param altezza   l'altezza desiderata in pixel
      * @return l'oggetto <code>ImageIcon</code> ridimensionato, oppure <code>null</code> se non trovato
@@ -227,7 +227,7 @@ public class StileTheKnife {
 
 
             String[] risorseJar = {
-                    "/media/" + soloNome,
+                    "/risorse/" + soloNome,
                     "/" + nomeFile.replace("\\", "/").replaceFirst("^src/", ""),
                     "/" + nomeFile.replace("\\", "/")
             };
@@ -243,9 +243,9 @@ public class StileTheKnife {
             if (img == null) {
                 File[] possibiliPercorsi = {
                         new File(nomeFile),
-                        new File("src/media/" + soloNome),
+                        new File("src/risorse/" + soloNome),
                         new File("../" + nomeFile),
-                        new File("../src/media/" + soloNome)
+                        new File("../src/risorse/" + soloNome)
                 };
                 for (File f : possibiliPercorsi) {
                     if (f.exists() && f.isFile()) {
@@ -273,7 +273,7 @@ public class StileTheKnife {
      */
     public static JLabel creaLabelLogo(int dimensione) {
         JLabel lbl = new JLabel();
-        ImageIcon icon = caricaImmagine("src/media/logo.png", dimensione, dimensione);
+        ImageIcon icon = caricaImmagine("src/risorse/logo.png", dimensione, dimensione);
         if (icon != null) {
             lbl.setIcon(icon);
         }
@@ -294,8 +294,8 @@ public class StileTheKnife {
         JLabel lbl = new JLabel();
         lbl.setPreferredSize(new Dimension(larghezza, altezza));
         ImageIcon icon = caricaImmagine(fileBandiera, larghezza, altezza);
-        if (icon == null && !fileBandiera.equals("src/media/Globe.png")) {
-            icon = caricaImmagine("src/media/Globe.png", larghezza, altezza);
+        if (icon == null && !fileBandiera.equals("src/risorse/Globe.png")) {
+            icon = caricaImmagine("src/risorse/Globe.png", larghezza, altezza);
         }
         if (icon != null) {
             lbl.setIcon(icon);
@@ -316,29 +316,29 @@ public class StileTheKnife {
      * Restituisce il nome del file immagine della bandiera corrispondente alla nazione passata.
      *
      * @param nazione il nome della nazione (in italiano o inglese)
-     * @return il nome del file della bandiera, oppure "src/media/Globe.png" come valore predefinito
+     * @return il nome del file della bandiera, oppure "src/risorse/Globe.png" come valore predefinito
      */
     public static String determinaFileBandiera(String nazione) {
         if (nazione == null) {
-            return "src/media/Globe.png";
+            return "src/risorse/Globe.png";
         }
         String n = nazione.trim().toLowerCase();
         if (n.contains("italy") || n.contains("italia")) {
-            return "src/media/Flag_of_Italy.png";
+            return "src/risorse/Flag_of_Italy.png";
         } else if (n.contains("france") || n.contains("francia")) {
-            return "src/media/Flag_of_France.png";
+            return "src/risorse/Flag_of_France.png";
         } else if (n.contains("germany") || n.contains("germania")) {
-            return "src/media/Flag_of_Germany.png";
+            return "src/risorse/Flag_of_Germany.png";
         } else if (n.contains("spain") || n.contains("spagna")) {
-            return "src/media/Flag_of_Spain.png";
+            return "src/risorse/Flag_of_Spain.png";
         } else if (n.contains("japan") || n.contains("giappone")) {
-            return "src/media/Flag_of_Japan.png";
+            return "src/risorse/Flag_of_Japan.png";
         } else if (n.contains("china") || n.contains("cina") || n.contains("hong kong") || n.contains("macau")) {
-            return "src/media/Flag_of_China.png";
+            return "src/risorse/Flag_of_China.png";
         } else if (n.contains("united states") || n.equals("usa") || n.contains("stati uniti")) {
-            return "src/media/Flag_of_United_States.png";
+            return "src/risorse/Flag_of_United_States.png";
         }
-        return "src/media/Globe.png";
+        return "src/risorse/Globe.png";
     }
 
     /**
@@ -362,7 +362,7 @@ public class StileTheKnife {
 
         return "Situato a " + r.getCitta() + " (" + r.getNazione() + ") in " + r.getIndirizzo() + ", "
                 + r.getNome() + " è un ristorante selezionato che propone una cucina di tipo " + r.getTipoCucina() + ". "
-                + "La fascia di prezzo media indicativa è di circa " + r.getFasciaPrezzo() + " € a persona, "
+                + "La fascia di prezzo risorse indicativa è di circa " + r.getFasciaPrezzo() + " € a persona, "
                 + "con particolare attenzione alla qualità delle materie prime e all'accoglienza. " + servizi;
     }
 
@@ -695,13 +695,13 @@ public class StileTheKnife {
     }
 
     /**
-     * Imposta l'immagine <code>src/media/logo.png</code> come icona della finestra nella barra del titolo
+     * Imposta l'immagine <code>src/risorse/logo.png</code> come icona della finestra nella barra del titolo
      * del sistema operativo e nella barra delle applicazioni.
      *
      * @param finestra il <code>JFrame</code> o <code>JDialog</code> a cui applicare l'icona
      */
     public static void applicaIconaFinestra(java.awt.Window finestra) {
-        ImageIcon icona = caricaImmagine("src/media/logo.png", 64, 64);
+        ImageIcon icona = caricaImmagine("src/risorse/logo.png", 64, 64);
         if (icona != null && finestra != null) {
             finestra.setIconImage(icona.getImage());
         }

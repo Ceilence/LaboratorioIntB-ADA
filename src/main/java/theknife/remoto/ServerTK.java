@@ -498,7 +498,7 @@ public class ServerTK extends UnicastRemoteObject implements ServiziTheKnife {
                         );
 
                         // Controlla se serve popolare il DB dal CSV
-                        ImportatoreCSV.importaDati("michelin_my_maps.csv");
+                        ImportatoreCSV.importaDati("../src/risorse/michelin_my_maps.csv");
 
                         ServerTK server = new ServerTK();
                         Registry registry = LocateRegistry.createRegistry(1099);
