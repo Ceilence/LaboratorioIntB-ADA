@@ -12,6 +12,7 @@ import theknife.essenziali.SessioneUtente;
 import theknife.essenziali.Utente;
 import theknife.remoto.ServiziTheKnife;
 
+import javax.swing.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
@@ -52,6 +53,17 @@ public class ControllerTheKnife {
     public ControllerTheKnife(String hostServer) {
         this.sessione = new SessioneUtente();
         connettiAlServer(hostServer);
+
+        // Timer per controllo disconnessione server
+        javax.swing.Timer timerControlloServer = new javax.swing.Timer(2000, evt -> {
+            try {
+                serverRemoto.visualizzaRiepilogo(-1);
+            } catch (Exception ex) {
+                ((javax.swing.Timer) evt.getSource()).stop();
+                gestisciErroreServer(ex);
+            }
+        });
+        timerControlloServer.start();
     }
 
     /**
@@ -109,7 +121,7 @@ public class ControllerTheKnife {
             }
         } catch (Exception e) {
             System.err.println("Errore di comunicazione con il server durante il login:");
-            e.printStackTrace();
+            gestisciErroreServer(e);
         }
         return false;
     }
@@ -124,7 +136,7 @@ public class ControllerTheKnife {
             return serverRemoto.registrazione(nuovoUtente);
         } catch (Exception e) {
             System.err.println("Errore di comunicazione con il server durante la registrazione:");
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return false;
         }
     }
@@ -174,7 +186,7 @@ public class ControllerTheKnife {
             );
         } catch (Exception e) {
             System.err.println("Errore di comunicazione con il server durante cercaRistorante:");
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return new ArrayList<>();
         }
     }
@@ -189,7 +201,7 @@ public class ControllerTheKnife {
             return serverRemoto.visualizzaRistorante(idRistorante);
         } catch (Exception e) {
             System.err.println("Errore di comunicazione con il server durante visualizzaRistorante:");
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return null;
         }
     }
@@ -204,7 +216,7 @@ public class ControllerTheKnife {
             return serverRemoto.visualizzaRecensioni(idRistorante);
         } catch (Exception e) {
             System.err.println("Errore di comunicazione con il server durante visualizzaRecensioni:");
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return new ArrayList<>();
         }
     }
@@ -219,7 +231,7 @@ public class ControllerTheKnife {
             return serverRemoto.visualizzaRiepilogo(idRistorante);
         } catch (Exception e) {
             System.err.println("Errore di comunicazione con il server durante visualizzaRiepilogo:");
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return new double[]{0.0, 0.0};
         }
     }
@@ -236,7 +248,7 @@ public class ControllerTheKnife {
         try {
             return serverRemoto.aggiungiPreferito(sessione.getUtenteCorrente().getIdUtente(), idRistorante);
         } catch (Exception e) {
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return false;
         }
     }
@@ -253,7 +265,7 @@ public class ControllerTheKnife {
         try {
             return serverRemoto.rimuoviPreferito(sessione.getUtenteCorrente().getIdUtente(), idRistorante);
         } catch (Exception e) {
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return false;
         }
     }
@@ -269,7 +281,7 @@ public class ControllerTheKnife {
         try {
             return serverRemoto.visualizzaPreferiti(sessione.getUtenteCorrente().getIdUtente());
         } catch (Exception e) {
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return new ArrayList<>();
         }
     }
@@ -289,7 +301,7 @@ public class ControllerTheKnife {
             Recensione nuova = new Recensione(sessione.getUtenteCorrente().getIdUtente(), idRistorante, stelle, testo, null);
             return serverRemoto.aggiungiRecensione(nuova);
         } catch (Exception e) {
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return false;
         }
     }
@@ -308,7 +320,7 @@ public class ControllerTheKnife {
         try {
             return serverRemoto.modificaRecensione(idRecensione, sessione.getUtenteCorrente().getIdUtente(), nuoveStelle, nuovoTesto);
         } catch (Exception e) {
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return false;
         }
     }
@@ -325,7 +337,7 @@ public class ControllerTheKnife {
         try {
             return serverRemoto.eliminaRecensione(idRecensione, sessione.getUtenteCorrente().getIdUtente());
         } catch (Exception e) {
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return false;
         }
     }
@@ -341,7 +353,7 @@ public class ControllerTheKnife {
         try {
             return serverRemoto.visualizzaRecensioniPerCliente(sessione.getUtenteCorrente().getIdUtente());
         } catch (Exception e) {
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return new ArrayList<>();
         }
     }
@@ -360,7 +372,7 @@ public class ControllerTheKnife {
             nuovoRistorante.setIdRistoratore(idRistoratore);
             return serverRemoto.aggiungiRistorante(nuovoRistorante, idRistoratore);
         } catch (Exception e) {
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return false;
         }
     }
@@ -378,7 +390,7 @@ public class ControllerTheKnife {
         try {
             return serverRemoto.rispostaRecensioni(idRecensione, sessione.getUtenteCorrente().getIdUtente(), testoRisposta);
         } catch (Exception e) {
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return false;
         }
     }
@@ -394,7 +406,7 @@ public class ControllerTheKnife {
         try {
             return serverRemoto.getRistorantiPerRistoratore(sessione.getUtenteCorrente().getIdUtente());
         } catch (Exception e) {
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return new ArrayList<>();
         }
     }
@@ -462,7 +474,8 @@ public class ControllerTheKnife {
                 return true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            gestisciErroreServer(e);
+            return false;
         }
         return false;
     }
@@ -481,10 +494,38 @@ public class ControllerTheKnife {
             ristoranteModificato.setIdRistoratore(idRist);
             return serverRemoto.modificaRistorante(ristoranteModificato, idRist);
         } catch (Exception e) {
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return false;
         }
     }
+
+    private boolean erroreDisconnesione = false;
+    /**
+     * Gestisce la caduta della connessione col server RMI mostrando un messaggio
+     * di errore all'utente e chiudendo l'applicazione in modo sicuro.
+     *
+     * @param e l'eccezione remota catturata
+     */
+    private synchronized void gestisciErroreServer(Exception e) {
+        if (erroreDisconnesione) {
+            return;
+        }
+        erroreDisconnesione = true;
+        System.err.println("Connessione col server persa: " + e.getMessage());
+
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Connessione con il server TheKnife persa.\n"
+                            + "Il server potrebbe essere stato chiuso o non essere più raggiungibile.\n"
+                            + "L'applicazione verrà chiusa.",
+                    "Errore di connessione al server",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            System.exit(1); // Chiude il client e tutti i Timer attivi
+        });
+    }
+
 
     /**
      * Elimina un ristorante gestito dal ristoratore loggato.
@@ -498,7 +539,7 @@ public class ControllerTheKnife {
         try {
             return serverRemoto.eliminaRistorante(idRistorante, sessione.getUtenteCorrente().getIdUtente());
         } catch (Exception e) {
-            e.printStackTrace();
+            gestisciErroreServer(e);
             return false;
         }
     }

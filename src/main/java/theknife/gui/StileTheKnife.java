@@ -8,19 +8,7 @@ package theknife.gui;
 
 import theknife.essenziali.Ristorante;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -362,8 +350,7 @@ public class StileTheKnife {
 
         return "Situato a " + r.getCitta() + " (" + r.getNazione() + ") in " + r.getIndirizzo() + ", "
                 + r.getNome() + " è un ristorante selezionato che propone una cucina di tipo " + r.getTipoCucina() + ". "
-                + "La fascia di prezzo risorse indicativa è di circa " + r.getFasciaPrezzo() + " € a persona, "
-                + "con particolare attenzione alla qualità delle materie prime e all'accoglienza. " + servizi;
+                + "La fascia di prezzo indicativa è di circa " + r.getFasciaPrezzo() + " € a persona, " + servizi;
     }
 
     /**

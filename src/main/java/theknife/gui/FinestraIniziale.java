@@ -123,7 +123,7 @@ public class FinestraIniziale extends JFrame {
         card.setPreferredSize(new Dimension(420, 415));
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-        JLabel lblIntestazione = new JLabel("Accedi al tuo Account");
+        JLabel lblIntestazione = new JLabel("Accedi al tuo account");
         lblIntestazione.setFont(StileTheKnife.FONT_SOTTOTITOLO);
         lblIntestazione.setForeground(StileTheKnife.VERDE_THEKNIFE);
         lblIntestazione.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -144,7 +144,7 @@ public class FinestraIniziale extends JFrame {
         JPanel panelPassConOcchio = StileTheKnife.creaPannelloPasswordConOcchio(txtPassword, 360);
         panelPassConOcchio.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton btnLogin = StileTheKnife.creaBottonePrimario("Accedi alla Piattaforma");
+        JButton btnLogin = StileTheKnife.creaBottonePrimario("Accedi alla piattaforma");
         btnLogin.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnLogin.setPreferredSize(new Dimension(360, 44));
         btnLogin.setMinimumSize(new Dimension(360, 44));
@@ -189,7 +189,7 @@ public class FinestraIniziale extends JFrame {
         card.setPreferredSize(new Dimension(420, 415));
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-        JLabel lblIntestazione = new JLabel("Esplora come Ospite");
+        JLabel lblIntestazione = new JLabel("Esplora come ospite");
         lblIntestazione.setFont(StileTheKnife.FONT_SOTTOTITOLO);
         lblIntestazione.setForeground(StileTheKnife.VERDE_THEKNIFE);
         lblIntestazione.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -216,7 +216,7 @@ public class FinestraIniziale extends JFrame {
         txtLuogoGuest.setAlignmentX(Component.LEFT_ALIGNMENT);
         StileTheKnife.fissaDimensioneInput(txtLuogoGuest, 360);
 
-        JButton btnGuest = StileTheKnife.creaBottonePrimario("Continua come Guest");
+        JButton btnGuest = StileTheKnife.creaBottonePrimario("Continua come guest");
         btnGuest.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnGuest.setPreferredSize(new Dimension(360, 44));
         btnGuest.setMinimumSize(new Dimension(360, 44));
@@ -264,14 +264,14 @@ public class FinestraIniziale extends JFrame {
         String password = new String(txtPassword.getPassword());
 
         if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Inserisci sia lo username che la password.", "Dati Mancanti", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Inserisci sia lo username che la password.", "Dati mancanti", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (controller.login(username, password)) {
             apriSchermataPrincipale(controller.getSessione().getUtenteCorrente());
         } else {
-            JOptionPane.showMessageDialog(this, "Username o password non corretti. Riprova.", "Accesso Negato", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Username o password non corretti. Riprova.", "Accesso negato", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -282,7 +282,7 @@ public class FinestraIniziale extends JFrame {
     private void gestisciAccessoGuest() {
         String luogo = txtLuogoGuest.getText().trim();
         if (luogo.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Indica il nome di un luogo (es. Como, Vienna).", "Luogo Obbligatorio", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Indica il nome di un luogo (es. Como, Vienna).", "Luogo obbligatorio", JOptionPane.WARNING_MESSAGE);
             return;
         }
         controller.accediComeGuest(luogo);

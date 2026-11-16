@@ -374,7 +374,7 @@ public class ServerTK extends UnicastRemoteObject implements ServiziTheKnife {
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(new EmptyBorder(15, 20, 15, 20));
 
-        JLabel lblTitolo = new JLabel("Configurazione Database PostgreSQL", SwingConstants.CENTER);
+        JLabel lblTitolo = new JLabel("Configurazione database PostgreSQL", SwingConstants.CENTER);
         lblTitolo.setFont(new Font("SansSerif", Font.BOLD, 16));
         mainPanel.add(lblTitolo, BorderLayout.NORTH);
 
@@ -425,12 +425,12 @@ public class ServerTK extends UnicastRemoteObject implements ServiziTheKnife {
         JTextArea areaLog = new JTextArea(4, 30);
         areaLog.setEditable(false);
         areaLog.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        areaLog.setText("Premi Invio su Host e Username per i valori standard,\ninserisci la password e premi Invio per avviare.");
+        areaLog.setText("Premi invio su Host e Username per i valori standard,\ninserisci la password e premi invio per avviare.");
         JScrollPane scrollLog = new JScrollPane(areaLog);
         bottomPanel.add(scrollLog, BorderLayout.CENTER);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btnAvvia = new JButton("Avvia Server");
+        JButton btnAvvia = new JButton("Avvia server");
         JButton btnChiudi = new JButton("Esci");
         btnPanel.add(btnAvvia);
         btnPanel.add(btnChiudi);
@@ -538,7 +538,7 @@ public class ServerTK extends UnicastRemoteObject implements ServiziTheKnife {
                                                  JTextArea areaLog, String messaggioErrore) {
         SwingUtilities.invokeLater(() -> {
             areaLog.setText("Errore: " + messaggioErrore + "\nRiprova a inserire la password.");
-            JOptionPane.showMessageDialog(frame, messaggioErrore, "Errore di Connessione", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, messaggioErrore, "Errore di connessione", JOptionPane.ERROR_MESSAGE);
             txtHost.setEnabled(true);
             txtUser.setEnabled(true);
             txtPass.setEnabled(true);

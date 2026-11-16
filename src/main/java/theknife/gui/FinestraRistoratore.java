@@ -244,7 +244,7 @@ public class FinestraRistoratore extends JFrame {
         lblIntestazione.setForeground(StileTheKnife.VERDE_THEKNIFE);
         panel.add(lblIntestazione, BorderLayout.NORTH);
 
-        String[] col = {"Nome Locale", "Città", "Cucina", "Prezzo", "Delivery", "Media ★", "Recensioni"};
+        String[] col = {"Nome locale", "Città", "Cucina", "Prezzo", "Delivery", "Media ★", "Recensioni"};
         modelloRistoranti = new DefaultTableModel(col, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -319,10 +319,10 @@ public class FinestraRistoratore extends JFrame {
         StileTheKnife.applicaStileTabella(tabellaRecensioni);
 
         tabellaRecensioni.getColumnModel().getColumn(0).setPreferredWidth(95);  // Stelle
-        tabellaRecensioni.getColumnModel().getColumn(1).setPreferredWidth(100); // Nome Utente
+        tabellaRecensioni.getColumnModel().getColumn(1).setPreferredWidth(100); // Nome utente
         tabellaRecensioni.getColumnModel().getColumn(2).setPreferredWidth(190); // Commento
         tabellaRecensioni.getColumnModel().getColumn(3).setPreferredWidth(85);  // Data
-        tabellaRecensioni.getColumnModel().getColumn(4).setPreferredWidth(170); // La Tua Risposta
+        tabellaRecensioni.getColumnModel().getColumn(4).setPreferredWidth(170); // La tua risposta
         tabellaRecensioni.getColumnModel().getColumn(5).setPreferredWidth(80);  // Modificata
 
         // Renderer personalizzato per il pallino rosso lampeggiante nella colonna 5 ("Modificata")

@@ -64,7 +64,7 @@ public class FinestraModificaProfilo extends JDialog {
      * @param callbackAggiornamento Azione da eseguire a salvataggio completato.
      */
     public FinestraModificaProfilo(JFrame parent, ControllerTheKnife controller, Runnable callbackAggiornamento) {
-        super(parent, "Il Mio Account - Modifica Credenziali", true);
+        super(parent, "Il mio account - modifica credenziali", true);
         this.controller = controller;
         this.callbackAggiornamento = callbackAggiornamento;
         inizializzaGUI();
@@ -86,7 +86,7 @@ public class FinestraModificaProfilo extends JDialog {
         JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 12));
         header.setBackground(StileTheKnife.VERDE_THEKNIFE);
         header.add(StileTheKnife.creaLabelLogo(36));
-        JLabel lblTitolo = new JLabel("Modifica Profilo e Credenziali (" + u.getRuolo() + ")");
+        JLabel lblTitolo = new JLabel("Modifica profilo e credenziali (" + u.getRuolo() + ")");
         lblTitolo.setFont(StileTheKnife.FONT_SOTTOTITOLO);
         lblTitolo.setForeground(StileTheKnife.BIANCO);
         header.add(lblTitolo);
@@ -116,7 +116,7 @@ public class FinestraModificaProfilo extends JDialog {
         aggiungiRiga(form, gbc, 1, "Cognome *:", txtCognome);
         aggiungiRiga(form, gbc, 2, "Username / Email *:", txtUsername);
         aggiungiRiga(form, gbc, 3, "Città di domicilio *:", txtDomicilio);
-        aggiungiRiga(form, gbc, 4, "Nuova Password (opzionale):", panelNuovaPasswordConOcchio);
+        aggiungiRiga(form, gbc, 4, "Nuova password (opzionale):", panelNuovaPasswordConOcchio);
 
         gbc.gridx = 0;
         gbc.gridy = 5;

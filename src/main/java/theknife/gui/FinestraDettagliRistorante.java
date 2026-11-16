@@ -65,7 +65,7 @@ public class FinestraDettagliRistorante extends JDialog {
      * @param ristorante l'oggetto <code>Ristorante</code> da visualizzare
      */
     public FinestraDettagliRistorante(JFrame parent, ControllerTheKnife controller, Ristorante ristorante) {
-        super(parent, "Dettagli Ristorante - " + ristorante.getNome(), true);
+        super(parent, "Dettagli ristorante - " + ristorante.getNome(), true);
         this.controller = controller;
         this.ristorante = ristorante;
         inizializzaGUI();
@@ -107,10 +107,10 @@ public class FinestraDettagliRistorante extends JDialog {
         // Scheda caratteristiche del ristorante
         JPanel cardInfo = StileTheKnife.creaCardBianca();
         cardInfo.setLayout(new GridLayout(3, 2, 15, 10));
-        cardInfo.add(StileTheKnife.creaEtichetta("<html><b>Città e Nazione:</b> " + ristorante.getCitta() + " (" + ristorante.getNazione() + ")</html>"));
-        cardInfo.add(StileTheKnife.creaEtichetta("<html><b>Tipologia Cucina:</b> " + ristorante.getTipoCucina() + "</html>"));
+        cardInfo.add(StileTheKnife.creaEtichetta("<html><b>Città e nazione:</b> " + ristorante.getCitta() + " (" + ristorante.getNazione() + ")</html>"));
+        cardInfo.add(StileTheKnife.creaEtichetta("<html><b>Tipologia cucina:</b> " + ristorante.getTipoCucina() + "</html>"));
         cardInfo.add(StileTheKnife.creaEtichetta("<html><b>Indirizzo:</b> " + ristorante.getIndirizzo() + "</html>"));
-        cardInfo.add(StileTheKnife.creaEtichetta("<html><b>Fascia di Prezzo:</b> ~" + ristorante.getFasciaPrezzo() + " €</html>"));
+        cardInfo.add(StileTheKnife.creaEtichetta("<html><b>Fascia di prezzo:</b> ~" + ristorante.getFasciaPrezzo() + " €</html>"));
         cardInfo.add(StileTheKnife.creaEtichetta("<html><b>Coordinate:</b> Lat " + ristorante.getLatitudine() + ", Lon " + ristorante.getLongitudine() + "</html>"));
         cardInfo.add(StileTheKnife.creaEtichetta("<html><b>Servizi:</b> Delivery: " + (ristorante.isDelivery() ? "Sì" : "No")
                 + " | Prenotazione Online: " + (ristorante.isPrenotazioneOnline() ? "Sì" : "No") + "</html>"));
@@ -125,7 +125,7 @@ public class FinestraDettagliRistorante extends JDialog {
         JScrollPane scrollRecensioni = new JScrollPane(panelListaRecensioni);
         scrollRecensioni.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(StileTheKnife.GRIGIO_BORDO),
-                "Recensioni dei Clienti (Visualizzazione Anonima)"
+                "Recensioni dei clienti (visualizzazione anonima)"
         ));
         scrollRecensioni.getVerticalScrollBar().setUnitIncrement(16);
         panelCentro.add(scrollRecensioni, BorderLayout.CENTER);
@@ -139,8 +139,8 @@ public class FinestraDettagliRistorante extends JDialog {
 
         Utente utente = controller.getSessione().getUtenteCorrente();
         if (utente != null && utente.isCliente()) {
-            JButton btnPreferito = StileTheKnife.creaBottoneSecondario("★ Aggiungi ai Preferiti");
-            JButton btnScriviRec = StileTheKnife.creaBottonePrimario("✍ Scrivi una Recensione");
+            JButton btnPreferito = StileTheKnife.creaBottoneSecondario("★ Aggiungi ai preferiti");
+            JButton btnScriviRec = StileTheKnife.creaBottonePrimario("✍ Scrivi una recensione");
 
             btnPreferito.addActionListener(e -> {
                 if (controller.aggiungiPreferito(ristorante.getIdRistorante())) {
@@ -155,7 +155,7 @@ public class FinestraDettagliRistorante extends JDialog {
             panelSud.add(btnPreferito);
             panelSud.add(btnScriviRec);
         } else {
-            JLabel lblGuestInfo = StileTheKnife.creaEtichetta("Accedi come Cliente per salvare nei preferiti o scrivere una recensione.");
+            JLabel lblGuestInfo = StileTheKnife.creaEtichetta("Accedi come cliente per salvare nei preferiti o scrivere una recensione.");
             panelSud.add(lblGuestInfo);
         }
 
@@ -190,7 +190,7 @@ public class FinestraDettagliRistorante extends JDialog {
                 ));
 
                 String stelleStr = "★".repeat(Math.max(0, r.getStelle())) + "☆".repeat(Math.max(0, 5 - r.getStelle()));
-                JLabel lblIntestazione = new JLabel(stelleStr + "  (" + r.getStelle() + "/5)  -  Cliente Anonimo  [" + r.getDataRecensione() + "]");
+                JLabel lblIntestazione = new JLabel(stelleStr + "  (" + r.getStelle() + "/5)  -  Cliente anonimo  [" + r.getDataRecensione() + "]");
                 lblIntestazione.setFont(StileTheKnife.FONT_BOTTONE);
                 lblIntestazione.setForeground(StileTheKnife.VERDE_THEKNIFE);
 
@@ -201,7 +201,7 @@ public class FinestraDettagliRistorante extends JDialog {
                 boxRec.add(lblTesto, BorderLayout.CENTER);
 
                 if (r.getRispostaRistoratore() != null && !r.getRispostaRistoratore().isEmpty()) {
-                    JLabel lblRisp = new JLabel("<html><b>Risposta del Ristoratore:</b> " + r.getRispostaRistoratore() + "</html>");
+                    JLabel lblRisp = new JLabel("<html><b>Risposta del ristoratore:</b> " + r.getRispostaRistoratore() + "</html>");
                     lblRisp.setFont(StileTheKnife.FONT_NORMALE);
                     lblRisp.setForeground(StileTheKnife.VERDE_THEKNIFE);
                     lblRisp.setBorder(BorderFactory.createEmptyBorder(6, 15, 0, 0));
@@ -227,14 +227,14 @@ public class FinestraDettagliRistorante extends JDialog {
 
         JPanel panelInput = new JPanel(new BorderLayout(8, 8));
         JPanel rigaStelle = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        rigaStelle.add(new JLabel("Valutazione (Stelle da 1 a 5):"));
+        rigaStelle.add(new JLabel("Valutazione (stelle da 1 a 5):"));
         rigaStelle.add(cmbStelle);
 
         panelInput.add(rigaStelle, BorderLayout.NORTH);
         panelInput.add(new JScrollPane(txtCommento), BorderLayout.CENTER);
 
         int scelta = JOptionPane.showConfirmDialog(this, panelInput,
-                "Nuova Recensione per " + ristorante.getNome(),
+                "Nuova recensione per " + ristorante.getNome(),
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (scelta == JOptionPane.OK_OPTION) {
@@ -242,7 +242,7 @@ public class FinestraDettagliRistorante extends JDialog {
             int stelle = (Integer) cmbStelle.getSelectedItem();
 
             if (testo.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Inserisci un commento testuale.", "Campo Vuoto", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Inserisci un commento testuale.", "Campo vuoto", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
@@ -251,8 +251,8 @@ public class FinestraDettagliRistorante extends JDialog {
                 aggiornaRecensioniERiepilogo();
             } else {
                 JOptionPane.showMessageDialog(this,
-                        "Impossibile aggiungere la recensione.\nHai già recensito questo ristorante (puoi modificarla dalla sezione 'Le Mie Recensioni').",
-                        "Recensione Già Presente", JOptionPane.ERROR_MESSAGE);
+                        "Impossibile aggiungere la recensione.\nHai già recensito questo ristorante (puoi modificarla dalla sezione 'Le mie recensioni').",
+                        "Recensione già presente", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
