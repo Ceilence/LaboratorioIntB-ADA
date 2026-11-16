@@ -55,7 +55,7 @@ public class FinestraRegistrazione extends JDialog {
      * @param controller il controller principale per inoltrare la richiesta al server
      */
     public FinestraRegistrazione(JFrame parent, ControllerTheKnife controller) {
-        super(parent, "Registrazione Nuovo Utente - TheKnife", true);
+        super(parent, "Registrazione nuovo utente - TheKnife", true);
         this.controller = controller;
         inizializzaGUI();
     }
@@ -128,7 +128,7 @@ public class FinestraRegistrazione extends JDialog {
         panelBottoni.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, StileTheKnife.GRIGIO_BORDO));
 
         JButton btnAnnulla = StileTheKnife.creaBottoneSecondario("Annulla");
-        JButton btnConferma = StileTheKnife.creaBottonePrimario("Completa Registrazione");
+        JButton btnConferma = StileTheKnife.creaBottonePrimario("Completa registrazione");
 
         btnAnnulla.addActionListener(e -> dispose());
         btnConferma.addActionListener(e -> eseguiRegistrazione());

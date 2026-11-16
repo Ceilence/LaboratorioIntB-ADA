@@ -134,7 +134,7 @@ public class FinestraModificaProfilo extends JDialog {
         footer.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, StileTheKnife.GRIGIO_BORDO));
 
         JButton btnAnnulla = StileTheKnife.creaBottoneSecondario("Annulla");
-        JButton btnSalva = StileTheKnife.creaBottonePrimario("Salva Modifiche");
+        JButton btnSalva = StileTheKnife.creaBottonePrimario("Salva modifiche");
 
         btnAnnulla.addActionListener(e -> dispose());
         btnSalva.addActionListener(e -> salvaModifiche());
