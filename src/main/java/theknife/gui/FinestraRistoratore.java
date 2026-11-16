@@ -76,7 +76,7 @@ public class FinestraRistoratore extends JFrame {
      * @param controller il controller principale per le operazioni di backend
      */
     public FinestraRistoratore(ControllerTheKnife controller) {
-        super("TheKnife - Area Riservata Ristoratore");
+        super("TheKnife - area riservata ristoratore");
         this.controller = controller;
         inizializzaGUI();
         caricaMieiRistoranti();
