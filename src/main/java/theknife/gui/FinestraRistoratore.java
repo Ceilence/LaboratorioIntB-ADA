@@ -131,12 +131,12 @@ public class FinestraRistoratore extends JFrame {
         JPanel panelAzioniTop = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 4));
         panelAzioniTop.setOpaque(false);
 
-        JButton btnAccount = StileTheKnife.creaBottoneSecondario("👤 Il Mio Account ▾");
+        JButton btnAccount = StileTheKnife.creaBottoneSecondario("👤 Il mio account ▾");
         JPopupMenu menu = new JPopupMenu();
         menu.setBackground(StileTheKnife.BIANCO);
         menu.setBorder(BorderFactory.createLineBorder(StileTheKnife.VERDE_THEKNIFE, 2));
 
-        JMenuItem itemModificaProfilo = new JMenuItem("⚙  Modifica Profilo e Credenziali");
+        JMenuItem itemModificaProfilo = new JMenuItem("⚙  Modifica profilo e credenziali");
         itemModificaProfilo.setFont(StileTheKnife.FONT_NORMALE);
         itemModificaProfilo.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 20));
         itemModificaProfilo.addActionListener(e -> new FinestraModificaProfilo(this, controller, this::aggiornaTestoHeader).setVisible(true));
@@ -179,7 +179,7 @@ public class FinestraRistoratore extends JFrame {
      */
     private void aggiornaTestoHeader() {
         Utente u = controller.getSessione().getUtenteCorrente();
-        lblTitoloHeader.setText("Pannello Ristoratore: " + u.getNome() + " " + u.getCognome() + " (@" + u.getUsername() + ")");
+        lblTitoloHeader.setText("Pannello ristoratore: " + u.getNome() + " " + u.getCognome() + " (@" + u.getUsername() + ")");
     }
 
     /**
@@ -239,7 +239,7 @@ public class FinestraRistoratore extends JFrame {
         panel.setMinimumSize(new Dimension(320, 250));
         panel.setLayout(new BorderLayout(10, 12));
 
-        JLabel lblIntestazione = new JLabel("I Miei Ristoranti Gestiti");
+        JLabel lblIntestazione = new JLabel("I miei ristoranti gestiti");
         lblIntestazione.setFont(StileTheKnife.FONT_SOTTOTITOLO);
         lblIntestazione.setForeground(StileTheKnife.VERDE_THEKNIFE);
         panel.add(lblIntestazione, BorderLayout.NORTH);
@@ -306,7 +306,7 @@ public class FinestraRistoratore extends JFrame {
         lblRiepilogoLocale.setForeground(StileTheKnife.VERDE_THEKNIFE);
         panel.add(lblRiepilogoLocale, BorderLayout.NORTH);
 
-        String[] col = {"Stelle", "Nome Utente", "Commento", "Data", "La Tua Risposta", "Modificata"};
+        String[] col = {"Stelle", "Nome Utente", "Commento", "Data", "La tua risposta", "Modificata"};
         modelloRecensioni = new DefaultTableModel(col, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -346,7 +346,7 @@ public class FinestraRistoratore extends JFrame {
 
         panel.add(new JScrollPane(tabellaRecensioni), BorderLayout.CENTER);
 
-        JButton btnRispondi = StileTheKnife.creaBottonePrimario("💬 Rispondi / Modifica Risposta");
+        JButton btnRispondi = StileTheKnife.creaBottonePrimario("💬 Rispondi / Modifica risposta");
         btnRispondi.addActionListener(e -> rispondiOModificaRisposta());
         panel.add(btnRispondi, BorderLayout.SOUTH);
 
@@ -497,7 +497,7 @@ public class FinestraRistoratore extends JFrame {
         panel.add(boxRecCliente);
         panel.add(boxInputRisposta);
 
-        if (StileTheKnife.mostraDialogoStilizzato(this, "Risposta del Ristoratore", panel, "Pubblica Risposta", 560, 480)) {
+        if (StileTheKnife.mostraDialogoStilizzato(this, "Risposta del ristoratore", panel, "Pubblica risposta", 560, 480)) {
             String nuovaRisposta = txtRisposta.getText().trim();
             if (!nuovaRisposta.isEmpty() && controller.rispostaRecensioni(rec.getIdRecensione(), nuovaRisposta)) {
                 caricaRecensioniRistoranteSelezionato();
@@ -523,12 +523,12 @@ public class FinestraRistoratore extends JFrame {
         JTextField txtPrezzo = StileTheKnife.creaCampoTesto(10);
         JTextField txtCucina = StileTheKnife.creaCampoTesto(15);
 
-        JCheckBox chkDel = new JCheckBox("Servizio Attivo");
+        JCheckBox chkDel = new JCheckBox("Servizio attivo");
         chkDel.setFont(StileTheKnife.FONT_NORMALE);
         chkDel.setBackground(StileTheKnife.BIANCO);
         chkDel.setForeground(StileTheKnife.VERDE_THEKNIFE);
 
-        JCheckBox chkPren = new JCheckBox("Servizio Attivo");
+        JCheckBox chkPren = new JCheckBox("Servizio attivo");
         chkPren.setFont(StileTheKnife.FONT_NORMALE);
         chkPren.setBackground(StileTheKnife.BIANCO);
         chkPren.setForeground(StileTheKnife.VERDE_THEKNIFE);
@@ -551,19 +551,19 @@ public class FinestraRistoratore extends JFrame {
         }
 
         JPanel form = new JPanel(new GridLayout(10, 2, 10, 8));
-        form.add(StileTheKnife.creaEtichetta("Nome Ristorante *:")); form.add(txtNome);
+        form.add(StileTheKnife.creaEtichetta("Nome ristorante *:")); form.add(txtNome);
         form.add(StileTheKnife.creaEtichetta("Nazione (es. Italy, USA) *:")); form.add(txtNazione);
         form.add(StileTheKnife.creaEtichetta("Città *:")); form.add(txtCitta);
         form.add(StileTheKnife.creaEtichetta("Indirizzo *:")); form.add(txtIndirizzo);
         form.add(StileTheKnife.creaEtichetta("Latitudine *:")); form.add(txtLat);
         form.add(StileTheKnife.creaEtichetta("Longitudine *:")); form.add(txtLon);
-        form.add(StileTheKnife.creaEtichetta("Prezzo Medio (€) *:")); form.add(txtPrezzo);
-        form.add(StileTheKnife.creaEtichetta("Tipo di Cucina *:")); form.add(txtCucina);
-        form.add(StileTheKnife.creaEtichetta("Consegna Delivery:")); form.add(chkDel);
-        form.add(StileTheKnife.creaEtichetta("Prenotazione Online:")); form.add(chkPren);
+        form.add(StileTheKnife.creaEtichetta("Prezzo medio (€) *:")); form.add(txtPrezzo);
+        form.add(StileTheKnife.creaEtichetta("Tipo di cucina *:")); form.add(txtCucina);
+        form.add(StileTheKnife.creaEtichetta("Consegna delivery:")); form.add(chkDel);
+        form.add(StileTheKnife.creaEtichetta("Prenotazione online:")); form.add(chkPren);
 
-        String titolo = modalitaModifica ? "Modifica Ristorante: " + esistente.getNome() : "Aggiungi Nuovo Ristorante";
-        String testoBottone = modalitaModifica ? "Salva Modifiche" : "Crea Ristorante";
+        String titolo = modalitaModifica ? "Modifica ristorante: " + esistente.getNome() : "Aggiungi nuovo ristorante";
+        String testoBottone = modalitaModifica ? "Salva modifiche" : "Crea ristorante";
 
         if (StileTheKnife.mostraDialogoStilizzato(this, titolo, form, testoBottone, 520, 560)) {
             try {
@@ -599,7 +599,7 @@ public class FinestraRistoratore extends JFrame {
                     }
                 }
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Verifica che Latitudine, Longitudine e Prezzo siano numeri validi.", "Errore Formato", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Verifica che latitudine, longitudine e prezzo siano numeri validi.", "Errore formato", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -618,7 +618,7 @@ public class FinestraRistoratore extends JFrame {
         int conferma = JOptionPane.showConfirmDialog(
                 this,
                 "Sei sicuro di voler eliminare definitivamente il ristorante '" + r.getNome() + "'?",
-                "Conferma Eliminazione",
+                "Conferma eliminazione",
                 JOptionPane.YES_NO_OPTION
         );
         if (conferma == JOptionPane.YES_OPTION && controller.eliminaRistorante(r.getIdRistorante())) {

@@ -176,7 +176,7 @@ public class FinestraRegistrazione extends JDialog {
         if (nome.isEmpty() || cognome.isEmpty() || username.isEmpty() || password.isEmpty() || domicilio.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                     "Compila tutti i campi obbligatori contrassegnati con l'asterisco (*).",
-                    "Campi Mancanti", JOptionPane.WARNING_MESSAGE);
+                    "Campi mancanti", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -209,7 +209,7 @@ public class FinestraRegistrazione extends JDialog {
         } else {
             JOptionPane.showMessageDialog(this,
                     "Impossibile completare la registrazione.\nLo username '" + username + "' è già utilizzato da un altro utente.",
-                    "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
+                    "Errore di registrazione", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
