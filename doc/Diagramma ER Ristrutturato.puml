@@ -1,4 +1,5 @@
 @startdot
+!pragma layout smetana
 digraph ER_Ristrutturato {
     graph [
         label="Schema ER Ristrutturato - Database PostgreSQL \"the_knife\"\n\n"
