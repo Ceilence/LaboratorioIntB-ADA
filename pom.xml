@@ -104,6 +104,25 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Plugin per generare la documentazione Javadoc direttamente in doc/javadoc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <reportOutputDirectory>${project.basedir}/doc</reportOutputDirectory>
+                    <destDir>javadoc</destDir>
+                    <show>private</show>
+                    <author>true</author>
+                    <version>true</version>
+                    <encoding>UTF-8</encoding>
+                    <charset>UTF-8</charset>
+                    <docencoding>UTF-8</docencoding>
+                    <doclint>none</doclint>
+                    <failOnError>false</failOnError>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
