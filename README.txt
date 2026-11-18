@@ -80,9 +80,9 @@ AUTORI DEL PROGETTO:
 		   id_utente INTEGER NOT NULL REFERENCES Utenti(id_utente) ON DELETE CASCADE,
 		   id_ristorante INTEGER NOT NULL REFERENCES RistorantiTheKnife(id_ristorante) ON DELETE CASCADE,
 		   stelle INTEGER NOT NULL CHECK (stelle >= 1 AND stelle <= 5),
-		   testo TEXT NOT NULL,
+		   testo VARCHAR(400) NOT NULL,
 		   data_recensione DATE NOT NULL DEFAULT CURRENT_DATE,
-		   risposta_ristoratore TEXT,
+		   risposta_ristoratore VARCHAR(400),
 		   UNIQUE (id_utente, id_ristorante)
 	   );
 
