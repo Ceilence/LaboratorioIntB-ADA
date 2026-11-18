@@ -1,7 +1,7 @@
 @startdot
 digraph ER_Concettuale {
     graph [
-        label="Schema concettuale ER (NON Ristrutturato) - TheKnife\n\n"
+        label="Schema concettuale ER (NON ristrutturato) - TheKnife\n\n"
         labelloc="t"
         fontname="Helvetica,Arial,sans-serif"
         fontsize=16
